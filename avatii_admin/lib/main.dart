@@ -1,4 +1,4 @@
-import 'package:avatii_driver_app/Routes/routes.dart';
+import 'package:avatii_admin/Routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
