@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 // Enable CORS
 app.use(
   cors({
-    origin: `${FRONTEND_URL}`,
+    origin: `*`,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
