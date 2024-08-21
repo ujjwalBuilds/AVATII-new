@@ -3,6 +3,7 @@ import express, { json } from "express";
 import connectDb from "./config/dbconnection.js";
 import cors from "cors";
 import uploadKeRoutes from './routes/uploadRoutes.js';
+import userKeRoutes from './routes/UserRoutes.js';
 import {FRONTEND_URL} from "./constants.js"
 
 // Connect to MongoDB
@@ -28,6 +29,7 @@ app.use(
 );
 
 app.use("/api/image",uploadKeRoutes);
+app.use("/api/user",userKeRoutes);
 app.get("/",(req,res)=>{
   res.send("server is working");
 })
