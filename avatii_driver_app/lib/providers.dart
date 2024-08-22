@@ -15,3 +15,8 @@ class OtpNotifier extends StateNotifier<List<String>> {
 
   String get otp => state.join();
 }
+
+
+final userInfoProvider = StateProvider<Map<String, String>>((ref) => {});
+
+final documentProvider = StateProvider<Map<String, String>>((ref) => {});

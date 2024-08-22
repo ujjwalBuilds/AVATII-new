@@ -1,105 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:go_router/go_router.dart';
-
-// class UserInfoScreen extends StatefulWidget {
-//   const UserInfoScreen({super.key});
-
-//   @override
-//   State<UserInfoScreen> createState() => _UserInfoScreenState();
-// }
-
-// class _UserInfoScreenState extends State<UserInfoScreen> {
-//   @override
-//   Widget build(BuildContext context) {
-//     final Size screenSize = MediaQuery.of(context).size;
-//     return Scaffold(
-//       body: Padding(
-//         padding: const EdgeInsets.all(10.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             const Text('Please enter your details', style: TextStyle(color: Colors.black ,fontWeight: FontWeight.w600, fontSize: 28),),
-//             const SizedBox(height: 5),
-//             const Text('Registration process is very simple', style: TextStyle(color: Color.fromARGB(255, 21, 14, 168) ,fontWeight: FontWeight.w400, fontSize: 14),),
-//             const SizedBox(height: 20),
-//             TextField(
-//                           decoration: InputDecoration(
-//                             filled: true,
-//                             fillColor: Colors.white,
-//                             hintText: 'Enter your name',
-//                             hintStyle: const TextStyle(
-//                               color: Color.fromARGB(255, 108, 107, 107),
-//                               fontWeight: FontWeight.normal,
-//                             ),
-//                             enabledBorder: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(screenSize.width * 0.06),
-//                               borderSide: BorderSide(color: Colors.grey.withOpacity(0.5)),
-//                             ),
-//                             focusedBorder: OutlineInputBorder(
-//                               borderSide: const BorderSide(color: Colors.blueAccent),
-//                               borderRadius: BorderRadius.circular(screenSize.width * 0.06),
-//                             ),
-//                             suffixIcon: const Icon(Icons.arrow_forward_rounded),
-//                           ),
-//                           keyboardType: TextInputType.phone,
-//                         ),
-//             const SizedBox(height: 15),
-//             TextField(
-//                           decoration: InputDecoration(
-//                             filled: true,
-//                             fillColor: Colors.white,
-//                             hintText: 'Choose your city',
-//                             hintStyle: const TextStyle(
-//                               color: Color.fromARGB(255, 108, 107, 107),
-//                               fontWeight: FontWeight.normal,
-//                             ),
-//                             enabledBorder: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(screenSize.width * 0.06),
-//                               borderSide: BorderSide(color: Colors.grey.withOpacity(0.5)),
-//                             ),
-//                             focusedBorder: OutlineInputBorder(
-//                               borderSide: const BorderSide(color: Colors.blueAccent),
-//                               borderRadius: BorderRadius.circular(screenSize.width * 0.06),
-//                             ),
-//                             suffixIcon: const Icon(Icons.arrow_forward_rounded),
-//                           ),
-//                           keyboardType: TextInputType.phone,
-//                         ),
-//             const SizedBox(height: 50),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: [
-//                 SizedBox(
-//                   width: 100,
-//                   child: ElevatedButton(
-//                     onPressed: (){
-//                       GoRouter.of(context).push('/home-screen');
-//                     },
-//                     style: ElevatedButton.styleFrom(
-//                           backgroundColor: Color(0xFF000000),
-//                           padding: EdgeInsets.symmetric(vertical: 15),
-//                           shape: RoundedRectangleBorder(
-//                             borderRadius: BorderRadius.circular(15),
-//                           ),
-//                     ),
-//                     child: Text('Next',style: TextStyle(
-//                             fontSize: 18,
-//                             color: Colors.white,
-//                           ),)),
-//                 )
-//               ],
-//             )
-        
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -159,6 +57,50 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                 suffixIcon: const Icon(Icons.person,color: Colors.grey,),
               ),
               keyboardType: TextInputType.name,
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                hintText: 'Enter your age',
+                hintStyle: const TextStyle(
+                  color: Color.fromARGB(255, 108, 107, 107),
+                  fontWeight: FontWeight.normal,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(screenSize.width * 0.06),
+                  borderSide: BorderSide(color: Colors.grey.withOpacity(0.5)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.blueAccent),
+                  borderRadius: BorderRadius.circular(screenSize.width * 0.06),
+                ),
+                suffixIcon: const Icon(Icons.person,color: Colors.grey,),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                hintText: 'Enter your mobile number',
+                hintStyle: const TextStyle(
+                  color: Color.fromARGB(255, 108, 107, 107),
+                  fontWeight: FontWeight.normal,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(screenSize.width * 0.06),
+                  borderSide: BorderSide(color: Colors.grey.withOpacity(0.5)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.blueAccent),
+                  borderRadius: BorderRadius.circular(screenSize.width * 0.06),
+                ),
+                suffixIcon: const Icon(Icons.person,color: Colors.grey,),
+              ),
+              keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 15),
             DropdownButtonFormField<String>(
