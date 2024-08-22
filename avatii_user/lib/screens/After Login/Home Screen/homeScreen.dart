@@ -33,17 +33,51 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _checkLocationPermission();
+  }
+
+  Future<void> _checkLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permission denied
+        setState(() {
+          _loading = false;
+        });
+        return;
+      }
+    }
+    
+    if (permission == LocationPermission.deniedForever) {
+      // Permission permanently denied
+      setState(() {
+        _loading = false;
+      });
+      return;
+    }
+
+    // Permission granted, get user location
     _getUserLocation();
   }
 
+
   void _getUserLocation() async {
+    try {
     Position position = await Geolocator.getCurrentPosition(
         // ignore: deprecated_member_use
         desiredAccuracy: LocationAccuracy.high);
+
     setState(() {
       _initialPosition = LatLng(position.latitude, position.longitude);
       _loading = false;
     });
+    } catch (e) {
+      print("Error getting location: $e");
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   void _onLocationButtonPressed(String location) {
