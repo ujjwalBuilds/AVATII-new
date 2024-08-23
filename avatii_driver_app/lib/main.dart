@@ -1,10 +1,9 @@
 
+import 'package:avatii_driver_app/provider/DriverProvider.dart';
 import 'package:avatii_driver_app/provider/Register_provider.dart';
-import 'package:avatii_driver_app/screens/Before%20Login/User%20Info/userInfo.dart';
+import 'package:avatii_driver_app/screens/Before%20Login/Onboarding1/onboardingView.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-//import 'package:flutter_riverpod/flutter_riverpod.dart';
-//import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -20,7 +19,7 @@ class MainApp extends StatelessWidget {
       
       providers: [
        ChangeNotifierProvider(create: (context) => DriverauthProvider()),
-
+         ChangeNotifierProvider(create: (context) =>DriverProvider()),
 
       ],
       child: GetMaterialApp(
@@ -31,7 +30,7 @@ class MainApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
           fontFamily: 'Poppins',
         ),
-        home: UserInfoScreen(),
+        home: OnboardingView(),
 
 
 

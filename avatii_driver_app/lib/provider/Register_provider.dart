@@ -98,7 +98,7 @@ await registerDriver(driver);
 
 
  Future<void> loginDriver(String phoneNumber) async {
-    final url = Uri.parse('https://your-api-url.com/loginDriver'); // Replace with your actual API URL
+    final url = Uri.parse(Appurls.LoginDriver); // Replace with your actual API URL
 
     try {
       final response = await http.post(
@@ -111,11 +111,15 @@ await registerDriver(driver);
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
+print('Login successfull.................................');
+print(response.body);
+
 
         _driverId = responseData['_id'];
         _driverName = responseData['name'];
         _phoneNumber = responseData['PhoneNumber'];
         _token = responseData['token'];
+        _approved=responseData['approved'];
 
         // Save data locally
         final prefs = await SharedPreferences.getInstance();
@@ -123,6 +127,8 @@ await registerDriver(driver);
         await prefs.setString('driverId', _driverId!);
         await prefs.setString('driverName', _driverName!);
         await prefs.setString('phoneNumber', _phoneNumber!);
+        await prefs.setInt('approved',_approved!);
+
 
         notifyListeners();
       } else {
@@ -140,6 +146,7 @@ await registerDriver(driver);
   String? _driverId;
   String? _driverName;
   String? _phoneNumber;
+  int? _approved;
 
   String? get token => _token;
   String? get driverId => _driverId;

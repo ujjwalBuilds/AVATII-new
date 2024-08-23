@@ -103,7 +103,7 @@ export const LoginDriver = asyncHandler(async (req, res) => {
       approved: driver.approved
     });
   } catch (err) {
-    return res.status(500).json({ message: `Internal Server error ${err}` });
+    return res.status(500).json({ message: `Internal Server error ${err}`});
   }
 });
 
@@ -179,9 +179,9 @@ export const deleteDriver = asyncHandler(async (req, res) => {
 
 export const ValidateDriver = asyncHandler(async (req, res) => {
   try {
-    const { id,operation } = req.body;
+    const { id } = req.body;
 
-    if (!id || !operation) {
+    if (!id) {
       return res.status(400).json({ message: "Phone Number is missing" });
     }
 
@@ -191,7 +191,7 @@ export const ValidateDriver = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Driver not found" });
     }
 
-    driver.approved = operation;
+    driver.approved = 1;
     await driver.save();
     return res.status(200).json({ message: "Driver approved succesfully" });
   } catch (err) {

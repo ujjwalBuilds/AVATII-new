@@ -1,6 +1,9 @@
 import 'package:avatii/constants/imageStrings.dart';
+import 'package:avatii/screens/Before%20Login/Onboarding1/onboardingView.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+//import 'package:go_router/go_router.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -17,7 +20,9 @@ class _SplashScreenState extends State<SplashScreen> {
   _navigateToHome() async {
     await Future.delayed(Duration(seconds: 3), () {});
     // Use GoRouter for navigation
-    context.go('/onboard');
+    //context.go('/onboard');
+  Get.to(()=>OnboardingView());
+  
   }
 
   @override

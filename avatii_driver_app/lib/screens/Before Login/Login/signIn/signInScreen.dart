@@ -1,6 +1,7 @@
 import 'package:avatii_driver_app/constants/helper_functions.dart';
 import 'package:avatii_driver_app/provider/Register_provider.dart';
 import 'package:avatii_driver_app/screens/After%20Login/Home%20Screen/homeScreen.dart';
+import 'package:avatii_driver_app/screens/Approval_screen.dart';
 import 'package:avatii_driver_app/screens/Before%20Login/Login/otp/sendOtp.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,9 +24,12 @@ void onsubmit(){
   Provider.of<DriverauthProvider>(context, listen: false).loginDriver(
     _phoneNumber.text).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Application Submitted successfully")),
+      
+        SnackBar(
+          backgroundColor: Colors.blue,
+          content: Text("Login successfully")),
       );
-      Get.offAll(() => HomeScreen());
+      Get.offAll(() => StatusCheckPage());
     }).catchError((onError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(onError.toString())),
@@ -116,7 +120,7 @@ void onsubmit(){
                       ElevatedButton(
                         onPressed: () {
                          // GoRouter.of(context).push('/otp-login');
-                        Get.to(()=>OtpLoginScreen());
+                      onsubmit();
                     
                         
                         },

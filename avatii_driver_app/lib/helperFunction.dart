@@ -6,11 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Helperfunction {
-  // static Future<String?> getUserId() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   String? userId = prefs.getString('userId');
-  //   return userId;
-  // }
 
 //  static Future<String?> uploadImage(File? image) async {
 //     try{
@@ -48,7 +43,7 @@ static Future<String?> uploadImage(File? image) async {
   }
 
   try {
-    var uri = Uri.parse('http://192.168.0.104:3002/api/image/upload');
+    var uri = Uri.parse(Appurls.uploadimageurl);
     var request = http.MultipartRequest('POST', uri);
 
     request.files.add(await http.MultipartFile.fromPath('image', image.path));

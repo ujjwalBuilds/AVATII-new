@@ -1,5 +1,9 @@
+import 'package:avatii_driver_app/screens/Before%20Login/Login/signIn/signInScreen.dart';
 import 'package:avatii_driver_app/screens/Before%20Login/Onboarding1/onboardingItems.dart';
+import 'package:avatii_driver_app/screens/Before%20Login/User%20Info/userInfo.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -84,7 +88,7 @@ class _OnboardingViewState extends State<OnboardingView> {
               width: MediaQuery.of(context).size.width * 0.9,
               height: 55,
               child: TextButton(
-                onPressed: () => GoRouter.of(context).push('/user-info'),
+                onPressed: () => Get.to(()=>UserInfoScreen()),
                 child: const Text(
                   "Register",
                   style: TextStyle(color: Colors.black),
@@ -100,7 +104,7 @@ class _OnboardingViewState extends State<OnboardingView> {
               width: MediaQuery.of(context).size.width * 0.9,
               height: 55,
               child: TextButton(
-                onPressed: () => GoRouter.of(context).push('/sign-in'),
+                onPressed: () => Get.to(()=>SignInScreen()),
                 child: const Text("Login", style: TextStyle(color: Colors.white)),
               ),
             ),
