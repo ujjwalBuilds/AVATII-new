@@ -48,7 +48,7 @@ static Future<String?> uploadImage(File? image) async {
   }
 
   try {
-    var uri = Uri.parse('http://192.168.0.104:3002/api/image/upload');
+    var uri = Uri.parse(Appurls.uploadimageurl);
     var request = http.MultipartRequest('POST', uri);
 
     request.files.add(await http.MultipartFile.fromPath('image', image.path));
