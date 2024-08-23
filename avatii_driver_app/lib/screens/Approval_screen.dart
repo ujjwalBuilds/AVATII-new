@@ -1,5 +1,6 @@
 import 'package:avatii_driver_app/screens/After%20Login/Home%20Screen/homeScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StatusCheckPage extends StatefulWidget {
@@ -30,9 +31,10 @@ class _StatusCheckPageState extends State<StatusCheckPage> {
   }
 
   void _navigateToHomeScreen() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => HomeScreen()), // Replace with your actual HomeScreen widget
-    );
+    // Navigator.of(context).pushReplacement(
+    //   MaterialPageRoute(builder: (context) => HomeScreen()), // Replace with your actual HomeScreen widget
+    // );
+    Get.to(() => HomeScreen());
   }
 
   @override
@@ -114,4 +116,3 @@ class _StatusCheckPageState extends State<StatusCheckPage> {
     Navigator.of(context).pop(true);
   }
 }
-

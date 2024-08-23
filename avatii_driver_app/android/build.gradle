@@ -1,5 +1,6 @@
 allprojects {
     repositories {
+        // ext.kotlin_version = '1.9.25'
         google()
         mavenCentral()
     }

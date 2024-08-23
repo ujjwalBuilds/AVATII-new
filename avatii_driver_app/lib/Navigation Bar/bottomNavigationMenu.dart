@@ -3,7 +3,7 @@ import 'package:avatii_driver_app/svgIconWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class NavigationMenu extends ConsumerWidget {
+class NavigationMenu extends StatefulWidget {
   final Function(int) onItemTapped;
 
   const NavigationMenu({
@@ -12,10 +12,14 @@ class NavigationMenu extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selectedIndex = ref.watch(selectedIndexProvider);
-    
-    
+  _NavigationMenuState createState() => _NavigationMenuState();
+}
+
+class _NavigationMenuState extends State<NavigationMenu> {
+  int selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 11, bottom: 10),
       child: Container(
@@ -42,8 +46,10 @@ class NavigationMenu extends ConsumerWidget {
             selectedItemColor: Colors.black,
             unselectedItemColor: Colors.black,
             onTap: (index) {
-              ref.read(selectedIndexProvider.notifier).state = index;
-              onItemTapped(index);
+              setState(() {
+                selectedIndex = index;
+              });
+              widget.onItemTapped(index);
             },
             items: [
               BottomNavigationBarItem(
