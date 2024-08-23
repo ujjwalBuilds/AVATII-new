@@ -12,31 +12,67 @@ class Helperfunction {
   //   return userId;
   // }
 
- static Future<String?> uploadImage(File? image) async {
-    if (image != Null) {
-      print("image is here");
-    }
-    var uri =
-        Uri.parse(Appurls.uploadimageurl);
+//  static Future<String?> uploadImage(File? image) async {
+//     try{
+//     if (image != Null) {
+//       print("image is here");
+//     }
+//     var uri =
+//         Uri.parse(Appurls.uploadimageurl);
 
+//     var request = http.MultipartRequest('POST', uri);
+//     request.files.add(await http.MultipartFile.fromPath('image', image!.path));
+
+//     var response = await request.send();
+//     var responseData = await http.Response.fromStream(response);
+
+//     if (response.statusCode == 200) {
+//       var jsonResponse = json.decode(responseData.body);
+//       print("succesfull");
+//       print(jsonResponse['imageUrl']);
+//       return jsonResponse['imageUrl'];
+//     } else {
+//       print('${response.statusCode}');
+//       print("Failed${responseData.body}");
+      
+//     }
+//   }catch(error){
+//   throw Exception(error);
+//  }
+
+//  }
+static Future<String?> uploadImage(File? image) async {
+  if (image == null) {
+    print("No image selected");
+    return null;
+  }
+
+  try {
+    var uri = Uri.parse('http://192.168.0.104:3002/api/image/upload');
     var request = http.MultipartRequest('POST', uri);
-    request.files.add(await http.MultipartFile.fromPath('image', image!.path));
+
+    request.files.add(await http.MultipartFile.fromPath('image', image.path));
 
     var response = await request.send();
     var responseData = await http.Response.fromStream(response);
 
+    print("Response Status Code: ${response.statusCode}");
+    print("Response Body: ${responseData.body}");
+
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(responseData.body);
-      print("succesfull");
-      print(jsonResponse['imageUrl']);
+      print("Image uploaded successfully");
+      print("Image URL: ${jsonResponse['imageUrl']}");
       return jsonResponse['imageUrl'];
     } else {
-      print("Failed${responseData.body}");
+      print("Failed to upload image. Status code: ${response.statusCode}");
+      print("Response: ${responseData.body}");
+      return null;
     }
-  }
-
-
-
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }}
 
 
 

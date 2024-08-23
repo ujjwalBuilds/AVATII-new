@@ -16,7 +16,7 @@ const DriverSchema = new Schema({
     },
     profileUrl: String,
     status: { type: Boolean, default: false },
-    approved: { type: Boolean, default: false }
+    approved: { type: Number, default: 0 }
 }, { timestamps: true });
 
 const Driver = model("Driver", DriverSchema);

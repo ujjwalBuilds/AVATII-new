@@ -1,12 +1,43 @@
+import 'package:avatii_driver_app/constants/helper_functions.dart';
+import 'package:avatii_driver_app/provider/Register_provider.dart';
+import 'package:avatii_driver_app/screens/After%20Login/Home%20Screen/homeScreen.dart';
+import 'package:avatii_driver_app/screens/Before%20Login/Login/otp/sendOtp.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
+//import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SignInScreen extends ConsumerWidget {
+class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+TextEditingController _phoneNumber=TextEditingController();
+
+void onsubmit(){
+  Provider.of<DriverauthProvider>(context, listen: false).loginDriver(
+    _phoneNumber.text).then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Application Submitted successfully")),
+      );
+      Get.offAll(() => HomeScreen());
+    }).catchError((onError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(onError.toString())),
+      );
+    });
+
+
+
+}
+
+  @override
+  Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -57,7 +88,9 @@ class SignInScreen extends ConsumerWidget {
                       ),
                       SizedBox(height: screenSize.height * 0.03),
                       TextField(
+                        controller:_phoneNumber ,
                         decoration: InputDecoration(
+                          
                           filled: true,
                           fillColor: Colors.white,
                           hintText: 'Enter Mobile number',
@@ -82,7 +115,10 @@ class SignInScreen extends ConsumerWidget {
                       // Continue Button
                       ElevatedButton(
                         onPressed: () {
-                          GoRouter.of(context).push('/otp-login');
+                         // GoRouter.of(context).push('/otp-login');
+                        Get.to(()=>OtpLoginScreen());
+                    
+                        
                         },
                         style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.all<Color>(const Color(0xFF000000)),

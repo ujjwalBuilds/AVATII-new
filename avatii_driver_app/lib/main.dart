@@ -1,9 +1,14 @@
-import 'package:avatii_driver_app/Routes/routes.dart';
+
+import 'package:avatii_driver_app/provider/Register_provider.dart';
+import 'package:avatii_driver_app/screens/Before%20Login/User%20Info/userInfo.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
+//import 'package:flutter_riverpod/flutter_riverpod.dart';
+//import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(ProviderScope(child: const MainApp()));
+  runApp( MainApp());
 }
 
 class MainApp extends StatelessWidget {
@@ -11,12 +16,29 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Poppins',
-      ),
-      routerConfig: router, 
-    );
+    return MultiProvider(
+      
+      providers: [
+       ChangeNotifierProvider(create: (context) => DriverauthProvider()),
+
+
+      ],
+      child: GetMaterialApp(
+ title: 'Registration Form',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          scaffoldBackgroundColor: Colors.white,
+          fontFamily: 'Poppins',
+        ),
+        home: UserInfoScreen(),
+
+
+
+),
+      
+      
+      )
+      ;
   }
 }
