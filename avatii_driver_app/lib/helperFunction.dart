@@ -6,11 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Helperfunction {
-  // static Future<String?> getUserId() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   String? userId = prefs.getString('userId');
-  //   return userId;
-  // }
 
  static Future<String?> uploadImage(File? image) async {
     if (image != Null) {
