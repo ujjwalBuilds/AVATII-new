@@ -262,6 +262,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.10+1"
+  flutter_svprogresshud:
+    dependency: "direct main"
+    description:
+      name: flutter_svprogresshud
+      sha256: a4c13a582c7de0eec003fe88e8444ca8041ad004e5c4eb323f6ade9ebae91285
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
