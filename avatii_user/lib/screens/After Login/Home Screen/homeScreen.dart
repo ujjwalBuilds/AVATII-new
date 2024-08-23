@@ -27,7 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
   GoogleMapController? _mapController;
   LatLng _initialPosition = const LatLng(0, 0);
   bool _loading = true;
-
+  String _paymentMode = 'Cash';
+  String? _selectedRide;
   final TextEditingController _destinationController = TextEditingController();
 
   @override
@@ -48,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return;
       }
     }
-    
+
     if (permission == LocationPermission.deniedForever) {
       // Permission permanently denied
       setState(() {
@@ -61,17 +62,16 @@ class _HomeScreenState extends State<HomeScreen> {
     _getUserLocation();
   }
 
-
   void _getUserLocation() async {
     try {
-    Position position = await Geolocator.getCurrentPosition(
-        // ignore: deprecated_member_use
-        desiredAccuracy: LocationAccuracy.high);
+      Position position = await Geolocator.getCurrentPosition(
+          // ignore: deprecated_member_use
+          desiredAccuracy: LocationAccuracy.high);
 
-    setState(() {
-      _initialPosition = LatLng(position.latitude, position.longitude);
-      _loading = false;
-    });
+      setState(() {
+        _initialPosition = LatLng(position.latitude, position.longitude);
+        _loading = false;
+      });
     } catch (e) {
       print("Error getting location: $e");
       setState(() {
@@ -208,14 +208,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             const SizedBox(height: 20),
                             ElevatedButton(
-                              onPressed: () => _sheetaglaneeche(),
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: const Size(350, 50),
-                                backgroundColor: Colors.black,
-                                elevation: 1,
-                              ),
-                              child: const Text('Continue', style: TextStyle(color: Colors.white),)
-                            ),
+                                onPressed: () => _sheetaglaneeche(),
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: const Size(350, 50),
+                                  backgroundColor: Colors.black,
+                                  elevation: 1,
+                                ),
+                                child: const Text(
+                                  'Continue',
+                                  style: TextStyle(color: Colors.white),
+                                )),
                             const SizedBox(height: 20),
                             const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 12.0),
@@ -250,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _sheetaglaneeche() {
+  void _searchdriver() {
     showMaterialModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -264,41 +266,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
               child: Container(
-                height: 450,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          children: [
-                            const Align(
-                              alignment: Alignment.topCenter,
-                              child: Padding(
-                                padding: EdgeInsets.only(top: 12, bottom: 6),
-                                child: Text(
-                                  'Available rides',
-                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                                ),
-                              ),
-                            ),
-                            Divider(
-                              indent: 17,
-                              endIndent: 17,
-                              color: Colors.grey.shade300,
-                            ),
-                            const SizedBox(height: 10),
-                            _buildrides(rideType: 'Avatii X',price: '₹254.66',time: '8:15pm',distance: '4 min away',details: 'Private • Most popular',image: const AssetImage(Aimages.hatchback)),
-                            _buildrides(rideType: 'Avatii XL',price: '₹290.57',time: '8:15pm',distance: '3 min away',details: 'Private • Popular',image: const AssetImage(Aimages.sedan)),
-                            _buildrides(rideType: 'Avatii Lux',price: '₹350.13',time: '8:15pm',distance: '10 min away',details: 'Private • Very popular',image: const AssetImage(Aimages.hatchback)),
-                            _buildrides(rideType: 'Avatii Auto',price: '₹180.45',time: '8:15pm',distance: '2 min away',details: 'Private • Popular',image: const AssetImage(Aimages.sedan)),
-                            _buildrides(rideType: 'Avatii Moto',price: '₹120.37',time: '8:15pm',distance: '5 min away',details: 'Private • Very popular',image: const AssetImage(Aimages.hatchback)),
-                            _buildrides(rideType: 'Avatii Share',price: '₹130.75',time: '8:15pm',distance: '20 min away',details: 'Shared • Less popular',image: const AssetImage(Aimages.sedan)),
-                          ],
-                        ),
+                height: 500, // Increased height to accommodate new widgets
+                child: const Center(
+                  child: Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(color: Colors.black),
+                          SizedBox(height: 10),
+                          Text(
+                            'Searching for Drivers...',
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -306,92 +290,237 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
-}
+  }
 
-Widget _buildSavedPlace(String name, String address, String distance) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-    child: Row(
-      children: [
-        const Icon(Icons.access_time, color: Colors.grey),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(address, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-            ],
-          ),
-        ),
-        Text(distance, style: const TextStyle(color: Colors.grey)),
-      ],
-    ),
-  );
-}
+  void _sheetaglaneeche() {
+    showMaterialModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StatefulBuilder(
+        builder: (BuildContext context, StateSetter setModalState) {
+          return ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+            child: SingleChildScrollView(
+              child: Container(
+                color: const Color(0xFFF2F2F5),
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: Container(
+                    height: 500,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                const Align(
+                                  alignment: Alignment.topCenter,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(top: 12, bottom: 6),
+                                    child: Text(
+                                      'Available rides',
+                                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                ),
+                                Divider(
+                                  indent: 17,
+                                  endIndent: 17,
+                                  color: Colors.grey.shade300,
+                                ),
+                                const SizedBox(height: 10),
+                                GestureDetector(
+                                  onTap: () {
+                                    setModalState(() {
+                                      _selectedRide = 'Avatii Cab';
+                                    });
+                                  },
+                                  child: _buildrides(
+                                    rideType: 'Avatii Cab',
+                                    price: '₹254.66',
+                                    time: '8:15pm',
+                                    distance: '4 min away',
+                                    details: 'Private • Most popular',
+                                    image: const AssetImage(Aimages.hatchback),
+                                    isSelected: _selectedRide == 'Avatii Cab',
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                GestureDetector(
+                                  onTap: () {
+                                    setModalState(() {
+                                      _selectedRide = 'Avatii Auto';
+                                    });
+                                  },
+                                  child: _buildrides(
+                                    rideType: 'Avatii Auto',
+                                    price: '₹290.57',
+                                    time: '8:15pm',
+                                    distance: '3 min away',
+                                    details: 'Private • Popular',
+                                    image: const AssetImage(Aimages.auto),
+                                    isSelected: _selectedRide == 'Avatii Auto',
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                GestureDetector(
+                                  onTap: () {
+                                    setModalState(() {
+                                      _selectedRide = 'Avatii Bike';
+                                    });
+                                  },
+                                  child: _buildrides(
+                                    rideType: 'Avatii Bike',
+                                    price: '₹350.13',
+                                    time: '8:15pm',
+                                    distance: '10 min away',
+                                    details: 'Private • Very popular',
+                                    image: const AssetImage(Aimages.bike),
+                                    isSelected: _selectedRide == 'Avatii Bike',
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                DropdownButton<String>(
+                                  value: _paymentMode,
+                                  onChanged: (String? newValue) {
+                                    setModalState(() {
+                                      _paymentMode = newValue!;
+                                    });
+                                  },
+                                  items: <String>[
+                                    'Cash',
+                                    'Online'
+                                  ].map<DropdownMenuItem<String>>((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                ),
+                                const SizedBox(height: 10),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 50,
+                                    child: ElevatedButton(
+                                      onPressed: () => _searchdriver(),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.black,
+                                      ),
+                                      child: Text('Search for ride', style: TextStyle(color: Colors.white)),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 
-Widget _buildrides({
-  required String rideType,
-  required String price,
-  required String time,
-  required String distance,
-  required String details,
-  required ImageProvider image,
-}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-    child: Row(
-      children: [
-        Image(
-          image: image,
-          width: 50,
-          height: 50,
-          fit: BoxFit.contain,
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    rideType,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    price,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Text(
-                    time,
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    distance,
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text(
-                details,
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-            ],
+  Widget _buildrides({
+    required String rideType,
+    required String price,
+    required String time,
+    required String distance,
+    required String details,
+    required ImageProvider image,
+    required bool isSelected,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: isSelected ? Colors.blue : Colors.transparent, width: 2),
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.white,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        children: [
+          Image(
+            image: image,
+            width: 50,
+            height: 50,
+            fit: BoxFit.contain,
           ),
-        ),
-      ],
-    ),
-  );
-}
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      rideType,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      price,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      time,
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      distance,
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  details,
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSavedPlace(String name, String address, String distance) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        children: [
+          const Icon(Icons.access_time, color: Colors.grey),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(address, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+              ],
+            ),
+          ),
+          Text(distance, style: const TextStyle(color: Colors.grey)),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -475,9 +604,15 @@ Widget _buildrides({
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Where would you go?', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w400),),
+                              Text(
+                                'Where would you go?',
+                                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w400),
+                              ),
                               SizedBox(width: 8),
-                              Icon(Icons.location_on_rounded, color: Colors.grey,),
+                              Icon(
+                                Icons.location_on_rounded,
+                                color: Colors.grey,
+                              ),
                             ],
                           ),
                         ),
@@ -532,7 +667,11 @@ Widget _buildrides({
                               });
                             },
                             isExpanded: true,
-                            icon: const Icon(Icons.location_on_outlined, color: Color.fromARGB(255, 37, 33, 33), size: 25,),
+                            icon: const Icon(
+                              Icons.location_on_outlined,
+                              color: Color.fromARGB(255, 37, 33, 33),
+                              size: 25,
+                            ),
                             dropdownColor: Colors.white,
                             underline: const SizedBox(),
                             style: const TextStyle(
