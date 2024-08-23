@@ -70,6 +70,7 @@ export const RegisterDriver = asyncHandler(async (req, res) => {
       name: createdDriver.name,
       PhoneNumber: createdDriver.PhoneNumber,
       token,
+      approved: driver.approved
     });
   } catch (err) {
     return res.status(500).json({ message: `Internal Server error ${err}` });
@@ -99,6 +100,7 @@ export const LoginDriver = asyncHandler(async (req, res) => {
       name: driver.name,
       PhoneNumber: driver.PhoneNumber,
       token,
+      approved: driver.approved
     });
   } catch (err) {
     return res.status(500).json({ message: `Internal Server error ${err}` });
