@@ -280,11 +280,14 @@
 
 
 import 'package:avatii_driver_app/Navigation%20Bar/bottomNavigationBar.dart';
+import 'package:avatii_driver_app/provider/DriverProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:location/location.dart';
 import 'dart:async';
+
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -389,14 +392,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         actions: [
           Switch(
             value: _isOnline,
-            onChanged: (value) {
+            onChanged: (value) async {
               setState(() {
                 _isOnline = value;
-                if (_isOnline) {
-                  _startAnimation();
-                  _showRideDetailsPopup();
-                }
               });
+
+              if (_isOnline) {
+                // Call the provider's method to change the driver's status
+                await Provider.of<DriverProvider>(context, listen: false).changeDriverStatus();
+                _startAnimation();
+              }
             },
             activeTrackColor: Colors.blue,
             activeColor: Colors.white,

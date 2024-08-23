@@ -1,16 +1,17 @@
 import 'package:avatii/constants/imageStrings.dart';
+import 'package:avatii/providers.dart';
+import 'package:avatii/screens/After%20Login/Home%20Screen/homeScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import '../../../../providers.dart';
+import 'package:get/get.dart';
 
-class OtpLoginScreen extends ConsumerWidget {
+
+class OtpLoginScreen extends StatelessWidget {
   const OtpLoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final otpState = ref.watch(otpProvider);
-    final otpNotifier = ref.read(otpProvider.notifier);
+  Widget build(BuildContext context) {
+    // final otpState = ref.watch(otpProvider);
+    // final otpNotifier = ref.read(otpProvider.notifier);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F5),
@@ -59,12 +60,12 @@ class OtpLoginScreen extends ConsumerWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(6, (index) {
-                    return _buildOtpField(context, otpNotifier, index, otpState[index]);
-                  }),
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: List.generate(6, (index) {
+                // //    return _buildOtpField(context, otpNotifier, index, otpState[index]);
+                //   }),
+                // ),
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -105,9 +106,9 @@ class OtpLoginScreen extends ConsumerWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      final otp = otpNotifier.state.join();
+                      // final otp = otpNotifier.state.join();
                       // TODO: OTP LOGIC
-                      context.go('/home-screen');
+                      Get.to(()=>HomeScreen());
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF000000),

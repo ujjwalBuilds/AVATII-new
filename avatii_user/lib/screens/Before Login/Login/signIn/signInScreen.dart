@@ -1,4 +1,7 @@
+import 'package:avatii/screens/Before%20Login/Login/otp/sendOtp.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -82,7 +85,9 @@ class SignInScreen extends ConsumerWidget {
                       // Continue Button
                       ElevatedButton(
                         onPressed: () {
-                          GoRouter.of(context).push('/otp-login');
+                         // GoRouter.of(context).push('/otp-login');
+                        Get.to(()=>OtpLoginScreen());
+                        
                         },
                         style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.all<Color>(const Color(0xFF000000)),
