@@ -1,6 +1,8 @@
 // import 'package:avatii_driver_app/Navigation%20Bar/bottomNavigationBar.dart';
 // import 'package:flutter/material.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:iconsax/iconsax.dart';
+// import 'package:location/location.dart';
 // import 'dart:async';
 
 // class HomeScreen extends StatefulWidget {
@@ -21,12 +23,38 @@
 //   Timer? _popupTimer;
 //   AnimationController? _animationController;
 
+//   Completer<GoogleMapController> _mapController = Completer();
+//   LocationData? _currentLocation;
+//   late Location _locationService;
+//   Marker? _marker;
+
 //   @override
 //   void initState() {
 //     super.initState();
 //     _animationController = AnimationController(
 //       duration: const Duration(seconds: 5),
 //       vsync: this,
+//     );
+//     _locationService = Location();
+//     _initializeLocation();
+//   }
+
+//   Future<void> _initializeLocation() async {
+//     final locationData = await _locationService.getLocation();
+//     setState(() {
+//       _currentLocation = locationData;
+//       _marker = Marker(
+//         markerId: MarkerId("current_location"),
+//         position: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+//       );
+//     });
+
+//     final controller = await _mapController.future;
+//     controller.animateCamera(
+//       CameraUpdate.newLatLngZoom(
+//         LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+//         14.0,
+//       ),
 //     );
 //   }
 
@@ -46,6 +74,7 @@
 //   Widget build(BuildContext context) {
 //     return Scaffold(
 //       appBar: AppBar(
+//         automaticallyImplyLeading: false,
 //         backgroundColor: Colors.black,
 //         title: Text(
 //           'Avatii',
@@ -75,14 +104,23 @@
 //       ),
 //       body: Stack(
 //         children: [
-//           Image.asset(
-//             'assets/images/map_placeholder.png',
-//             fit: BoxFit.cover,
-//             width: double.infinity,
-//             height: double.infinity,
-//           ),
+//           if (_currentLocation != null)
+//             GoogleMap(
+//               initialCameraPosition: CameraPosition(
+//                 target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+//                 zoom: 14.0,
+//               ),
+//               markers: _marker != null ? {_marker!} : {},
+//               myLocationEnabled: true,
+//               onMapCreated: (GoogleMapController controller) {
+//                 _mapController.complete(controller);
+//               },
+//             )
+//           else
+//             Center(child: CircularProgressIndicator()),
+
 //           // Positioned widget for bottom navigation bar
-//            Positioned(
+//           Positioned(
 //             bottom: 0,
 //             left: 0,
 //             right: 0,
@@ -240,6 +278,7 @@
 // }
 
 
+
 import 'package:avatii_driver_app/Navigation%20Bar/bottomNavigationBar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -279,16 +318,22 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
     _locationService = Location();
     _initializeLocation();
+
+    _locationService.onLocationChanged.listen((LocationData newLocation) {
+      if (mounted) {
+        setState(() {
+          _currentLocation = newLocation;
+          _updateMarker(newLocation);
+        });
+      }
+    });
   }
 
   Future<void> _initializeLocation() async {
     final locationData = await _locationService.getLocation();
     setState(() {
       _currentLocation = locationData;
-      _marker = Marker(
-        markerId: MarkerId("current_location"),
-        position: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-      );
+      _updateMarker(locationData);
     });
 
     final controller = await _mapController.future;
@@ -298,6 +343,25 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         14.0,
       ),
     );
+  }
+
+  Future<void> _updateMarker(LocationData newLocation) async {
+    final heading = newLocation.heading ?? 0.0; // Get the heading (direction)
+    
+    final BitmapDescriptor rotatedMarker = await BitmapDescriptor.asset(
+  ImageConfiguration(size: Size(120, 60)), // Adjust size as needed
+  'assets/images/car-icon.png',
+);
+
+    setState(() {
+      _marker = Marker(
+        markerId: MarkerId("current_location"),
+        position: LatLng(newLocation.latitude!, newLocation.longitude!),
+        icon: rotatedMarker,
+        rotation: heading, // Rotate the marker according to the heading
+        anchor: Offset(0.5, 0.5), // Center the marker image
+      );
+    });
   }
 
   @override
@@ -316,6 +380,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.black,
         title: Text(
           'Avatii',
