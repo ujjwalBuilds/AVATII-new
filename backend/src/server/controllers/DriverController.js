@@ -55,7 +55,7 @@ export const RegisterDriver = asyncHandler(async (req, res) => {
       drivingLicense,
       profileUrl,
       status: false,
-      approved: false,
+      approved: 0,
     });
 
     const createdDriver = await driver.save();
@@ -177,9 +177,9 @@ export const deleteDriver = asyncHandler(async (req, res) => {
 
 export const ValidateDriver = asyncHandler(async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id,operation } = req.body;
 
-    if (!id) {
+    if (!id || !operation) {
       return res.status(400).json({ message: "Phone Number is missing" });
     }
 
@@ -189,7 +189,7 @@ export const ValidateDriver = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Driver not found" });
     }
 
-    driver.approved = true;
+    driver.approved = operation;
     await driver.save();
     return res.status(200).json({ message: "Driver approved succesfully" });
   } catch (err) {
