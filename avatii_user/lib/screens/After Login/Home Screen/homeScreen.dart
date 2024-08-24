@@ -1,3 +1,6 @@
+import 'package:avatii/helperFunction.dart';
+import 'package:avatii/models/ride_model.dart';
+import 'package:avatii/provider/Ride_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -9,6 +12,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:avatii/Navigation%20Bar/bottomNavigationBar.dart';
 import 'package:avatii/constants/imageStrings.dart';
+import 'package:provider/provider.dart';
 //import 'package:google_maps_webservice/places.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,20 +33,25 @@ class _HomeScreenState extends State<HomeScreen> {
   LatLng _initialPosition = const LatLng(0, 0);
   bool _loading = true;
   String _paymentMode = 'Cash';
-  String?  destinationCoordinates;//destionation coordinates
+   Map<String,double>?  destinationCoordinates;//destionation coordinates
   String? _selectedRide;
-  String? currentCoordinates;//user current loaction corrdinates
+  Map<String,double>? currentCoordinates;//user current loaction corrdinates
   String? destinationAddress;//user destination location where he want to go
   String? currentAddress;///user location in words
 
   final TextEditingController _destinationController = TextEditingController();
-
+String? userid;
   @override
   void initState() {
     super.initState();
     _checkLocationPermission();
     _fetchCurrentLocation();
   }
+
+void _load()async{
+  userid=await Helperfunction.getUserId();
+}
+
 
   Future<void> _checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -126,7 +135,12 @@ Future<void> _convertLatLngToAddress(double latitude, double longitude) async {
     print("Location fetched: ${position.latitude}, ${position.longitude}");
     // Store the current latitude and longitude
     setState(() {
-      currentCoordinates = "${position.latitude}, ${position.longitude}";
+      //currentCoordinates = "${position.latitude}, ${position.longitude}";
+   currentCoordinates = {
+  'latitude': position.latitude,
+  'longitude': position.longitude,
+};
+   
     } );
 
     // Convert lat/long to a human-readable address
@@ -237,8 +251,11 @@ Future<void> _convertLatLngToAddress(double latitude, double longitude) async {
                                isLatLngRequired: true,
                               getPlaceDetailWithLatLng: (Prediction prediction) {
                                 setState(() {
-                                  destinationCoordinates = "${prediction.lat}, ${prediction.lng}";
-
+                                //  destinationCoordinates = "${prediction.lat}, ${prediction.lng}";
+destinationCoordinates = {
+  'latitude': 40.7128,
+  'longitude': -74.0060,
+};
                                 });
                                 print("Destination Coordinates: .................................................$destinationCoordinates");
                               },
@@ -317,7 +334,19 @@ Future<void> _convertLatLngToAddress(double latitude, double longitude) async {
     );
   }
 
+
+
   void _searchdriver() {
+    //user current loaction coordinate
+    //user destination coordinates
+
+     final rideRequest = RideRequest(
+              userId: userid,
+              currentLocation: currentCoordinates??{},
+              destinationLocation: destinationCoordinates??{},
+            );
+
+            Provider.of<RideProvider>(context, listen: false).requestRide(rideRequest);
     showMaterialModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,

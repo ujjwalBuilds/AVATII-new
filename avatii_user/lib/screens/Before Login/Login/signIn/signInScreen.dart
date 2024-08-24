@@ -1,16 +1,42 @@
+import 'package:avatii/provider/userINfo_provider.dart';
+import 'package:avatii/screens/After%20Login/Home%20Screen/homeScreen.dart';
 import 'package:avatii/screens/Before%20Login/Login/otp/sendOtp.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
+//import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
+
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+TextEditingController _phoneNumber=TextEditingController();
+TextEditingController _name=TextEditingController();
+
+
+void onregister()async{
+  await Provider.of<UserProvider>(context, listen: false).registerUser(_name.text,
+   _phoneNumber.text).then((_){
+    Get.to(()=>HomeScreen());
+   }).catchError((error){
+    ScaffoldMessenger(child: Text(error.toString()));
+   }   
+   );
+                        
+
+}
+
 
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
+    final userprovider=Provider.of<UserProvider>(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F5),
@@ -58,8 +84,34 @@ class SignInScreen extends StatelessWidget {
                           color: const Color.fromARGB(255, 116, 116, 116),
                         ),
                       ),
+                        TextField(
+                        controller: _name
+                  ,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: 'Enter Your Name',
+                          hintStyle: const TextStyle(
+                            color: Color.fromARGB(255, 108, 107, 107),
+                            fontWeight: FontWeight.normal,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(screenSize.width * 0.06),
+                            borderSide: BorderSide(color: Colors.grey.withOpacity(0.5)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.blueAccent),
+                            borderRadius: BorderRadius.circular(screenSize.width * 0.06),
+                          ),
+                          suffixIcon: const Icon(Icons.arrow_forward_rounded),
+                        ),
+                      //  keyboardType: TextInputType.phone,
+                      ),
+
                       SizedBox(height: screenSize.height * 0.03),
+                      
                       TextField(
+                        controller: _phoneNumber,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
@@ -83,17 +135,20 @@ class SignInScreen extends StatelessWidget {
                       SizedBox(height: screenSize.height * 0.02),
 
                       // Continue Button
+                      
+                     userprovider.isLoading ? CircularProgressIndicator():
                       ElevatedButton(
                         onPressed: () {
                          // GoRouter.of(context).push('/otp-login');
-                        Get.to(()=>OtpLoginScreen());
-                        
+                       // Get.to(()=>OtpLoginScreen());
+                       print('function hitted');
+                          onregister();
                         },
                         style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.all<Color>(const Color(0xFF000000)),
                         ),
                         child: const Text(
-                          'Send OTP',
+                          'Submit',
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
