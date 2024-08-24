@@ -4,7 +4,7 @@ const userSchema = new Schema({
     name:{
         type:String
     },
-    phoneNumebr:{
+    phoneNumber:{
         type:String
     }
 }, { timestamps: true });
