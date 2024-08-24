@@ -5,11 +5,11 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SignInScreen extends ConsumerWidget {
+class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(

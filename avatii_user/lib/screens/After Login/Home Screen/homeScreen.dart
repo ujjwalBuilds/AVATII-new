@@ -9,7 +9,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:avatii/Navigation%20Bar/bottomNavigationBar.dart';
 import 'package:avatii/constants/imageStrings.dart';
-
+//import 'package:google_maps_webservice/places.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -29,10 +29,11 @@ class _HomeScreenState extends State<HomeScreen> {
   LatLng _initialPosition = const LatLng(0, 0);
   bool _loading = true;
   String _paymentMode = 'Cash';
+  String?  destinationCoordinates;//destionation coordinates
   String? _selectedRide;
-  String? currentLocation;
-  String? destinationLocation;
-  String? currentAddress;
+  String? currentCoordinates;//user current loaction corrdinates
+  String? destinationAddress;//user destination location where he want to go
+  String? currentAddress;///user location in words
 
   final TextEditingController _destinationController = TextEditingController();
 
@@ -125,7 +126,7 @@ Future<void> _convertLatLngToAddress(double latitude, double longitude) async {
     print("Location fetched: ${position.latitude}, ${position.longitude}");
     // Store the current latitude and longitude
     setState(() {
-      currentLocation = "${position.latitude}, ${position.longitude}";
+      currentCoordinates = "${position.latitude}, ${position.longitude}";
     } );
 
     // Convert lat/long to a human-readable address
@@ -177,34 +178,34 @@ Future<void> _convertLatLngToAddress(double latitude, double longitude) async {
                             ),
                             Padding(
                               padding: const EdgeInsets.only(top: 14),
-                              // child: TextField(
-                              //   controller: TextEditingController(text: currentLocation ?? "Fetching address..."),
-                              //   readOnly: true,
+                              child: TextField(
+                                controller: TextEditingController(text: currentAddress ?? "Fetching address..."),
+                                readOnly: true,
                                 
-                              //   decoration: InputDecoration(
+                                decoration: InputDecoration(
                                   
-                              //     filled: true,
-                              //     fillColor: Colors.white,
-                              //     hintText: currentAddress ?? '' ,
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                //  hintText: currentAddress ?? '' ,
                                   
-                              //     hintStyle: const TextStyle(
-                              //       fontSize: 15,
-                              //       color: Color.fromARGB(255, 129, 129, 129),
-                              //       fontWeight: FontWeight.w400,
-                              //     ),
-                              //     enabledBorder: OutlineInputBorder(
-                              //       borderRadius: BorderRadius.circular(25),
-                              //       borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
-                              //     ),
-                              //     focusedBorder: OutlineInputBorder(
-                              //       borderSide: const BorderSide(color: Colors.blueAccent),
-                              //       borderRadius: BorderRadius.circular(25),
-                              //     ),
-                              //     prefixIcon: const Icon(Icons.share_location_rounded, color: Colors.amber),
-                              //     suffixIcon: const Icon(Icons.my_location_rounded, color: Colors.grey, size: 15),
-                              //   ),
-                              // ),
-                              child: Text('$currentAddress'),
+                                  hintStyle: const TextStyle(
+                                    fontSize: 15,
+                                    color: Color.fromARGB(255, 129, 129, 129),
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                    borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(color: Colors.blueAccent),
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                  prefixIcon: const Icon(Icons.share_location_rounded, color: Colors.amber),
+                                  suffixIcon: const Icon(Icons.my_location_rounded, color: Colors.grey, size: 15),
+                                ),
+                              ),
+                            //  child: Text('$currentAddress'),
                             ),
                             const SizedBox(height: 10),
                             Padding(
@@ -233,17 +234,21 @@ Future<void> _convertLatLngToAddress(double latitude, double longitude) async {
                                   suffixIcon: Icon(Icons.location_pin, color: Colors.grey, size: 15),
                                 ),
                                 debounceTime: 800,
-                                isLatLngRequired: true,
-                                getPlaceDetailWithLatLng: (Prediction prediction) {
-                                  print("placeDetails: ${prediction.lng}");
-                                },
-                                itemClick: (Prediction prediction) {
-                                  _destinationController.text = prediction.description ?? '';
-                                  _destinationController.selection = TextSelection.fromPosition(TextPosition(offset: prediction.description?.length ?? 0));
-                                  setState(() {
-                                    destinationLocation = prediction.description;
-                                  });
-                                },
+                               isLatLngRequired: true,
+                              getPlaceDetailWithLatLng: (Prediction prediction) {
+                                setState(() {
+                                  destinationCoordinates = "${prediction.lat}, ${prediction.lng}";
+
+                                });
+                                print("Destination Coordinates: .................................................$destinationCoordinates");
+                              },
+                              itemClick: (Prediction prediction) async {
+                                _destinationController.text = prediction.description ?? '';
+                                _destinationController.selection = TextSelection.fromPosition(TextPosition(offset: prediction.description?.length ?? 0));
+                                setState(() {
+                                  destinationAddress = prediction.description;
+                                });
+                              },
                                 itemBuilder: (context, index, prediction) {
                                   return Container(
                                     padding: const EdgeInsets.all(10),
@@ -266,8 +271,8 @@ Future<void> _convertLatLngToAddress(double latitude, double longitude) async {
                             ElevatedButton(
                                 onPressed: () {
                                   _sheetaglaneeche();
-                                  print("Current Location: $currentLocation");
-                                  print("Destination Location: $destinationLocation");
+                                  print("Current Location: $currentCoordinates");
+                                  print("Destination Location: $destinationAddress");
                                 },
                                 style: ElevatedButton.styleFrom(
                                   minimumSize: const Size(350, 50),
