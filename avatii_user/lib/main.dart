@@ -1,4 +1,4 @@
-import 'package:avatii/Routes/routes.dart';
+// import 'package:avatii/Routes/routes.dart';
 import 'package:avatii/provider/userINfo_provider.dart';
 import 'package:avatii/screens/After%20Login/Home%20Screen/homeScreen.dart';
 import 'package:avatii/screens/Before%20Login/splashScreen/splashScreen.dart';

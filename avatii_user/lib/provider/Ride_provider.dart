@@ -1,4 +1,5 @@
 import 'package:avatii/models/ride_model.dart';
+import 'package:avatii/url.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -15,7 +16,7 @@ class RideProvider with ChangeNotifier {
   }
 
   void _initializeSocket() {
-    _socket = IO.io(, <String, dynamic>{
+    _socket = IO.io(Appurls.baseurl,<String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
