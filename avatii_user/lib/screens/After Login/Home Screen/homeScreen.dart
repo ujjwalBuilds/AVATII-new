@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
@@ -29,12 +30,17 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _loading = true;
   String _paymentMode = 'Cash';
   String? _selectedRide;
+  String? currentLocation;
+  String? destinationLocation;
+  String? currentAddress;
+
   final TextEditingController _destinationController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _checkLocationPermission();
+    _fetchCurrentLocation();
   }
 
   Future<void> _checkLocationPermission() async {
@@ -91,6 +97,47 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+Future<void> _convertLatLngToAddress(double latitude, double longitude) async {
+  try {
+    List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+    if (placemarks!= Null) {
+      Placemark place = placemarks[0];
+      setState(() {
+        currentAddress = "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
+      });
+    } else {
+      setState(() {
+        currentAddress = "Address not found";
+      });
+    }
+  } catch (e) {
+    print("Error converting lat/lng to address: $e");
+    setState(() {
+      currentAddress = "Error fetching address";
+    });
+  }
+}
+
+  Future<void> _fetchCurrentLocation() async {
+  try {
+    print("Fetching location...");
+    Position position = await Geolocator.getCurrentPosition(locationSettings: LocationSettings(accuracy: LocationAccuracy.best));
+    print("Location fetched: ${position.latitude}, ${position.longitude}");
+    // Store the current latitude and longitude
+    setState(() {
+      currentLocation = "${position.latitude}, ${position.longitude}";
+    } );
+
+    // Convert lat/long to a human-readable address
+    await _convertLatLngToAddress(position.latitude, position.longitude);
+  } catch (e) {
+    print("Error fetching location: $e");
+    setState(() {
+      currentAddress = "Error fetching location";
+    });
+  }
+}
+
   void _sheetneeche() {
     showMaterialModalBottomSheet(
       context: context,
@@ -130,28 +177,34 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             Padding(
                               padding: const EdgeInsets.only(top: 14),
-                              child: TextField(
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  hintText: 'Your Location',
-                                  hintStyle: const TextStyle(
-                                    fontSize: 15,
-                                    color: Color.fromARGB(255, 129, 129, 129),
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25),
-                                    borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(color: Colors.blueAccent),
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                  prefixIcon: const Icon(Icons.share_location_rounded, color: Colors.amber),
-                                  suffixIcon: const Icon(Icons.my_location_rounded, color: Colors.grey, size: 15),
-                                ),
-                              ),
+                              // child: TextField(
+                              //   controller: TextEditingController(text: currentLocation ?? "Fetching address..."),
+                              //   readOnly: true,
+                                
+                              //   decoration: InputDecoration(
+                                  
+                              //     filled: true,
+                              //     fillColor: Colors.white,
+                              //     hintText: currentAddress ?? '' ,
+                                  
+                              //     hintStyle: const TextStyle(
+                              //       fontSize: 15,
+                              //       color: Color.fromARGB(255, 129, 129, 129),
+                              //       fontWeight: FontWeight.w400,
+                              //     ),
+                              //     enabledBorder: OutlineInputBorder(
+                              //       borderRadius: BorderRadius.circular(25),
+                              //       borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                              //     ),
+                              //     focusedBorder: OutlineInputBorder(
+                              //       borderSide: const BorderSide(color: Colors.blueAccent),
+                              //       borderRadius: BorderRadius.circular(25),
+                              //     ),
+                              //     prefixIcon: const Icon(Icons.share_location_rounded, color: Colors.amber),
+                              //     suffixIcon: const Icon(Icons.my_location_rounded, color: Colors.grey, size: 15),
+                              //   ),
+                              // ),
+                              child: Text('$currentAddress'),
                             ),
                             const SizedBox(height: 10),
                             Padding(
@@ -187,6 +240,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 itemClick: (Prediction prediction) {
                                   _destinationController.text = prediction.description ?? '';
                                   _destinationController.selection = TextSelection.fromPosition(TextPosition(offset: prediction.description?.length ?? 0));
+                                  setState(() {
+                                    destinationLocation = prediction.description;
+                                  });
                                 },
                                 itemBuilder: (context, index, prediction) {
                                   return Container(
@@ -208,7 +264,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             const SizedBox(height: 20),
                             ElevatedButton(
-                                onPressed: () => _sheetaglaneeche(),
+                                onPressed: () {
+                                  _sheetaglaneeche();
+                                  print("Current Location: $currentLocation");
+                                  print("Destination Location: $destinationLocation");
+                                },
                                 style: ElevatedButton.styleFrom(
                                   minimumSize: const Size(350, 50),
                                   backgroundColor: Colors.black,
