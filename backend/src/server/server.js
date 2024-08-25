@@ -259,6 +259,7 @@ io.on("connection", (socket) => {
     // Notify all available drivers
     for (let [driverData] of drivers) {
       if (driverData.available) {
+        console.log("oye yha function aarha hai.........")
         io.to(driverData.socketId).emit("rideRequest", {
           requestId,
           userId,
