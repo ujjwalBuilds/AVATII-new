@@ -636,7 +636,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         });
       }
     });
-
+    load();
     _connectToSocket(); // Connect to the socket
   }
 
@@ -702,7 +702,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       _connectDriver();
     });
 
-    socket?.on('requestRide', (data) {
+    socket?.on('rideRequest', (data) {
       print('Request is coming...........................');
       setState(() {
         _hasRideRequest = true;
@@ -722,6 +722,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       'driverId': 'your_driver_id', // Replace with actual driver ID
       'userId': _rideRequestDetails?['userId'],
       'journeyId': 'your_journey_id', // Replace with actual journey ID
+      
     });
 
     // Close the popup and proceed with ride logic
