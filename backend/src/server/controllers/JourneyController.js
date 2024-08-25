@@ -26,7 +26,7 @@ export const StartJourney = asyncHandler(async (req, res) => {
 
         await startedJourney.save();
 
-        return res.status(201).json({ message: "Journey created", journey: startedJourney });
+        return res.status(201).json({ message: "Journey created", journeyId:startedJourney._id });
     } catch (err) {
         return res.status(500).json({ message: `Internal Server Error: ${err.message}` });
     }

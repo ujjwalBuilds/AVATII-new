@@ -488,7 +488,9 @@ socket.on("acceptRide", async ({ requestId, driverId }) => {
     };
 
     try {
-      const { data } = await createJourney(journeyDetails);
+      console.log("rekha meri jaan");
+      console.log(journeyDetails);
+      const { data } = await axios.post('https://avatii-backend.onrender.com/api/booking/start', journeyDetails);
       const journeyId = data.journeyId;
 
       // Notify the passenger
@@ -537,19 +539,6 @@ socket.on("acceptRide", async ({ requestId, driverId }) => {
     socket.emit("rideUnavailable", { requestId });
   }
 });
-
-  // Function to create a journey
-  async function createJourney(journeyDetails) {
-    try {
-      console.log(journeyDetails);
-      console.log('*******************************************data aagya hai***********************');
-      const response = await axios.post('https://avatii-backend.onrender.com/api/booking/start', journeyDetails);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating journey:', error);
-      throw error;
-    }
-  }
 
   // Handle disconnection
   socket.on("disconnect", () => {
