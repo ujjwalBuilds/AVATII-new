@@ -46,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _checkLocationPermission();
     _fetchCurrentLocation();
+  _load();
   }
 
 void _load()async{
@@ -339,7 +340,10 @@ destinationCoordinates = {
   void _searchdriver() {
     //user current loaction coordinate
     //user destination coordinates
-
+          print(userid);
+          print("${currentCoordinates}...............................");
+          print("${ destinationCoordinates}...........................");
+          
      final rideRequest = RideRequest(
               userId: userid,
               currentLocation: currentCoordinates??{},

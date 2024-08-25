@@ -35,6 +35,7 @@ class RideProvider with ChangeNotifier {
 
   void requestRide(RideRequest rideRequest) {
     _socket.emit('requestRide', rideRequest.toJson());
+    print('emitted ridee...............................');
     _rideRequested = true;
     notifyListeners();
   }
