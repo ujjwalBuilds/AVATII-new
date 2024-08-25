@@ -36,6 +36,13 @@ class Helperfunction {
 //  }
 
 //  }
+
+ static Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('driverId');
+    return userId;
+  }
+
 static Future<String?> uploadImage(File? image) async {
   if (image == null) {
     print("No image selected");
