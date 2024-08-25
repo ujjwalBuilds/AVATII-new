@@ -1,3 +1,4 @@
+import 'package:avatii/Url.dart';
 import 'package:avatii/helperFunction.dart';
 import 'package:avatii/models/ride_model.dart';
 import 'package:avatii/provider/Ride_provider.dart';
@@ -14,6 +15,8 @@ import 'package:avatii/Navigation%20Bar/bottomNavigationBar.dart';
 import 'package:avatii/constants/imageStrings.dart';
 import 'package:provider/provider.dart';
 //import 'package:google_maps_webservice/places.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -26,6 +29,100 @@ class _HomeScreenState extends State<HomeScreen> {
     'Your Current Location',
     'Set Location on Map',
   ];
+//for ride acceptance
+  late IO.Socket socket;
+  bool _isSearching = false;
+  String _driverName = '';
+  String _driverPhone = '';
+  String _driverCar = '';
+
+
+
+
+
+ void _initializeSocket() {
+    socket = IO.io(Appurls.baseurl, IO.OptionBuilder()
+        .setTransports(['websocket']).enableAutoConnect()
+        .build());
+        
+    socket?.on('connect', (_) {
+      print('connected to socket server................');
+    });
+
+    socket.on('accetpRide', (data) {
+      // Assuming `data` includes driver information
+      print('Ride accepted succesfully..............................');
+      setState(() {
+        _isSearching = false;
+        _driverName = data['driverId'];
+        _driverPhone = data['journeyId'];
+        _driverCar = 'car';
+      });
+      _showDriverDetails();
+    });
+
+    
+     socket?.on('disconnect', (_) {
+      print('disconnected from socket server');
+    });
+  }
+
+  @override
+  void dispose() {
+   
+    socket?.disconnect();
+    super.dispose();
+  }
+
+
+
+
+void _showDriverDetails() {
+    showMaterialModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        child: Container(
+          color: const Color(0xFFF2F2F5),
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Container(
+              height: 500,
+              child: Column(
+                children: [
+                  // Driver Details
+                  ListTile(
+                    title: Text('Driver Name: $_driverName'),
+                    subtitle: Text('journey id: $_driverPhone\nCar: $_driverCar'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(350, 50),
+                      backgroundColor: Colors.black,
+                      elevation: 1,
+                    ),
+                    child: const Text(
+                      'Close',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+
+
 
   String _selectedLocation = 'Your Current Location';
   bool _isExpanded = false;
@@ -46,6 +143,7 @@ String? userid;
     super.initState();
     _checkLocationPermission();
     _fetchCurrentLocation();
+    _initializeSocket();
   _load();
   }
 
@@ -340,6 +438,9 @@ destinationCoordinates = {
   void _searchdriver() {
     //user current loaction coordinate
     //user destination coordinates
+ setState(() {
+      _isSearching = true;
+    });
           print(userid);
           print("${currentCoordinates}...............................");
           print("${ destinationCoordinates}...........................");
@@ -505,7 +606,7 @@ destinationCoordinates = {
                                     width: double.infinity,
                                     height: 50,
                                     child: ElevatedButton(
-                                      onPressed: () => _searchdriver(),
+                                      onPressed: () =>_isSearching==true?    _searchdriver():null,
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.black,
                                       ),
