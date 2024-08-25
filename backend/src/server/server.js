@@ -9,6 +9,8 @@ import { Server } from "socket.io";
 import http from "http";
 
 // Connect to MongoDB
+
+
 connectDb();
 
 // Initialize Express app
@@ -61,6 +63,7 @@ io.on("connection", (socket) => {
   });
 
   // Listen for driver location updates
+
   socket.on("updateLocation", ({ driverId, location }) => {
     const driver = drivers.get(driverId);
     if (driver) {
@@ -79,14 +82,29 @@ io.on("connection", (socket) => {
 
  // Listen for ride requests
  socket.on("requestRide", ({ userId, currentLocation, destinationLocation }) => {
-  console.log(`User ${userId} requested a ride from ${currentLocation} to ${destinationLocation}`);
+  // console.log(`User ${userId} requested a ride from ${currentLocation} to ${destinationLocation}`);
 
-  // Notify all drivers (for simplicity, you could filter drivers based on proximity)
-  io.emit("rideRequest", {
-    userId,
-    currentLocation,
-    destinationLocation,
-  });
+  // // Notify all drivers (for simplicity, you could filter drivers based on proximity)
+  // io.emit("rideRequest", {
+  //   userId,
+  //   currentLocation,
+  //   destinationLocation,
+  console.log(`Passenger ${userId} requested a ride from ${currentLocation} to ${destinationLocation}`);
+
+    // Store the request temporarily
+    const requestId = `request-${Date.now()}`; // Generate a unique request ID
+    activeRequests.set(requestId, {userId, currentLocation, destinationLocation });
+
+    // Emit the ride request to all available drivers
+    for (let [userId, driverData] of drivers) {
+      if (driverData.available) {
+        io.to(driverData.socketId).emit("rideRequest", { requestId, userId, currentLocation, destinationLocation });
+      }
+    }// });
+
+
+
+
 });
 
 socket.on("acceptRide", ({ driverId, userId, journeyId }) => {
@@ -94,6 +112,7 @@ socket.on("acceptRide", ({ driverId, userId, journeyId }) => {
 
   // Notify the user that their ride was accepted
   io.to(userId).emit("rideAccepted", {
+
     driverId,
     journeyId,
   });
