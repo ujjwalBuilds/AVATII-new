@@ -58,8 +58,12 @@ class _HomeScreenState extends State<HomeScreen> {
       print('connected to socket server................');
       _connectUser();
     });
+
+
+
+
     socket.on('rideAccepted', (data) {
-      print('....................Ride accepted by driver for passanger........................');
+      print('..................................Ride accepted by driver for passanger........................');
       setState(() {
         _isSearching = false;
         _driverName = data['journeyId'];

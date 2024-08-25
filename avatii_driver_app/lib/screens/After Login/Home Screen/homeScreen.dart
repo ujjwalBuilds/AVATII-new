@@ -719,11 +719,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   void _acceptRide() {
     // Notify the server that the ride was accepted
     socket?.emit('acceptRide', {
-      'driverId': 'your_driver_id', // Replace with actual driver ID
-      'userId': _rideRequestDetails?['userId'],
-      'journeyId': 'your_journey_id', // Replace with actual journey ID
+      // 'driverId': 'your_driver_id', // Replace with actual driver ID
+      // 'userId': _rideRequestDetails?['userId'],
+      // 'journeyId': 'your_journey_id', // Replace with actual journey ID
+    'requestId':_rideRequestDetails?['requestId'],
+    'driverId':driverId
+    
     });
-
+ print('ride is accepted .............................by the driver');
     // Close the popup and proceed with ride logic
     setState(() {
       _hasRideRequest = false;
