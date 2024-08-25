@@ -10,11 +10,11 @@ const journeySchema = new Schema({
         required: true
     },
     pickOff: {
-        type: String,
+        type: {latitude: Float64Array, longitude: Float64Array},
         required: true
     },
     dropOff: {
-        type: String,
+        type: {latitude: Float64Array, longitude: Float64Array},
         required: true
     },
     distance: {
