@@ -1,4 +1,4 @@
-import 'package:avatii/screens/Before%20Login/Login/signIn/signInScreen.dart';
+import 'package:avatii/screens/Before%20Login/Sign%20In/signIn/signInScreen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

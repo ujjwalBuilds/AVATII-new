@@ -9,6 +9,10 @@ import {
   ValidateDriver,
   ChangeDriverStatus
 } from "../controllers/DriverController.js";
+import {
+  registerUser,
+  loginUser,
+} from "../controllers/UserController.js"; // Importing user controllers
 
 const router = Router();
 
@@ -36,4 +40,15 @@ router.post("/driver/validate", ValidateDriver);
 // Route for changing the status of a driver by ID
 router.post("/driver/status", ChangeDriverStatus);
 
+// ------------------------------
+// User Routes
+// ------------------------------
+
+// Route for registering a new user
+router.post("/user/register", registerUser);
+
+// Route for logging in a user using PhoneNumber
+router.post("/user/login", loginUser);
+
 export default router;
+

@@ -19,7 +19,7 @@
 // }
 
 class RideRequest {
-  final String userId;
+  String? userId;
   final Map<String, double> currentLocation;
   final Map<String, double> destinationLocation;
 
