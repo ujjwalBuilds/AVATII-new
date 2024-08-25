@@ -6,7 +6,7 @@ dotenv.config();
 
 export const StartJourney = asyncHandler(async (req, res) => {
     try {
-        const { passengerId, driverId, pickOff, dropOff, distance } = req.body;
+        const { passengerId, driverId, pickOff, dropOff} = req.body;
 
         if (!passengerId || !driverId || !pickOff || !dropOff ) {
             return res.status(400).json({ message: "Bad request" });

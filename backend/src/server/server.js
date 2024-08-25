@@ -541,7 +541,8 @@ socket.on("acceptRide", async ({ requestId, driverId }) => {
   // Function to create a journey
   async function createJourney(journeyDetails) {
     try {
-      
+      console.log(journeyDetails);
+      console.log('*******************************************data aagya hai***********************');
       const response = await axios.post('https://avatii-backend.onrender.com/api/booking/start', journeyDetails);
       return response.data;
     } catch (error) {
