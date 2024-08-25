@@ -36,29 +36,36 @@ class _HomeScreenState extends State<HomeScreen> {
   String _driverPhone = '';
   String _driverCar = '';
 
+  void _connectUser() async {
+    // String userId = await Helperfunction.getUserId();
+    print('User connect ho rha hai bhai................');
+    socket.emit('userConnect', {
+      'userId': userid
+    });
+  }
 
+  void _initializeSocket() {
+    socket = IO.io(
+        Appurls.baseurl,
+        IO.OptionBuilder()
+            .setTransports([
+              'websocket'
+            ])
+            .enableAutoConnect()
+            .build());
 
-
-
- void _initializeSocket() {
-    socket = IO.io(Appurls.baseurl, IO.OptionBuilder()
-        .setTransports(['websocket']).enableAutoConnect()
-        .build());
-        
     socket?.on('connect', (_) {
       print('connected to socket server................');
       _connectUser();
-
     });
-  socket.on('rideAccepted', (data) {
-      
+    socket.on('rideAccepted', (data) {
       print('....................Ride accepted by driver for passanger........................');
       setState(() {
         _isSearching = false;
         _driverName = data['journeyId'];
         _driverPhone = data['driverId'];
-        _driverCar='gadddi';
-       // _driverCar = data['driverCar'];
+        _driverCar = 'gadddi';
+        // _driverCar = data['driverCar'];
         // _journeyId = data['journeyId'];
         // _pickupLocation = data['pickOff'];
         // _dropoffLocation = data['dropOff'];
@@ -69,26 +76,25 @@ class _HomeScreenState extends State<HomeScreen> {
       _showDriverDetails();
     });
 
-
-     socket?.on('disconnect', (_) {
+    socket?.on('disconnect', (_) {
       print('disconnected from socket server');
     });
   }
 
   @override
   void dispose() {
-   
     socket?.disconnect();
     super.dispose();
   }
 
+  // void _connectUser() async {
+  //   //String userId = await Helperfunction.getUserId();
+  //   socket.emit('userConnect', {
+  //     'userId': userid
+  //   });
+  // }
 
-void _connectUser() async {
-  //String userId = await Helperfunction.getUserId();
-  socket.emit('userConnect', {'userId': userid});
-}
-
-void _showDriverDetails() {
+  void _showDriverDetails() {
     showMaterialModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -132,20 +138,19 @@ void _showDriverDetails() {
     );
   }
 
-
-
-
   String _selectedLocation = 'Your Current Location';
   bool _isExpanded = false;
   GoogleMapController? _mapController;
   LatLng _initialPosition = const LatLng(0, 0);
   bool _loading = true;
   String _paymentMode = 'Cash';
-   Map<String,double>?  destinationCoordinates;//destionation coordinates
+  Map<String, double>? destinationCoordinates; //destionation coordinates
   String? _selectedRide;
-  Map<String,double>? currentCoordinates;//user current loaction corrdinates
-  String? destinationAddress;//user destination location where he want to go
-  String? currentAddress;///user location in words
+  Map<String, double>? currentCoordinates; //user current loaction corrdinates
+  String? destinationAddress; //user destination location where he want to go
+  String? currentAddress;
+
+  ///user location in words
 
   final TextEditingController _destinationController = TextEditingController();
   String? userid;
@@ -154,15 +159,13 @@ void _showDriverDetails() {
     super.initState();
     _checkLocationPermission();
     _fetchCurrentLocation();
-  _load();
+    _load();
     _initializeSocket();
-  
   }
 
-void _load()async{
-  userid=await Helperfunction.getUserId();
-}
-
+  void _load() async {
+    userid = await Helperfunction.getUserId();
+  }
 
   Future<void> _checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -218,51 +221,50 @@ void _load()async{
     });
   }
 
-Future<void> _convertLatLngToAddress(double latitude, double longitude) async {
-  try {
-    List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
-    if (placemarks!= Null) {
-      Placemark place = placemarks[0];
+  Future<void> _convertLatLngToAddress(double latitude, double longitude) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+      if (placemarks != Null) {
+        Placemark place = placemarks[0];
+        setState(() {
+          currentAddress = "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
+        });
+      } else {
+        setState(() {
+          currentAddress = "Address not found";
+        });
+      }
+    } catch (e) {
+      print("Error converting lat/lng to address: $e");
       setState(() {
-        currentAddress = "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
-      });
-    } else {
-      setState(() {
-        currentAddress = "Address not found";
+        currentAddress = "Error fetching address";
       });
     }
-  } catch (e) {
-    print("Error converting lat/lng to address: $e");
-    setState(() {
-      currentAddress = "Error fetching address";
-    });
   }
-}
 
   Future<void> _fetchCurrentLocation() async {
-  try {
-    print("Fetching location...");
-    Position position = await Geolocator.getCurrentPosition(locationSettings: LocationSettings(accuracy: LocationAccuracy.best));
-    print("Location fetched: ${position.latitude}, ${position.longitude}");
-    // Store the current latitude and longitude
-    setState(() {
-      //currentCoordinates = "${position.latitude}, ${position.longitude}";
-   currentCoordinates = {
-  'latitude': position.latitude,
-  'longitude': position.longitude,
-};
-   
-    } );
+    try {
+      print("Fetching location...");
+      Position position = await Geolocator.getCurrentPosition(locationSettings: LocationSettings(accuracy: LocationAccuracy.best));
+      print("Location fetched: ${position.latitude}, ${position.longitude}");
+      // Store the current latitude and longitude
+      setState(() {
+        //currentCoordinates = "${position.latitude}, ${position.longitude}";
+        currentCoordinates = {
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+        };
+      });
 
-    // Convert lat/long to a human-readable address
-    await _convertLatLngToAddress(position.latitude, position.longitude);
-  } catch (e) {
-    print("Error fetching location: $e");
-    setState(() {
-      currentAddress = "Error fetching location";
-    });
+      // Convert lat/long to a human-readable address
+      await _convertLatLngToAddress(position.latitude, position.longitude);
+    } catch (e) {
+      print("Error fetching location: $e");
+      setState(() {
+        currentAddress = "Error fetching location";
+      });
+    }
   }
-}
 
   void _sheetneeche() {
     showMaterialModalBottomSheet(
@@ -306,13 +308,11 @@ Future<void> _convertLatLngToAddress(double latitude, double longitude) async {
                               child: TextField(
                                 controller: TextEditingController(text: currentAddress ?? "Fetching address..."),
                                 readOnly: true,
-                                
                                 decoration: InputDecoration(
-                                  
                                   filled: true,
                                   fillColor: Colors.white,
-                                //  hintText: currentAddress ?? '' ,
-                                  
+                                  //  hintText: currentAddress ?? '' ,
+
                                   hintStyle: const TextStyle(
                                     fontSize: 15,
                                     color: Color.fromARGB(255, 129, 129, 129),
@@ -330,7 +330,7 @@ Future<void> _convertLatLngToAddress(double latitude, double longitude) async {
                                   suffixIcon: const Icon(Icons.my_location_rounded, color: Colors.grey, size: 15),
                                 ),
                               ),
-                            //  child: Text('$currentAddress'),
+                              //  child: Text('$currentAddress'),
                             ),
                             const SizedBox(height: 10),
                             Padding(
@@ -359,24 +359,24 @@ Future<void> _convertLatLngToAddress(double latitude, double longitude) async {
                                   suffixIcon: Icon(Icons.location_pin, color: Colors.grey, size: 15),
                                 ),
                                 debounceTime: 800,
-                               isLatLngRequired: true,
-                              getPlaceDetailWithLatLng: (Prediction prediction) {
-                                setState(() {
-                                //  destinationCoordinates = "${prediction.lat}, ${prediction.lng}";
-destinationCoordinates = {
-  'latitude': 40.7128,
-  'longitude': -74.0060,
-};
-                                });
-                                print("Destination Coordinates: .................................................$destinationCoordinates");
-                              },
-                              itemClick: (Prediction prediction) async {
-                                _destinationController.text = prediction.description ?? '';
-                                _destinationController.selection = TextSelection.fromPosition(TextPosition(offset: prediction.description?.length ?? 0));
-                                setState(() {
-                                  destinationAddress = prediction.description;
-                                });
-                              },
+                                isLatLngRequired: true,
+                                getPlaceDetailWithLatLng: (Prediction prediction) {
+                                  setState(() {
+                                    //  destinationCoordinates = "${prediction.lat}, ${prediction.lng}";
+                                    destinationCoordinates = {
+                                      'latitude': 40.7128,
+                                      'longitude': -74.0060,
+                                    };
+                                  });
+                                  print("Destination Coordinates: .................................................$destinationCoordinates");
+                                },
+                                itemClick: (Prediction prediction) async {
+                                  _destinationController.text = prediction.description ?? '';
+                                  _destinationController.selection = TextSelection.fromPosition(TextPosition(offset: prediction.description?.length ?? 0));
+                                  setState(() {
+                                    destinationAddress = prediction.description;
+                                  });
+                                },
                                 itemBuilder: (context, index, prediction) {
                                   return Container(
                                     padding: const EdgeInsets.all(10),
@@ -445,25 +445,23 @@ destinationCoordinates = {
     );
   }
 
-
-
   void _searchdriver() {
     //user current loaction coordinate
     //user destination coordinates
- setState(() {
+    setState(() {
       _isSearching = true;
     });
-          print(userid);
-          print("${currentCoordinates}...............................");
-          print("${ destinationCoordinates}...........................");
-          
-     final rideRequest = RideRequest(
-              userId: userid,
-              currentLocation: currentCoordinates??{},
-              destinationLocation: destinationCoordinates??{},
-            );
+    print(userid);
+    print("${currentCoordinates}...............................");
+    print("${destinationCoordinates}...........................");
 
-            Provider.of<RideProvider>(context, listen: false).requestRide(rideRequest);
+    final rideRequest = RideRequest(
+      userId: userid,
+      currentLocation: currentCoordinates ?? {},
+      destinationLocation: destinationCoordinates ?? {},
+    );
+
+    Provider.of<RideProvider>(context, listen: false).requestRide(rideRequest);
     showMaterialModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -619,10 +617,9 @@ destinationCoordinates = {
                                     height: 50,
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        if(_isSearching){
+                                        if (_isSearching) {
                                           _searchdriver();
-                                        }
-                                        else{
+                                        } else {
                                           return null;
                                         }
                                       },

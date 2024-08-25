@@ -577,6 +577,7 @@
 // }
 
 // Add import for socket.io-client
+import 'package:avatii_driver_app/helperFunction.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:avatii_driver_app/Navigation%20Bar/bottomNavigationBar.dart';
 import 'package:avatii_driver_app/Url.dart';
@@ -606,6 +607,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   bool _isOnline = false; // Toggle state
   Timer? _popupTimer;
   AnimationController? _animationController;
+  String? driverId;
 
   Completer<GoogleMapController> _mapController = Completer();
   LocationData? _currentLocation;
@@ -654,6 +656,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
+  void _connectDriver() async {
+    // String driverId = await Helperfunction.getDriverId(); // Replace with actual method to get driver ID
+    print('Driver is connected just abhi hua hai.........***************************');
+    socket?.emit('driverConnect', {
+      'driverId': driverId
+    });
+  }
+
+  void load() async {
+    driverId = await Helperfunction.getUserId();
+  }
+
   Future<void> _updateMarker(LocationData newLocation) async {
     final heading = newLocation.heading ?? 0.0; // Get the heading (direction)
 
@@ -685,6 +699,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     socket?.on('connect', (_) {
       print('connected to socket server.......');
+      _connectDriver();
     });
 
     socket?.on('requestRide', (data) {
