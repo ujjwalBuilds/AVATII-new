@@ -145,16 +145,36 @@ import jouneyRoutes from "./routes/JourneyRoutes.js";
 import { Server } from "socket.io";
 import http from "http";
 import axios from "axios";
+import AdminJS from 'adminjs';
+import AdminJSExpress from '@adminjs/express';
+import { Database, Resource } from '@adminjs/mongoose';
+import User from './models/UserModel.js';
+import Journey from './models/JourneyModel.js';
+import Driver from './models/DriverModel.js';
 
 // Connect to MongoDB
 connectDb();
+
+// Initialize AdminJS
+AdminJS.registerAdapter({ Database, Resource });
+
+const adminJs = new AdminJS({
+  resources: [
+    { resource: User },
+    { resource: Journey },
+    { resource: Driver },
+  ],
+  rootPath: '/admin',
+});
+
+const adminRouter = AdminJSExpress.buildRouter(adminJs);
 
 // Initialize Express app
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow requests from any origin
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
@@ -172,6 +192,9 @@ app.use(cors({
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
+// Add AdminJS router
+app.use(adminJs.options.rootPath, adminRouter);
 
 app.use("/api/image", uploadKeRoutes);
 app.use("/api/user", userKeRoutes);
