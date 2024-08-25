@@ -234,7 +234,7 @@ io.on("connection", (socket) => {
     // activeRequests.set(requestId, {userId, currentLocation,destinationLocation});
 
     // Notify all available drivers
-    for (let [driverId, driverData] of drivers) {
+    for (let [driverData] of drivers) {
       if (driverData.available) {
         io.to(driverData.socketId).emit("rideRequest", {
           requestId,
