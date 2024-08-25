@@ -19,7 +19,7 @@ export const StartJourney = asyncHandler(async (req, res) => {
             driverId,
             pickOff,
             dropOff,
-            distance,
+            distance:5,
             otp,
             status: "ACTIVE"
         });

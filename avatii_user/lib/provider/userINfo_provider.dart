@@ -85,6 +85,8 @@ bool get isLoading=>_isLoading;
         notifyListeners();
       //  await _saveUserToPrefs(); // Save user data to shared preferences
       } else {
+
+        print('successfull login.......................... ');
         throw Exception('Failed to login user');
       }
     } catch (error) {
