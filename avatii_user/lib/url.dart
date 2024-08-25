@@ -1,7 +1,7 @@
 class Appurls{
 
 
-static final  String baseurl='https://avatii-new.onrender.com';
+static final  String baseurl='https://avatii-new-x9eb.onrender.com';
 
 static final  String registeruser='${baseurl}/api/user/user/register';
 

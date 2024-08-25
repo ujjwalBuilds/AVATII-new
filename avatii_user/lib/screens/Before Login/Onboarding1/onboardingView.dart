@@ -150,20 +150,20 @@ class _OnboardingViewState extends State<OnboardingView> {
 
 
 
-  Widget getStartedButton() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.black,
-      ),
-      width: MediaQuery.of(context).size.width * 0.9,
-      height: 55,
-      child: TextButton(
-        onPressed: () => Get.to(()=>SignInScreen()),
-        child: const Text("Get Started", style: TextStyle(color: Colors.white)),
-      ),
-    );
-  }
+  // Widget getStartedButton() {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       borderRadius: BorderRadius.circular(8),
+  //       color: Colors.black,
+  //     ),
+  //     width: MediaQuery.of(context).size.width * 0.9,
+  //     height: 55,
+  //     child: TextButton(
+  //       onPressed: () => Get.to(()=>SignInScreen()),
+  //       child: const Text("Get Started", style: TextStyle(color: Colors.white)),
+  //     ),
+  //   );
+  // }
 }
 
 

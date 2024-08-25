@@ -277,10 +277,6 @@
 //   }
 // }
 
-
-
-
-
 // class HomeScreen extends StatefulWidget {
 //   const HomeScreen({super.key});
 
@@ -342,7 +338,7 @@
 
 //   Future<void> _updateMarker(LocationData newLocation) async {
 //     final heading = newLocation.heading ?? 0.0; // Get the heading (direction)
-    
+
 //     final BitmapDescriptor rotatedMarker = await BitmapDescriptor.asset(
 //   ImageConfiguration(size: Size(120, 60)), // Adjust size as needed
 //   'assets/images/car-icon.png',
@@ -593,7 +589,6 @@ import 'dart:async';
 
 import 'package:provider/provider.dart';
 
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -661,11 +656,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   Future<void> _updateMarker(LocationData newLocation) async {
     final heading = newLocation.heading ?? 0.0; // Get the heading (direction)
-    
+
     final BitmapDescriptor rotatedMarker = await BitmapDescriptor.asset(
-  ImageConfiguration(size: Size(120, 60)), // Adjust size as needed
-  'assets/images/car-icon.png',
-);
+      ImageConfiguration(size: Size(120, 60)), // Adjust size as needed
+      'assets/images/car-icon.png',
+    );
 
     setState(() {
       _marker = Marker(
@@ -679,16 +674,21 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   void _connectToSocket() {
-    socket = IO.io(Appurls.baseurl, IO.OptionBuilder()
-        .setTransports(['websocket'])
-        .enableAutoConnect()
-        .build());
+    socket = IO.io(
+        Appurls.baseurl,
+        IO.OptionBuilder()
+            .setTransports([
+              'websocket'
+            ])
+            .enableAutoConnect()
+            .build());
 
     socket?.on('connect', (_) {
       print('connected to socket server.......');
     });
 
-    socket?.on('rideRequest', (data) {
+    socket?.on('requestRide', (data) {
+      print('Request is coming...........................');
       setState(() {
         _hasRideRequest = true;
         _rideRequestDetails = data;
@@ -817,115 +817,109 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   //   );
   // }
 
-
   /*New code for new ride popup to be shown in drivers app */
 
-void _showRideDetailsPopup() async {
-  // Placeholder variables for human-readable addresses
-  String fromAddress = 'Loading...';
-  String toAddress = 'Loading...';
+  void _showRideDetailsPopup() async {
+    // Placeholder variables for human-readable addresses
+    String fromAddress = 'Loading...';
+    String toAddress = 'Loading...';
 
-  if (_rideRequestDetails != null) {
-    // Extract latitude and longitude from the map
-    double? fromLat = _rideRequestDetails?['currentLocation']['latitude'];
-    double? fromLng = _rideRequestDetails?['currentLocation']['longitude'];
-    double? toLat = _rideRequestDetails?['destinationLocation']['latitude'];
-    double? toLng = _rideRequestDetails?['destinationLocation']['longitude'];
+    if (_rideRequestDetails != null) {
+      // Extract latitude and longitude from the map
+      double? fromLat = _rideRequestDetails?['currentLocation']['latitude'];
+      double? fromLng = _rideRequestDetails?['currentLocation']['longitude'];
+      double? toLat = _rideRequestDetails?['destinationLocation']['latitude'];
+      double? toLng = _rideRequestDetails?['destinationLocation']['longitude'];
 
-    // Perform reverse geocoding to get human-readable addresses
-    if (fromLat != null && fromLng != null) {
-      List<Placemark> fromPlacemarks = await placemarkFromCoordinates(fromLat, fromLng);
-      fromAddress = "${fromPlacemarks.first.street}, ${fromPlacemarks.first.locality}, ${fromPlacemarks.first.administrativeArea}, ${fromPlacemarks.first.country}";
+      // Perform reverse geocoding to get human-readable addresses
+      if (fromLat != null && fromLng != null) {
+        List<Placemark> fromPlacemarks = await placemarkFromCoordinates(fromLat, fromLng);
+        fromAddress = "${fromPlacemarks.first.street}, ${fromPlacemarks.first.locality}, ${fromPlacemarks.first.administrativeArea}, ${fromPlacemarks.first.country}";
+      }
+
+      if (toLat != null && toLng != null) {
+        List<Placemark> toPlacemarks = await placemarkFromCoordinates(toLat, toLng);
+        toAddress = "${toPlacemarks.first.street}, ${toPlacemarks.first.locality}, ${toPlacemarks.first.administrativeArea}, ${toPlacemarks.first.country}";
+      }
     }
 
-    if (toLat != null && toLng != null) {
-      List<Placemark> toPlacemarks = await placemarkFromCoordinates(toLat, toLng);
-      toAddress = "${toPlacemarks.first.street}, ${toPlacemarks.first.locality}, ${toPlacemarks.first.administrativeArea}, ${toPlacemarks.first.country}";
-    }
-  }
+    showDialog(
+      context: context,
+      builder: (context) {
+        _popupTimer = Timer(const Duration(seconds: 15), () {
+          Navigator.of(context).pop(); // Close the popup after 15 seconds
+        });
 
-  showDialog(
-    context: context,
-    builder: (context) {
-      _popupTimer = Timer(const Duration(seconds: 15), () {
-        Navigator.of(context).pop(); // Close the popup after 15 seconds
-      });
-
-      return AlertDialog(
-        title: Text('Ride Details'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('From: $fromAddress'),
-            Text('To: $toAddress'),
-            Text('Estimated Earnings: ₹100'), // Example data
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // "Ignore" button
-                TextButton(
-                  onPressed: _rejectRide,
-                  child: Text('Ignore'),
-                ),
-                // "Accept" button with animated slider effect
-                SizedBox(
-                  width: 120,
-                  height: 40,
-                  child: Stack(
-                    children: [
-                      AnimatedBuilder(
-                        animation: _animationController!,
-                        builder: (context, child) {
-                          return Container(
-                            width: 120,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.green, width: 2),
-                            ),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Container(
-                                width: 120 * _animationController!.value,
-                                height: 40,
-                                color: Colors.lightGreen.withOpacity(0.5),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      Container(
-                        width: 120,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.green, width: 2),
-                        ),
-                        child: TextButton(
-                          onPressed: _acceptRide,
-                          child: Text('Accept', style: TextStyle(color: Colors.black)),
-                        ),
-                      ),
-                    ],
+        return AlertDialog(
+          title: Text('Ride Details'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('From: $fromAddress'),
+              Text('To: $toAddress'),
+              Text('Estimated Earnings: ₹100'), // Example data
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // "Ignore" button
+                  TextButton(
+                    onPressed: _rejectRide,
+                    child: Text('Ignore'),
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
-
-
-
-
-
+                  // "Accept" button with animated slider effect
+                  SizedBox(
+                    width: 120,
+                    height: 40,
+                    child: Stack(
+                      children: [
+                        AnimatedBuilder(
+                          animation: _animationController!,
+                          builder: (context, child) {
+                            return Container(
+                              width: 120,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.green, width: 2),
+                              ),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  width: 120 * _animationController!.value,
+                                  height: 40,
+                                  color: Colors.lightGreen.withOpacity(0.5),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        Container(
+                          width: 120,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.green, width: 2),
+                          ),
+                          child: TextButton(
+                            onPressed: _acceptRide,
+                            child: Text('Accept', style: TextStyle(color: Colors.black)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -948,7 +942,7 @@ void _showRideDetailsPopup() async {
               if (_isOnline) {
                 // Call the provider's method to change the driver's status
                 await Provider.of<DriverProvider>(context, listen: false).changeDriverStatus();
-               // _startAnimation();
+                // _startAnimation();
               }
             },
             activeTrackColor: Colors.blue,
@@ -969,7 +963,11 @@ void _showRideDetailsPopup() async {
                 target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
                 zoom: 14.0,
               ),
-              markers: _marker != null ? {_marker!} : {},
+              markers: _marker != null
+                  ? {
+                      _marker!
+                    }
+                  : {},
               myLocationEnabled: true,
               onMapCreated: (GoogleMapController controller) {
                 _mapController.complete(controller);
