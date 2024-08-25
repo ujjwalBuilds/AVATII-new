@@ -1,3 +1,4 @@
+import 'package:avatii/Url.dart';
 import 'package:avatii/helperFunction.dart';
 import 'package:avatii/models/ride_model.dart';
 import 'package:avatii/provider/Ride_provider.dart';
@@ -14,6 +15,8 @@ import 'package:avatii/Navigation%20Bar/bottomNavigationBar.dart';
 import 'package:avatii/constants/imageStrings.dart';
 import 'package:provider/provider.dart';
 //import 'package:google_maps_webservice/places.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -26,6 +29,111 @@ class _HomeScreenState extends State<HomeScreen> {
     'Your Current Location',
     'Set Location on Map',
   ];
+//for ride acceptance
+  late IO.Socket socket;
+  bool _isSearching = true;
+  String _driverName = '';
+  String _driverPhone = '';
+  String _driverCar = '';
+
+
+
+
+
+ void _initializeSocket() {
+    socket = IO.io(Appurls.baseurl, IO.OptionBuilder()
+        .setTransports(['websocket']).enableAutoConnect()
+        .build());
+        
+    socket?.on('connect', (_) {
+      print('connected to socket server................');
+      _connectUser();
+
+    });
+  socket.on('rideAccepted', (data) {
+      
+      print('....................Ride accepted by driver for passanger........................');
+      setState(() {
+        _isSearching = false;
+        _driverName = data['journeyId'];
+        _driverPhone = data['driverId'];
+        _driverCar='gadddi';
+       // _driverCar = data['driverCar'];
+        // _journeyId = data['journeyId'];
+        // _pickupLocation = data['pickOff'];
+        // _dropoffLocation = data['dropOff'];
+      });
+
+      print('${_driverName}.....................is journey here  id');
+      print('${_driverPhone}.....................is driver  here for id');
+      _showDriverDetails();
+    });
+
+
+     socket?.on('disconnect', (_) {
+      print('disconnected from socket server');
+    });
+  }
+
+  @override
+  void dispose() {
+   
+    socket?.disconnect();
+    super.dispose();
+  }
+
+
+void _connectUser() async {
+  //String userId = await Helperfunction.getUserId();
+  socket.emit('userConnect', {'userId': userid});
+}
+
+void _showDriverDetails() {
+    showMaterialModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        child: Container(
+          color: const Color(0xFFF2F2F5),
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Container(
+              height: 500,
+              child: Column(
+                children: [
+                  // Driver Details
+                  ListTile(
+                    title: Text('journey : $_driverName'),
+                    subtitle: Text('driver id: $_driverPhone\nCar: $_driverCar'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(350, 50),
+                      backgroundColor: Colors.black,
+                      elevation: 1,
+                    ),
+                    child: const Text(
+                      'Close',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+
+
 
   String _selectedLocation = 'Your Current Location';
   bool _isExpanded = false;
@@ -40,13 +148,15 @@ class _HomeScreenState extends State<HomeScreen> {
   String? currentAddress;///user location in words
 
   final TextEditingController _destinationController = TextEditingController();
-String? userid;
+  String? userid;
   @override
   void initState() {
     super.initState();
     _checkLocationPermission();
     _fetchCurrentLocation();
   _load();
+    _initializeSocket();
+  
   }
 
 void _load()async{
@@ -340,6 +450,9 @@ destinationCoordinates = {
   void _searchdriver() {
     //user current loaction coordinate
     //user destination coordinates
+ setState(() {
+      _isSearching = true;
+    });
           print(userid);
           print("${currentCoordinates}...............................");
           print("${ destinationCoordinates}...........................");
@@ -505,7 +618,14 @@ destinationCoordinates = {
                                     width: double.infinity,
                                     height: 50,
                                     child: ElevatedButton(
-                                      onPressed: () => _searchdriver(),
+                                      onPressed: () {
+                                        if(_isSearching){
+                                          _searchdriver();
+                                        }
+                                        else{
+                                          return null;
+                                        }
+                                      },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.black,
                                       ),
