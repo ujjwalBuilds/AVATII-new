@@ -230,7 +230,8 @@ io.on("connection", (socket) => {
 
     // Store the request temporarily
     const requestId = `request-${Date.now()}`;
-    activeRequests.set(requestId, { userId, currentLocation, destinationLocation });
+    // activeRequests.set(requestId, { userId, currentLocation, destinationLocation });
+    // activeRequests.set(requestId, {userId, currentLocation,destinationLocation});
 
     // Notify all available drivers
     for (let [driverId, driverData] of drivers) {
