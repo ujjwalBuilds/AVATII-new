@@ -636,7 +636,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         });
       }
     });
-
+    load();
     _connectToSocket(); // Connect to the socket
   }
 
@@ -702,7 +702,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       _connectDriver();
     });
 
-    socket?.on('requestRide', (data) {
+    socket?.on('rideRequest', (data) {
       print('Request is coming...........................');
       setState(() {
         _hasRideRequest = true;

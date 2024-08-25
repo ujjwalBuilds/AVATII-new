@@ -6,7 +6,7 @@ dotenv.config();
 
 export const StartJourney = asyncHandler(async (req, res) => {
     try {
-        const { passengerId, driverId, pickOff, dropOff, distance } = req.body;
+        const { passengerId, driverId, pickOff, dropOff} = req.body;
 
         if (!passengerId || !driverId || !pickOff || !dropOff ) {
             return res.status(400).json({ message: "Bad request" });
@@ -26,7 +26,7 @@ export const StartJourney = asyncHandler(async (req, res) => {
 
         await startedJourney.save();
 
-        return res.status(201).json({ message: "Journey created", journey: startedJourney });
+        return res.status(201).json({ message: "Journey created", journeyId:startedJourney._id });
     } catch (err) {
         return res.status(500).json({ message: `Internal Server Error: ${err.message}` });
     }
