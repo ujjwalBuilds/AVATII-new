@@ -257,18 +257,25 @@ io.on("connection", (socket) => {
     // activeRequests.set(requestId, {userId, currentLocation,destinationLocation});
 
     // Notify all available drivers
-    for (let [driverData] of drivers) {
-      if (driverData.available) {
-        console.log("oye yha function aarha hai.........")
-        io.to(driverData.socketId).emit("rideRequest", {
-          requestId,
-          userId,
-          currentLocation,
-          destinationLocation,
-          userSocketId: users.get(userId) // Emit user's socket ID to drivers
-        });
-      }
-    }
+    // for (let [driverData] of drivers) {
+    //   if (driverData.available) {
+    //     console.log("oye yha function aarha hai.........")
+    //     io.to(driverData.socketId).emit("rideRequest", {
+    //       requestId,
+    //       userId,
+    //       currentLocation,
+    //       destinationLocation,
+    //       userSocketId: users.get(userId) // Emit user's socket ID to drivers
+    //     });
+    //   }
+    // }
+    io.emit("rideRequest", {
+      requestId,
+      userId,
+      currentLocation,
+      destinationLocation,
+      userSocketId: users.get(userId) // Emit user's socket ID to drivers
+    });
   });
 // Handle a driver accepting a ride request
 
