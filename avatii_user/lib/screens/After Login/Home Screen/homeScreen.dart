@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 //for ride acceptance
   late IO.Socket socket;
-  bool _isSearching = false;
+  bool _isSearching = true;
   String _driverName = '';
   String _driverPhone = '';
   String _driverCar = '';
@@ -618,7 +618,14 @@ destinationCoordinates = {
                                     width: double.infinity,
                                     height: 50,
                                     child: ElevatedButton(
-                                      onPressed: () =>_isSearching==true?    _searchdriver():null,
+                                      onPressed: () {
+                                        if(_isSearching){
+                                          _searchdriver();
+                                        }
+                                        else{
+                                          return null;
+                                        }
+                                      },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.black,
                                       ),

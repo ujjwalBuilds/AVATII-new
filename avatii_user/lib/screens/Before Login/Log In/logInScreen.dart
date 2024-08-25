@@ -20,7 +20,7 @@ TextEditingController _name=TextEditingController();
 
 
 void onregister()async{
-  await Provider.of<UserProvider>(context, listen: false).registerUser(_name.text,
+  await Provider.of<UserProvider>(context, listen: false).loginUser(
    _phoneNumber.text).then((_){
     Get.to(()=>HomeScreen());
    }).catchError((error){
@@ -82,28 +82,6 @@ void onregister()async{
                           fontWeight: FontWeight.w600,
                           color: const Color.fromARGB(255, 116, 116, 116),
                         ),
-                      ),
-                        TextField(
-                        controller: _name,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                          hintText: 'Enter Your Name',
-                          hintStyle: const TextStyle(
-                            color: Color.fromARGB(255, 108, 107, 107),
-                            fontWeight: FontWeight.normal,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(screenSize.width * 0.06),
-                            borderSide: BorderSide(color: Colors.grey.withOpacity(0.5)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Colors.blueAccent),
-                            borderRadius: BorderRadius.circular(screenSize.width * 0.06),
-                          ),
-                          suffixIcon: const Icon(Icons.arrow_forward_rounded),
-                        ),
-                      //  keyboardType: TextInputType.phone,
                       ),
 
                       SizedBox(height: screenSize.height * 0.03),

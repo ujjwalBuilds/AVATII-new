@@ -22,6 +22,7 @@ class _OnboardingViewState extends State<OnboardingView> {
     super.initState();
     pageController.addListener(() {
       setState(() {
+        currentPage = pageController.page?.round() ?? 0;
         isLastPage = pageController.page == (OnboardingItems().items.length - 1);
       });
     });
@@ -43,6 +44,11 @@ class _OnboardingViewState extends State<OnboardingView> {
         child: PageView.builder(
           itemCount: controller.items.length,
           controller: pageController,
+          onPageChanged: (index) {
+            setState(() {
+              currentPage = index;
+            });
+          },
           itemBuilder: (context, index) {
             final item = controller.items[index];
             return Column(
