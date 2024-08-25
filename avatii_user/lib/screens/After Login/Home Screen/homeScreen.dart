@@ -47,21 +47,29 @@ class _HomeScreenState extends State<HomeScreen> {
         
     socket?.on('connect', (_) {
       print('connected to socket server................');
-    });
+      _connectUser();
 
-    socket.on('accetpRide', (data) {
-      // Assuming `data` includes driver information
-      print('Ride accepted succesfully..............................');
+    });
+  socket.on('rideAccepted', (data) {
+      
+      print('....................Ride accepted by driver for passanger........................');
       setState(() {
         _isSearching = false;
-        _driverName = data['driverId'];
-        _driverPhone = data['journeyId'];
-        _driverCar = 'car';
+        _driverName = data['journeyId'];
+        _driverPhone = data['driverId'];
+        _driverCar='gadddi';
+       // _driverCar = data['driverCar'];
+        // _journeyId = data['journeyId'];
+        // _pickupLocation = data['pickOff'];
+        // _dropoffLocation = data['dropOff'];
       });
+
+      print('${_driverName}.....................is journey here  id');
+      print('${_driverPhone}.....................is driver  here for id');
       _showDriverDetails();
     });
 
-    
+
      socket?.on('disconnect', (_) {
       print('disconnected from socket server');
     });
@@ -75,7 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 
-
+void _connectUser() async {
+  //String userId = await Helperfunction.getUserId();
+  socket.emit('userConnect', {'userId': userid});
+}
 
 void _showDriverDetails() {
     showMaterialModalBottomSheet(
@@ -95,8 +106,8 @@ void _showDriverDetails() {
                 children: [
                   // Driver Details
                   ListTile(
-                    title: Text('Driver Name: $_driverName'),
-                    subtitle: Text('journey id: $_driverPhone\nCar: $_driverCar'),
+                    title: Text('journey : $_driverName'),
+                    subtitle: Text('driver id: $_driverPhone\nCar: $_driverCar'),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -143,8 +154,9 @@ void _showDriverDetails() {
     super.initState();
     _checkLocationPermission();
     _fetchCurrentLocation();
-    _initializeSocket();
   _load();
+    _initializeSocket();
+  
   }
 
 void _load()async{
