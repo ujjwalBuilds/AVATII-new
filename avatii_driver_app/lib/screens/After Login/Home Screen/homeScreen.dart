@@ -279,16 +279,7 @@
 
 
 
-import 'package:avatii_driver_app/Navigation%20Bar/bottomNavigationBar.dart';
-import 'package:avatii_driver_app/Url.dart';
-import 'package:avatii_driver_app/provider/DriverProvider.dart';
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:location/location.dart';
-import 'dart:async';
 
-import 'package:provider/provider.dart';
 
 // class HomeScreen extends StatefulWidget {
 //   const HomeScreen({super.key});
@@ -588,13 +579,20 @@ import 'package:provider/provider.dart';
 //   //   );
 //   // }
 // }
-import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
-import 'package:provider/provider.dart';
+
 // Add import for socket.io-client
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:avatii_driver_app/Navigation%20Bar/bottomNavigationBar.dart';
+import 'package:avatii_driver_app/Url.dart';
+import 'package:avatii_driver_app/provider/DriverProvider.dart';
+import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart' hide Location;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
+import 'dart:async';
+
+import 'package:provider/provider.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -738,83 +736,196 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     super.dispose();
   }
 
-  void _showRideDetailsPopup() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        _popupTimer = Timer(const Duration(seconds: 15), () {
-          Navigator.of(context).pop(); // Close the popup after 15 seconds
-        });
+  /*Previous code for new ride popup to be shown in drivers app */
 
-        return AlertDialog(
-          title: Text('Ride Details'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('From: ${_rideRequestDetails?['currentLocation']}'),
-              Text('To: ${_rideRequestDetails?['destinationLocation']}'),
-              Text('Estimated Earnings: ₹100'), // Example data
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // "Ignore" button
-                  TextButton(
-                    onPressed: _rejectRide,
-                    child: Text('Ignore'),
-                  ),
-                  // "Accept" button with animated slider effect
-                  SizedBox(
-                    width: 120,
-                    height: 40,
-                    child: Stack(
-                      children: [
-                        AnimatedBuilder(
-                          animation: _animationController!,
-                          builder: (context, child) {
-                            return Container(
-                              width: 120,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.green, width: 2),
-                              ),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Container(
-                                  width: 120 * _animationController!.value,
-                                  height: 40,
-                                  color: Colors.lightGreen.withOpacity(0.5),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        Container(
-                          width: 120,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.green, width: 2),
-                          ),
-                          child: TextButton(
-                            onPressed: _acceptRide,
-                            child: Text('Accept', style: TextStyle(color: Colors.black)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  // void _showRideDetailsPopup() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       _popupTimer = Timer(const Duration(seconds: 15), () {
+  //         Navigator.of(context).pop(); // Close the popup after 15 seconds
+  //       });
+
+  //       return AlertDialog(
+  //         title: Text('Ride Details'),
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             Text('From: ${_rideRequestDetails?['currentLocation']}'),
+  //             Text('To: ${_rideRequestDetails?['destinationLocation']}'),
+  //             Text('Estimated Earnings: ₹100'), // Example data
+  //             const SizedBox(height: 20),
+  //             Row(
+  //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //               children: [
+  //                 // "Ignore" button
+  //                 TextButton(
+  //                   onPressed: _rejectRide,
+  //                   child: Text('Ignore'),
+  //                 ),
+  //                 // "Accept" button with animated slider effect
+  //                 SizedBox(
+  //                   width: 120,
+  //                   height: 40,
+  //                   child: Stack(
+  //                     children: [
+  //                       AnimatedBuilder(
+  //                         animation: _animationController!,
+  //                         builder: (context, child) {
+  //                           return Container(
+  //                             width: 120,
+  //                             height: 40,
+  //                             decoration: BoxDecoration(
+  //                               color: Colors.transparent,
+  //                               borderRadius: BorderRadius.circular(8),
+  //                               border: Border.all(color: Colors.green, width: 2),
+  //                             ),
+  //                             child: Align(
+  //                               alignment: Alignment.centerLeft,
+  //                               child: Container(
+  //                                 width: 120 * _animationController!.value,
+  //                                 height: 40,
+  //                                 color: Colors.lightGreen.withOpacity(0.5),
+  //                               ),
+  //                             ),
+  //                           );
+  //                         },
+  //                       ),
+  //                       Container(
+  //                         width: 120,
+  //                         height: 40,
+  //                         decoration: BoxDecoration(
+  //                           color: Colors.transparent,
+  //                           borderRadius: BorderRadius.circular(8),
+  //                           border: Border.all(color: Colors.green, width: 2),
+  //                         ),
+  //                         child: TextButton(
+  //                           onPressed: _acceptRide,
+  //                           child: Text('Accept', style: TextStyle(color: Colors.black)),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
+
+  /*New code for new ride popup to be shown in drivers app */
+
+void _showRideDetailsPopup() async {
+  // Placeholder variables for human-readable addresses
+  String fromAddress = 'Loading...';
+  String toAddress = 'Loading...';
+
+  if (_rideRequestDetails != null) {
+    // Extract latitude and longitude from the map
+    double? fromLat = _rideRequestDetails?['currentLocation']['latitude'];
+    double? fromLng = _rideRequestDetails?['currentLocation']['longitude'];
+    double? toLat = _rideRequestDetails?['destinationLocation']['latitude'];
+    double? toLng = _rideRequestDetails?['destinationLocation']['longitude'];
+
+    // Perform reverse geocoding to get human-readable addresses
+    if (fromLat != null && fromLng != null) {
+      List<Placemark> fromPlacemarks = await placemarkFromCoordinates(fromLat, fromLng);
+      fromAddress = "${fromPlacemarks.first.street}, ${fromPlacemarks.first.locality}, ${fromPlacemarks.first.administrativeArea}, ${fromPlacemarks.first.country}";
+    }
+
+    if (toLat != null && toLng != null) {
+      List<Placemark> toPlacemarks = await placemarkFromCoordinates(toLat, toLng);
+      toAddress = "${toPlacemarks.first.street}, ${toPlacemarks.first.locality}, ${toPlacemarks.first.administrativeArea}, ${toPlacemarks.first.country}";
+    }
   }
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      _popupTimer = Timer(const Duration(seconds: 15), () {
+        Navigator.of(context).pop(); // Close the popup after 15 seconds
+      });
+
+      return AlertDialog(
+        title: Text('Ride Details'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('From: $fromAddress'),
+            Text('To: $toAddress'),
+            Text('Estimated Earnings: ₹100'), // Example data
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // "Ignore" button
+                TextButton(
+                  onPressed: _rejectRide,
+                  child: Text('Ignore'),
+                ),
+                // "Accept" button with animated slider effect
+                SizedBox(
+                  width: 120,
+                  height: 40,
+                  child: Stack(
+                    children: [
+                      AnimatedBuilder(
+                        animation: _animationController!,
+                        builder: (context, child) {
+                          return Container(
+                            width: 120,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.green, width: 2),
+                            ),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                width: 120 * _animationController!.value,
+                                height: 40,
+                                color: Colors.lightGreen.withOpacity(0.5),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      Container(
+                        width: 120,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.green, width: 2),
+                        ),
+                        child: TextButton(
+                          onPressed: _acceptRide,
+                          child: Text('Accept', style: TextStyle(color: Colors.black)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
