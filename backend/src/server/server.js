@@ -248,76 +248,19 @@ io.on("connection", (socket) => {
   });
 // Handle a driver accepting a ride request
 
-socket.on("acceptRide", async ({ requestId, driverId }) => {
-  const request = activeRequests.get(requestId);
-  if (request) {
-    console.log(`Driver ${driverId} accepted the ride request ${requestId}`);
+socket.on("acceptRide", ({ driverId, userId, journeyId }) => {
+  console.log(`Driver ${driverId} accepted ride request for user ${userId}`);
 
-    // Remove the request from active requests
-    activeRequests.delete(requestId);
-
-    // Mark driver as unavailable
-    const driver = drivers.get(driverId);
-    if (driver) {
-      driver.available = false;
-    }
-
-    // Create a journey
-    const journeyDetails = {
-      passengerId: request.userId,
-      driverId,
-      pickOff: request.currentLocation,
-      dropOff: request.destinationLocation,
-    };
-
-    try {
-      const { data } = await createJourney(journeyDetails);
-      const journeyId = data.journeyId;
-
-      // Notify the passenger
-      const userSocketId = users.get(request.userId);
-      if (userSocketId) {
-        io.to(userSocketId).emit("rideAccepted", { journeyId, driverId, ...journeyDetails });
-        // Join the user to the journey room
-        socket.to(userSocketId).join(journeyId);
-      } else {
-        console.log(`Socket ID for user ${request.userId} not found`);
-      }
-
-      // Notify the driver to join the same room
-      const driverSocketId = driver.socketId;
-      if (driverSocketId) {
-        io.to(driverSocketId).emit("joinJourney", { journeyId, driverId });
-        // Join the driver to the journey room
-        socket.to(driverSocketId).join(journeyId);
-      } else {
-        console.log(`Socket ID for driver ${driverId} not found`);
-      }
-
-      console.log(`Journey ${journeyId} started with driver ${driverId} and passenger ${request.userId}`);
-    } catch (error) {
-      console.error('Error creating journey:', error);
-      socket.emit("rideError", { message: "Error creating journey" });
-    }
-  } else {
-    console.log(`Ride request ${requestId} is no longer available`);
-    socket.emit("rideUnavailable", { requestId });
-  }
+  // Notify the user that their ride was accepted
+  io.to(userId).emit("rideAccepted", {
+    driverId,
+    journeyId,
+  });
 });
 
 
-  // Function to create a journey
-  async function createJourney(journeyDetails) {
-    try {
-      const response = await axios.post('https://avatii-new.onrender.com/api/booking/start', journeyDetails);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating journey:', error);
-      throw error;
-    }
-  }
 
-  // Handle disconnection
+  // Listen for disconnection
   socket.on("disconnect", () => {
     console.log(`User disconnected: ${socket.id}`);
     // Cleanup user and driver data on disconnect
