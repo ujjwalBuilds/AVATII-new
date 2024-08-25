@@ -1,6 +1,6 @@
 import 'package:avatii/provider/userINfo_provider.dart';
 import 'package:avatii/screens/After%20Login/Home%20Screen/homeScreen.dart';
-import 'package:avatii/screens/Before%20Login/Login/otp/sendOtp.dart';
+import 'package:avatii/screens/Before%20Login/Sign%20In/otp/sendOtp.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -85,8 +85,7 @@ void onregister()async{
                         ),
                       ),
                         TextField(
-                        controller: _name
-                  ,
+                        controller: _name,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
