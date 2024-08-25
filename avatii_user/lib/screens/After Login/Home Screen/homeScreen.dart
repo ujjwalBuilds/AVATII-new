@@ -2,6 +2,7 @@ import 'package:avatii/Url.dart';
 import 'package:avatii/helperFunction.dart';
 import 'package:avatii/models/ride_model.dart';
 import 'package:avatii/provider/Ride_provider.dart';
+import 'package:avatii/provider/userINfo_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -33,8 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late IO.Socket socket;
   bool _isSearching = true;
   String _driverName = '';
-  String _driverPhone = '';
-  String _driverCar = '';
+  String _journeyId = '';
+  String _driverid = '';
 
   void _connectUser() async {
     // String userId = await Helperfunction.getUserId();
@@ -62,21 +63,29 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
 
-    socket.on('rideAccepted', (data) {
+    socket?.on('rideAccepted', (data) async{
       print('..................................Ride accepted by driver for passanger........................');
+     String journeyId = data['journeyId'];
+      String driverId = data['driverId'];
+
+      final rideProvider = Provider.of<UserProvider>(context, listen: false);
+      await rideProvider.fetchJourneyDetails(journeyId);
+      print('got the journey successfull..........');
+      await rideProvider.fetchDriverDetails(driverId);
+    
       setState(() {
         _isSearching = false;
         _driverName = data['journeyId'];
-        _driverPhone = data['driverId'];
-        _driverCar = 'gadddi';
+        // _driverPhone = data['driverId'];
+        // _driverCar = 'gadddi';
         // _driverCar = data['driverCar'];
         // _journeyId = data['journeyId'];
         // _pickupLocation = data['pickOff'];
         // _dropoffLocation = data['dropOff'];
       });
 
-      print('${_driverName}.....................is journey here  id');
-      print('${_driverPhone}.....................is driver  here for id');
+      // print('${_driverName}.....................is journey here  id');
+      // print('${_driverPhone}.....................is driver  here for id');
       _showDriverDetails();
     });
 
@@ -97,8 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
   //     'userId': userid
   //   });
   // }
-
-  void _showDriverDetails() {
+ void _showDriverDetails() {
     showMaterialModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -112,28 +120,40 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             child: Container(
               height: 500,
-              child: Column(
-                children: [
-                  // Driver Details
-                  ListTile(
-                    title: Text('journey : $_driverName'),
-                    subtitle: Text('driver id: $_driverPhone\nCar: $_driverCar'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(350, 50),
-                      backgroundColor: Colors.black,
-                      elevation: 1,
-                    ),
-                    child: const Text(
-                      'Close',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
+              child: Consumer<UserProvider>(
+                builder: (context, rideProvider, child) {
+                  final journey = rideProvider.journey;
+                  final driver = rideProvider.driver;
+                  return Column(
+                    children: [
+                      if (journey != null && driver != null)
+                        ListTile(
+                          title: Text('Journey: ${journey.id}'),
+                          subtitle: Text(
+                            'Driver: ${driver.name}\n'
+                            'Phone: ${driver.phoneNumber}\n'
+                            'Car: ${driver}\n'
+                            'Pickup: ${journey.pickOff}\n'
+                            'Dropoff: ${journey.dropOff}'
+                          ),
+                        ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(350, 50),
+                          backgroundColor: Colors.black,
+                          elevation: 1,
+                        ),
+                        child: const Text(
+                          'Close',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),

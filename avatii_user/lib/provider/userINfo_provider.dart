@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:avatii/models/driver_model.dart';
+import 'package:avatii/models/journeyModel.dart';
 import 'package:avatii/models/usermodel.dart';
 import 'package:avatii/url.dart';
 import 'package:flutter/material.dart';
@@ -124,4 +126,47 @@ bool get isLoading=>_isLoading;
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(_userKey);
   }
+
+
+ Journey? _journey;
+  Driver? _driver;
+
+  Journey? get journey => _journey;
+  Driver? get driver => _driver;
+//fetch journey details...............
+
+  Future<void> fetchJourneyDetails(String journeyId) async {
+    
+    final response = await http.get(Uri.parse('${Appurls.fetchJourneyDetails}$journeyId'));
+    if (response.statusCode == 200) {
+      _journey = Journey.fromJson(json.decode(response.body));
+      notifyListeners();
+    } else {
+
+      print('Failed to get user journey details..........');
+      throw Exception('Failed to load journey details');
+    }
+  }
+//fetch driver details
+  Future<void> fetchDriverDetails(String driverId) async {
+    final response = await http.get(Uri.parse('${Appurls.fetchDriverDetails}$driverId'));
+    if (response.statusCode == 200) {
+      _driver = Driver.fromJson(json.decode(response.body));
+      notifyListeners();
+    } else {
+      print("Failed to get user driver details.............${response.body}....");
+      throw Exception('Failed to load driver details');
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
 }
