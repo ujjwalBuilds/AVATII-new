@@ -99,8 +99,6 @@ socket.on("acceptRide", ({ driverId, userId, journeyId }) => {
   });
 });
 
-
-
   // Listen for disconnection
   socket.on("disconnect", () => {
     console.log(`User disconnected: ${socket.id}`);
