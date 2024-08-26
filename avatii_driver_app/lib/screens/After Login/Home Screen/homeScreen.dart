@@ -637,7 +637,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       }
     });
     load();
-    _connectToSocket(); // Connect to the socket
+    
   }
 
   Future<void> _initializeLocation() async {
@@ -666,6 +666,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   void load() async {
     driverId = await Helperfunction.getUserId();
+    _connectToSocket(); // Connect to the socket
   }
 
   Future<void> _updateMarker(LocationData newLocation) async {
