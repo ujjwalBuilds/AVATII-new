@@ -128,8 +128,12 @@ class DriverDetailsScreen extends StatefulWidget {
 class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
   GoogleMapController? _mapController;
 
+
   @override
   Widget build(BuildContext context) {
+    Location? pickOffcoordinates=widget.journey?.pickOff;
+    print(pickOffcoordinates?.latitude);
+    print(pickOffcoordinates?.longitude);
     return Scaffold(
       body: Stack(
         children: [
