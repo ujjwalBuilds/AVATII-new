@@ -33,9 +33,10 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _createPolylines();
+  //  _createPolylines();
     _getAddresses();
   _initializeSocket();
+  print('..............................init function over..............................................');
   }
 
 
@@ -55,9 +56,13 @@ void _initializeSocket(){
     });
 
 
-    socket?.on("locationUpdate", (data) => {
+    socket?.on("locationUpdate", (data)  {
   // Update the driver's marker on the user's map
-  updateDriverMarkerOnMap(data['location'])
+  print("Driver ki updated location aa rhi hai mere pass.................................");
+var loc=data['location'];
+print("${loc}...............Driver ke coordinates");
+  var location=LatLng(loc['lat'], loc['lng']);
+  updateDriverMarkerOnMap(data['location']);
   
 });
 
