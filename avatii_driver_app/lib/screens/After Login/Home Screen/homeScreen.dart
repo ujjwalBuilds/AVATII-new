@@ -578,6 +578,7 @@
 
 // Add import for socket.io-client
 import 'package:avatii_driver_app/helperFunction.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:avatii_driver_app/Navigation%20Bar/bottomNavigationBar.dart';
 import 'package:avatii_driver_app/Url.dart';
@@ -712,10 +713,104 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       _showRideDetailsPopup(); // Show the popup when a ride request is received
     });
 
+   socket?.on("startJourney",(data){
+print("Started journey function ho rhi hai..........................");
+var pickOffcorrdinates=data['pickOff'];
+print(pickOffcorrdinates);
+final corrdinatesofpassanger=LatLng(pickOffcorrdinates['latitude'], pickOffcorrdinates['longitude']);
+print('this is  my pick up coordinatess......................');
+    // Update the map to show the route from current location to pickup location
+    
+  setRouteToPickupLocation(corrdinatesofpassanger);
+
+   });
+   
     socket?.on('disconnect', (_) {
       print('disconnected from socket server');
     });
   }
+
+Set<Polyline> _polylines = {};
+Set<Marker> _markers = {};
+
+
+Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
+  final GoogleMapController controller = await _mapController.future;
+  final PolylinePoints polylinePoints = PolylinePoints();
+
+  // Get the driver's current location
+  LatLng driverCurrentLocation = LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
+
+  // Get route
+  PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+    
+    googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ'
+    , // Replace with your actual API key
+    // PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
+    // PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
+  
+    // Add the request parameter
+    request: PolylineRequest(
+      origin:  PointLatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+      destination:  PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
+    mode: TravelMode.driving,
+      //transitMode:  TreavelMode,
+      avoidHighways: false,
+      avoidTolls: false,
+      avoidFerries: false,
+    ),
+  );
+
+  if (result.points.isNotEmpty) {
+    List<LatLng> polylineCoordinates = result.points
+        .map((point) => LatLng(point.latitude, point.longitude))
+        .toList();
+
+    setState(() {
+      // Clear existing polylines and markers
+      _polylines.clear();
+      _markers.clear();
+
+      // Add new polyline
+      _polylines.add(Polyline(
+        polylineId: PolylineId('route'),
+        color: Colors.red,
+        points: polylineCoordinates,
+        width: 5,
+      ));
+
+      // Add markers for start and end points
+      _markers.add(Marker(
+        markerId: MarkerId('start'),
+        position: driverCurrentLocation,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      ));
+      _markers.add(Marker(
+        markerId: MarkerId('end'),
+        position: pickOffLocation,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      ));
+    });
+
+    // Move camera to show the entire route
+    LatLngBounds bounds = LatLngBounds(
+      southwest: driverCurrentLocation,
+      northeast: pickOffLocation,
+    );
+    controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+  } else {
+    print('Failed to get directions: ${result.errorMessage}');
+  }
+}
+
+
+
+
+
+
+
+
+
 
   void _acceptRide() {
     // Notify the server that the ride was accepted
@@ -978,6 +1073,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         children: [
           if (_currentLocation != null)
             GoogleMap(
+              polylines: _polylines,
               initialCameraPosition: CameraPosition(
                 target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
                 zoom: 14.0,
