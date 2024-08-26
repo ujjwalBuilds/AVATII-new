@@ -163,4 +163,34 @@ Journey _journey = Journey.fromJson(jsonData);
       throw Exception('Failed to load driver details');
     }
   }
+
+
+  //for Cancelling ride
+  String? _cancelStatus;
+  String? get cancelStatus => _cancelStatus;
+
+  Future<void> cancelJourney(String journeyId) async {
+    final url = Uri.parse(Appurls.cancelRide);
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'journeyId': journeyId}),
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        _cancelStatus = responseData['message'];
+        notifyListeners();
+      } else {
+        _cancelStatus = responseData['message'];
+        notifyListeners();
+      }
+    } catch (error) {
+      _cancelStatus = 'Internal Server Error: ${error.toString()}';
+      notifyListeners();
+    }
+  }
 }

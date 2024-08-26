@@ -39,4 +39,5 @@ class RideProvider with ChangeNotifier {
     _rideRequested = true;
     notifyListeners();
   }
+  
 }

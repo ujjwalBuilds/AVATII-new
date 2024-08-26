@@ -240,9 +240,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       // Update the map to show the route from current location to pickup location
 
       // setRouteToPickupLocation(corrdinatesofpassanger);
-      // _showArrivalBottomSheet(data['journeyId']);
+      _showArrivalBottomSheet(data['journeyId']);
       startTracking();
-      Get.to(() => JourneyDetailsScreen(journeyId: data['journeyId'], currentLocation: _currentLocation,));
+      // Get.to(() => JourneyDetailsScreen(journeyId: data['journeyId'], currentLocation: _currentLocation,));
     });
 
     socket?.on('disconnect', (_) {

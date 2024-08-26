@@ -10,6 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:url_launcher/url_launcher.dart';
 class DriverDetailsScreen extends StatefulWidget {
   final Journey? journey;
   final Driver? driver;
@@ -169,22 +170,6 @@ print("${loc}...............Driver ke coordinates");
     );
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
   Future<void> _getAddresses() async {
     journey.Location? pickOffCoordinates = widget.journey?.pickOff;
     LatLng dropOffLatLng = widget.destinationCoordinates ??
@@ -205,8 +190,8 @@ print("${loc}...............Driver ke coordinates");
       );
 
       setState(() {
-        pickupAddress = '${pickupPlacemarks[0].name}, ${pickupPlacemarks[0].locality},${pickupPlacemarks[0].postalCode} ';
-        dropoffAddress = '${dropoffPlacemarks[0].name}, ${dropoffPlacemarks[0].locality},${dropoffPlacemarks[0].postalCode} ';
+        pickupAddress = '${pickupPlacemarks[0].name}, ${pickupPlacemarks[0].thoroughfare}, ${pickupPlacemarks[0].administrativeArea}, ${pickupPlacemarks[0].locality}, ${pickupPlacemarks[0].postalCode}';
+        dropoffAddress = '${dropoffPlacemarks[0].name}, ${dropoffPlacemarks[0].thoroughfare}, ${dropoffPlacemarks[0].administrativeArea}, ${dropoffPlacemarks[0].locality}, ${dropoffPlacemarks[0].postalCode}';
         // "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}"
       });
     } catch (e) {
@@ -344,7 +329,18 @@ print("${loc}...............Driver ke coordinates");
                     ),
                     SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                       final phoneNumber = widget.driver?.phoneNumber;
+                       if (phoneNumber != null) {
+                         final Uri url = Uri(scheme: 'tel', path: phoneNumber);
+                         if (await canLaunchUrl(url)) {
+                           await launchUrl(url);
+                         } else {
+                           // Handle the error if the phone app cannot be launched
+                           print('Could not launch $url');
+                         }
+                       }
+                      },
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(double.infinity, 50),
                         backgroundColor: Colors.black,
