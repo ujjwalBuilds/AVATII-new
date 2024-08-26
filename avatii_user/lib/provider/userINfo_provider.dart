@@ -7,14 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-
 class UserProvider with ChangeNotifier {
   UserModel? _user;
 
   UserModel? get user => _user;
-bool _isLoading=false;
-bool get isLoading=>_isLoading;
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
   static const String _userKey = 'user_data';
 
   UserProvider() {
@@ -23,34 +21,34 @@ bool get isLoading=>_isLoading;
 
   // Register User
   Future<void> registerUser(String name, String phoneNumber) async {
-    _isLoading=true;
+    _isLoading = true;
     notifyListeners();
     final url = Appurls.registeruser; // Replace with your actual backend URL
     try {
       final response = await http.post(
         Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: json.encode({
           'name': name,
           'phoneNumber': phoneNumber,
         }),
       );
- _isLoading=false;
-    notifyListeners();
+      _isLoading = false;
+      notifyListeners();
       if (response.statusCode == 201) {
-
         print("Successfull registration.....................of the user.............");
         final responseData = json.decode(response.body);
         _user = UserModel.fromJson(responseData);
 
-
-        final pref=await SharedPreferences.getInstance();
-      await pref.setString('token',responseData['token']);
-      await pref.setString('contact',responseData['phoneNumber']);
-          await pref.setString('userid',responseData['_id']);
+        final pref = await SharedPreferences.getInstance();
+        await pref.setString('token', responseData['token']);
+        await pref.setString('contact', responseData['phoneNumber']);
+        await pref.setString('userid', responseData['_id']);
 
         notifyListeners();
-     //   await _saveUserToPrefs(); // Save user data to shared preferences
+        //   await _saveUserToPrefs(); // Save user data to shared preferences
       } else {
         print('failed to registeer.............${response.body}');
         throw Exception('Failed to register user');
@@ -67,27 +65,27 @@ bool get isLoading=>_isLoading;
     try {
       final response = await http.post(
         Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: json.encode({
           'phoneNumber': phoneNumber,
         }),
       );
 
       if (response.statusCode == 200) {
-
         print('Login ..........................successfull');
         final responseData = json.decode(response.body);
         _user = UserModel.fromJson(responseData);
         print(response.body);
-      final pref=await SharedPreferences.getInstance();
-      await pref.setString('token',responseData['token']);
-      await pref.setString('contact',responseData['phoneNumber']);
-          await pref.setString('userid',responseData['_id']);
+        final pref = await SharedPreferences.getInstance();
+        await pref.setString('token', responseData['token']);
+        await pref.setString('contact', responseData['phoneNumber']);
+        await pref.setString('userid', responseData['_id']);
 
         notifyListeners();
-      //  await _saveUserToPrefs(); // Save user data to shared preferences
+        //  await _saveUserToPrefs(); // Save user data to shared preferences
       } else {
-
         print('successfull login.......................... ');
         throw Exception('Failed to login user');
       }
@@ -109,7 +107,6 @@ bool get isLoading=>_isLoading;
   }
 
   // Save user data to shared preferences
- 
 
   // Load user data from shared preferences
   Future<void> _loadUserFromPrefs() async {
@@ -127,8 +124,7 @@ bool get isLoading=>_isLoading;
     prefs.remove(_userKey);
   }
 
-
- Journey? _journey;
+  Journey? _journey;
   Driver? _driver;
 
   Journey? get journey => _journey;
@@ -136,37 +132,28 @@ bool get isLoading=>_isLoading;
 //fetch journey details...............
 
   Future<void> fetchJourneyDetails(String journeyId) async {
-    
     final response = await http.get(Uri.parse('${Appurls.fetchJourneyDetails}$journeyId'));
     if (response.statusCode == 200) {
       _journey = Journey.fromJson(json.decode(response.body));
+      print('Jourrrrrrrrrrney details fetched successfully..........................................');
       notifyListeners();
     } else {
-
       print('Failed to get user journey details..........');
       throw Exception('Failed to load journey details');
     }
   }
+
 //fetch driver details
   Future<void> fetchDriverDetails(String driverId) async {
     final response = await http.get(Uri.parse('${Appurls.fetchDriverDetails}$driverId'));
     if (response.statusCode == 200) {
       _driver = Driver.fromJson(json.decode(response.body));
+      print('Driverrrrrrrrr details fetched successfully..........................................');
       notifyListeners();
+      
     } else {
       print("Failed to get user driver details.............${response.body}....");
       throw Exception('Failed to load driver details');
     }
   }
-
-
-
-
-
-
-
-
-
-
-
 }
