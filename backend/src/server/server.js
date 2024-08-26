@@ -504,7 +504,7 @@ socket.on("acceptRide", async ({ requestId, driverId }) => {
       } else {
         console.log(`Socket ID for driver ${driverId} not found`);
       }
- // Notify the driver to start the journey
+            // Notify the driver to start the journey
             // const driverSocketId = driver.socketId;
             if (driverSocketId) {
               io.to(driverSocketId).emit("startJourney", { 
@@ -520,9 +520,7 @@ socket.on("acceptRide", async ({ requestId, driverId }) => {
               console.log(`Socket ID for driver ${driverId} not found`);
             }
 
-
-
-
+          
       console.log(`Journey ${journeyId} started with driver ${driverId} and passenger ${request.userId}`);
     } catch (error) {
       console.error('Error creating journey:', error);

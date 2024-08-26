@@ -137,7 +137,7 @@ export const GetJourneyInfoById = asyncHandler(async (req, res) => {
             return res.status(404).json({ message: "Journey not found" });
         }
 
-        return res.status(200).json({ message: "Journey retrieved successfully", journey });
+        return res.status(200).json(journey);
     } catch (err) {
         return res.status(500).json({ message: `Internal Server Error: ${err.message}` });
     }

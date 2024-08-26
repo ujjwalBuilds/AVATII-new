@@ -703,7 +703,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     });
 
     socket?.on('rideRequest', (data) {
-      print('Request is coming...........................');
+      print('Request is coming................................');
       setState(() {
         _hasRideRequest = true;
         _rideRequestDetails = data;
