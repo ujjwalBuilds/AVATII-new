@@ -17,7 +17,6 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:avatii/Navigation%20Bar/bottomNavigationBar.dart';
 import 'package:avatii/constants/imageStrings.dart';
 import 'package:provider/provider.dart';
-//import 'package:google_maps_webservice/places.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class HomeScreen extends StatefulWidget {
@@ -106,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
   var driver = rideProvider.driver;
-Get.to(() => DriverDetailsScreen(journey: journey, driver: driver,currentLocation: currentCoordinates,));
+Get.to(() => DriverDetailsScreen(journey: journey, driver: driver,currentLocation: currentCoordinates, destinationCoordinates: LatLng(destinationCoordinates!['latitude']!,destinationCoordinates!['longitude']!),));
 
 });
 
@@ -123,68 +122,6 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver,currentLocatio
     socket?.disconnect();
     super.dispose();
   }
-
-  // void _connectUser() async {
-  //   //String userId = await Helperfunction.getUserId();
-  //   socket.emit('userConnect', {
-  //     'userId': userid
-  //   });
-  // }
-//  void _showDriverDetails() {
-//     showMaterialModalBottomSheet(
-//       context: context,
-//       backgroundColor: Colors.transparent,
-//       builder: (context) => ClipRRect(
-//         borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-//         child: Container(
-//           color: const Color(0xFFF2F2F5),
-//           child: Padding(
-//             padding: EdgeInsets.only(
-//               bottom: MediaQuery.of(context).viewInsets.bottom,
-//             ),
-//             child: Container(
-//               height: 500,
-//               child: Consumer<UserProvider>(
-//                 builder: (context, rideProvider, child) {
-//                   final journey = rideProvider.journey;
-//                   final driver = rideProvider.driver;
-//                   return Column(
-//                     children: [
-//                       if (journey != null && driver != null)
-//                         ListTile(
-//                           title: Text('Journey: ${journey.id}'),
-//                           subtitle: Text(
-//                             'Driver: ${driver.name}\n'
-//                             'Phone: ${driver.phoneNumber}\n'
-//                             'Car: ${driver}\n'
-//                             'Pickup: ${journey.pickOff}\n'
-//                             'Dropoff: ${journey.dropOff}'
-//                           ),
-//                         ),
-//                       ElevatedButton(
-//                         onPressed: () {
-//                           Navigator.pop(context);
-//                         },
-//                         style: ElevatedButton.styleFrom(
-//                           minimumSize: const Size(350, 50),
-//                           backgroundColor: Colors.black,
-//                           elevation: 1,
-//                         ),
-//                         child: const Text(
-//                           'Close',
-//                           style: TextStyle(color: Colors.white),
-//                         ),
-//                       ),
-//                     ],
-//                   );
-//                 },
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
 
   String _selectedLocation = 'Your Current Location';
   bool _isExpanded = false;
@@ -359,8 +296,7 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver,currentLocatio
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: Colors.white,
-                                  //  hintText: currentAddress ?? '' ,
-
+                              
                                   hintStyle: const TextStyle(
                                     fontSize: 15,
                                     color: Color.fromARGB(255, 129, 129, 129),
@@ -378,135 +314,75 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver,currentLocatio
                                   suffixIcon: const Icon(Icons.my_location_rounded, color: Colors.grey, size: 15),
                                 ),
                               ),
-                              //  child: Text('$currentAddress'),
                             ),
                             const SizedBox(height: 10),
-                            // Padding(
-                            //   padding: const EdgeInsets.only(top: 14),
-                            //   child: GooglePlaceAutoCompleteTextField(
-                            //     textEditingController: _destinationController,
-                            //     googleAPIKey: "AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ",
-                            //     inputDecoration: InputDecoration(
-                            //       hintText: 'Destination',
-                            //       filled: true,
-                            //       fillColor: Colors.white,
-                            //       hintStyle: const TextStyle(
-                            //         fontSize: 15,
-                            //         color: Color.fromARGB(255, 129, 129, 129),
-                            //         fontWeight: FontWeight.w400,
-                            //       ),
-                            //       enabledBorder: OutlineInputBorder(
-                            //         borderRadius: BorderRadius.circular(25),
-                            //         borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
-                            //       ),
-                            //       focusedBorder: OutlineInputBorder(
-                            //         borderRadius: BorderRadius.circular(25),
-                            //         borderSide: BorderSide(color: Colors.blueAccent),
-                            //       ),
-                            //       prefixIcon: Icon(Icons.local_taxi_rounded, color: Colors.amber),
-                            //       suffixIcon: Icon(Icons.location_pin, color: Colors.grey, size: 15),
-                            //     ),
-                            //     debounceTime: 800,
-                            //     isLatLngRequired: true,
-                            //     getPlaceDetailWithLatLng: (Prediction prediction) {
-                            //       setState(() {
-                            //         //  destinationCoordinates = "${prediction.lat}, ${prediction.lng}";
-                            //         // destinationCoordinates = {
-                            //         //   'latitude': 40.7128,
-                            //         //   'longitude': -74.0060,
-                            //         // };
-                            //       });
-                            //       print("Destination Coordinates: .................................................$destinationCoordinates");
-                            //     },
-                            //     itemClick: (Prediction prediction) async {
-                            //       _destinationController.text = prediction.description ?? '';
-                            //       _destinationController.selection = TextSelection.fromPosition(TextPosition(offset: prediction.description?.length ?? 0));
-                            //       setState(() {
-                            //         destinationAddress = prediction.description;
-                            //       });
-                            //     },
-                            //     itemBuilder: (context, index, prediction) {
-                            //       return Container(
-                            //         padding: const EdgeInsets.all(10),
-                            //         child: Row(
-                            //           children: [
-                            //             const Icon(Icons.location_on),
-                            //             const SizedBox(width: 7),
-                            //             Expanded(child: Text(prediction.description ?? "")),
-                            //           ],
-                            //         ),
-                            //       );
-                            //     },
-                            //     seperatedBuilder: const Divider(),
-                            //     isCrossBtnShown: true,
-                            //     containerHorizontalPadding: 10,
-                            //     placeType: PlaceType.geocode,
-                            //   ),
-                            // ),
                             
-                            Padding(
-  padding: const EdgeInsets.only(top: 14),
-  child: GooglePlaceAutoCompleteTextField(
-    textEditingController: _destinationController,
-    googleAPIKey: "AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ",
-    inputDecoration: InputDecoration(
-      hintText: 'Destination',
-      filled: true,
-      fillColor: Colors.white,
-      hintStyle: const TextStyle(
-        fontSize: 15,
-        color: Color.fromARGB(255, 129, 129, 129),
-        fontWeight: FontWeight.w400,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(25),
-        borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(25),
-        borderSide: BorderSide(color: Colors.blueAccent),
-      ),
-      prefixIcon: Icon(Icons.local_taxi_rounded, color: Colors.amber),
-      suffixIcon: Icon(Icons.location_pin, color: Colors.grey, size: 15),
-    ),
-    debounceTime: 800,
-    isLatLngRequired: true,
-    getPlaceDetailWithLatLng: (Prediction prediction) {
-      setState(() {
-        destinationCoordinates = {
-          'latitude': double.parse(prediction.lat ?? '0.0'),
-          'longitude': double.parse(prediction.lng ?? '0.0'),
-        };
-      });
-      print("Destination Coordinates: $destinationCoordinates");
-    },
-    itemClick: (Prediction prediction) async {
-      _destinationController.text = prediction.description ?? '';
-      _destinationController.selection = TextSelection.fromPosition(
-        TextPosition(offset: prediction.description?.length ?? 0),
-      );
-      setState(() {
-        destinationAddress = prediction.description;
-      });
-    },
-    itemBuilder: (context, index, prediction) {
-      return Container(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            const Icon(Icons.location_on),
-            const SizedBox(width: 7),
-            Expanded(child: Text(prediction.description ?? "")),
-          ],
-        ),
-      );
-    },
-    seperatedBuilder: const Divider(),
-    isCrossBtnShown: true,
-    containerHorizontalPadding: 10,
-    placeType: PlaceType.geocode,
-  ),
-),
+                            GooglePlaceAutoCompleteTextField(
+                              
+                              boxDecoration: BoxDecoration(
+                                border: Border.all(color: const Color(0xFFF2F2F5),)
+                              ),
+                              textEditingController: _destinationController,
+                              googleAPIKey: "AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ",
+                              inputDecoration: InputDecoration(
+                                
+                                hintText: 'Destination',
+                                filled: true,
+                                fillColor: Colors.white,
+                                hintStyle: const TextStyle(
+                                  fontSize: 15,
+                                  color: Color.fromARGB(255, 129, 129, 129),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(25),
+                                  borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(25),
+                                  borderSide: BorderSide(color: Colors.blueAccent),
+                                ),
+                                prefixIcon: Icon(Icons.local_taxi_rounded, color: Colors.amber),
+                                suffixIcon: Icon(Icons.location_pin, color: Colors.grey, size: 15),
+                              ),
+                              debounceTime: 800,
+                              isLatLngRequired: true,
+                              getPlaceDetailWithLatLng: (Prediction prediction) {
+                                setState(() {
+                                  destinationCoordinates = {
+                                    'latitude': double.parse(prediction.lat ?? '0.0'),
+                                    'longitude': double.parse(prediction.lng ?? '0.0'),
+                                  };
+                                });
+                                print("Destination Coordinates: $destinationCoordinates");
+                              },
+                              itemClick: (Prediction prediction) async {
+                                _destinationController.text = prediction.description ?? '';
+                                _destinationController.selection = TextSelection.collapsed(
+                                  offset: _destinationController.text.length,
+                                );
+                                setState(() {
+                                  destinationAddress = prediction.description;
+                                });
+                              },
+                              itemBuilder: (context, index, prediction) {
+                                return Container(
+                                  padding: const EdgeInsets.all(10),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.location_on),
+                                      const SizedBox(width: 7),
+                                      Expanded(child: Text(prediction.description ?? "")),
+                                    ],
+                                  ),
+                                );
+                              },
+                              seperatedBuilder: const Divider(),
+                              isCrossBtnShown: true,
+                              containerHorizontalPadding: 10,
+                              countries: ["IN"],
+                              placeType: PlaceType.geocode,
+                            ),
 
                             const SizedBox(height: 20),
                             ElevatedButton(

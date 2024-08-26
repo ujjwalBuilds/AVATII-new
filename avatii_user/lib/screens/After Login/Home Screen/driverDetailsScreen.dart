@@ -13,6 +13,7 @@ class DriverDetailsScreen extends StatefulWidget {
   final Map<String, double> currentLocation;
   final LatLng? destinationCoordinates;
 
+<<<<<<< HEAD
   const DriverDetailsScreen({
     Key? key,
     required this.journey,
@@ -20,6 +21,9 @@ class DriverDetailsScreen extends StatefulWidget {
     required this.currentLocation,
     this.destinationCoordinates,
   }) : super(key: key);
+=======
+  const DriverDetailsScreen({Key? key, required this.journey, required this.driver, required this.currentLocation, required this.destinationCoordinates}) : super(key: key);
+>>>>>>> 9237cee08e2b871d9c1548b1c2c9929860f065f8
 
   @override
   _DriverDetailsScreenState createState() => _DriverDetailsScreenState();
@@ -58,7 +62,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ',
-      request:  PolylineRequest(
+      request: PolylineRequest(
         origin: PointLatLng(pickOffLatLng.latitude, pickOffLatLng.longitude),
         destination: PointLatLng(dropOffLatLng.latitude, dropOffLatLng.longitude),
         mode: TravelMode.driving,
@@ -145,7 +149,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
         children: [
           // Google Map
           Positioned.fill(
-            child: GoogleMap( 
+            child: GoogleMap(
               onMapCreated: (controller) {
                 _mapController = controller;
               },
@@ -222,4 +226,3 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
     );
   }
 }
-
