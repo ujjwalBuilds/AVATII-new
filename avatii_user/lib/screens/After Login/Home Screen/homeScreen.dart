@@ -192,7 +192,7 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver, currentLocati
   LatLng _initialPosition = const LatLng(0, 0);
   bool _loading = true;
   String _paymentMode = 'Cash';
-  Map<String, double>? destinationCoordinates; //destionation coordinates
+  Map<String, double>? destinationCoordinates = {}; //destionation coordinates
   String? _selectedRide;
   Map<String, double> currentCoordinates = {}; //user current loaction corrdinates
   String? destinationAddress; //user destination location where he want to go
@@ -381,68 +381,133 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver, currentLocati
                               //  child: Text('$currentAddress'),
                             ),
                             const SizedBox(height: 10),
+                            // Padding(
+                            //   padding: const EdgeInsets.only(top: 14),
+                            //   child: GooglePlaceAutoCompleteTextField(
+                            //     textEditingController: _destinationController,
+                            //     googleAPIKey: "AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ",
+                            //     inputDecoration: InputDecoration(
+                            //       hintText: 'Destination',
+                            //       filled: true,
+                            //       fillColor: Colors.white,
+                            //       hintStyle: const TextStyle(
+                            //         fontSize: 15,
+                            //         color: Color.fromARGB(255, 129, 129, 129),
+                            //         fontWeight: FontWeight.w400,
+                            //       ),
+                            //       enabledBorder: OutlineInputBorder(
+                            //         borderRadius: BorderRadius.circular(25),
+                            //         borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
+                            //       ),
+                            //       focusedBorder: OutlineInputBorder(
+                            //         borderRadius: BorderRadius.circular(25),
+                            //         borderSide: BorderSide(color: Colors.blueAccent),
+                            //       ),
+                            //       prefixIcon: Icon(Icons.local_taxi_rounded, color: Colors.amber),
+                            //       suffixIcon: Icon(Icons.location_pin, color: Colors.grey, size: 15),
+                            //     ),
+                            //     debounceTime: 800,
+                            //     isLatLngRequired: true,
+                            //     getPlaceDetailWithLatLng: (Prediction prediction) {
+                            //       setState(() {
+                            //         //  destinationCoordinates = "${prediction.lat}, ${prediction.lng}";
+                            //         // destinationCoordinates = {
+                            //         //   'latitude': 40.7128,
+                            //         //   'longitude': -74.0060,
+                            //         // };
+                            //       });
+                            //       print("Destination Coordinates: .................................................$destinationCoordinates");
+                            //     },
+                            //     itemClick: (Prediction prediction) async {
+                            //       _destinationController.text = prediction.description ?? '';
+                            //       _destinationController.selection = TextSelection.fromPosition(TextPosition(offset: prediction.description?.length ?? 0));
+                            //       setState(() {
+                            //         destinationAddress = prediction.description;
+                            //       });
+                            //     },
+                            //     itemBuilder: (context, index, prediction) {
+                            //       return Container(
+                            //         padding: const EdgeInsets.all(10),
+                            //         child: Row(
+                            //           children: [
+                            //             const Icon(Icons.location_on),
+                            //             const SizedBox(width: 7),
+                            //             Expanded(child: Text(prediction.description ?? "")),
+                            //           ],
+                            //         ),
+                            //       );
+                            //     },
+                            //     seperatedBuilder: const Divider(),
+                            //     isCrossBtnShown: true,
+                            //     containerHorizontalPadding: 10,
+                            //     placeType: PlaceType.geocode,
+                            //   ),
+                            // ),
+                            
                             Padding(
-                              padding: const EdgeInsets.only(top: 14),
-                              child: GooglePlaceAutoCompleteTextField(
-                                textEditingController: _destinationController,
-                                googleAPIKey: "AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ",
-                                inputDecoration: InputDecoration(
-                                  hintText: 'Destination',
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  hintStyle: const TextStyle(
-                                    fontSize: 15,
-                                    color: Color.fromARGB(255, 129, 129, 129),
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25),
-                                    borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25),
-                                    borderSide: BorderSide(color: Colors.blueAccent),
-                                  ),
-                                  prefixIcon: Icon(Icons.local_taxi_rounded, color: Colors.amber),
-                                  suffixIcon: Icon(Icons.location_pin, color: Colors.grey, size: 15),
-                                ),
-                                debounceTime: 800,
-                                isLatLngRequired: true,
-                                getPlaceDetailWithLatLng: (Prediction prediction) {
-                                  setState(() {
-                                    //  destinationCoordinates = "${prediction.lat}, ${prediction.lng}";
-                                    destinationCoordinates = {
-                                      'latitude': 40.7128,
-                                      'longitude': -74.0060,
-                                    };
-                                  });
-                                  print("Destination Coordinates: .................................................$destinationCoordinates");
-                                },
-                                itemClick: (Prediction prediction) async {
-                                  _destinationController.text = prediction.description ?? '';
-                                  _destinationController.selection = TextSelection.fromPosition(TextPosition(offset: prediction.description?.length ?? 0));
-                                  setState(() {
-                                    destinationAddress = prediction.description;
-                                  });
-                                },
-                                itemBuilder: (context, index, prediction) {
-                                  return Container(
-                                    padding: const EdgeInsets.all(10),
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.location_on),
-                                        const SizedBox(width: 7),
-                                        Expanded(child: Text(prediction.description ?? "")),
-                                      ],
-                                    ),
-                                  );
-                                },
-                                seperatedBuilder: const Divider(),
-                                isCrossBtnShown: true,
-                                containerHorizontalPadding: 10,
-                                placeType: PlaceType.geocode,
-                              ),
-                            ),
+  padding: const EdgeInsets.only(top: 14),
+  child: GooglePlaceAutoCompleteTextField(
+    textEditingController: _destinationController,
+    googleAPIKey: "AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ",
+    inputDecoration: InputDecoration(
+      hintText: 'Destination',
+      filled: true,
+      fillColor: Colors.white,
+      hintStyle: const TextStyle(
+        fontSize: 15,
+        color: Color.fromARGB(255, 129, 129, 129),
+        fontWeight: FontWeight.w400,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(25),
+        borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(25),
+        borderSide: BorderSide(color: Colors.blueAccent),
+      ),
+      prefixIcon: Icon(Icons.local_taxi_rounded, color: Colors.amber),
+      suffixIcon: Icon(Icons.location_pin, color: Colors.grey, size: 15),
+    ),
+    debounceTime: 800,
+    isLatLngRequired: true,
+    getPlaceDetailWithLatLng: (Prediction prediction) {
+      setState(() {
+        destinationCoordinates = {
+          'latitude': double.parse(prediction.lat ?? '0.0'),
+          'longitude': double.parse(prediction.lng ?? '0.0'),
+        };
+      });
+      print("Destination Coordinates: $destinationCoordinates");
+    },
+    itemClick: (Prediction prediction) async {
+      _destinationController.text = prediction.description ?? '';
+      _destinationController.selection = TextSelection.fromPosition(
+        TextPosition(offset: prediction.description?.length ?? 0),
+      );
+      setState(() {
+        destinationAddress = prediction.description;
+      });
+    },
+    itemBuilder: (context, index, prediction) {
+      return Container(
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          children: [
+            const Icon(Icons.location_on),
+            const SizedBox(width: 7),
+            Expanded(child: Text(prediction.description ?? "")),
+          ],
+        ),
+      );
+    },
+    seperatedBuilder: const Divider(),
+    isCrossBtnShown: true,
+    containerHorizontalPadding: 10,
+    placeType: PlaceType.geocode,
+  ),
+),
+
                             const SizedBox(height: 20),
                             ElevatedButton(
                                 onPressed: () {
