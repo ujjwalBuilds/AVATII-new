@@ -99,9 +99,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final rideProvider =Provider.of<UserProvider>(context, listen: false);
   await rideProvider.fetchJourneyDetails(journeyId);
+    var journey = rideProvider.journey;
   await rideProvider.fetchDriverDetails(driverId);
 
-  var journey = rideProvider.journey;
+
   var driver = rideProvider.driver;
 Get.to(() => DriverDetailsScreen(journey: journey, driver: driver));
 
@@ -127,61 +128,61 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver));
   //     'userId': userid
   //   });
   // }
- void _showDriverDetails() {
-    showMaterialModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-        child: Container(
-          color: const Color(0xFFF2F2F5),
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
-            child: Container(
-              height: 500,
-              child: Consumer<UserProvider>(
-                builder: (context, rideProvider, child) {
-                  final journey = rideProvider.journey;
-                  final driver = rideProvider.driver;
-                  return Column(
-                    children: [
-                      if (journey != null && driver != null)
-                        ListTile(
-                          title: Text('Journey: ${journey.id}'),
-                          subtitle: Text(
-                            'Driver: ${driver.name}\n'
-                            'Phone: ${driver.phoneNumber}\n'
-                            'Car: ${driver}\n'
-                            'Pickup: ${journey.pickOff}\n'
-                            'Dropoff: ${journey.dropOff}'
-                          ),
-                        ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(350, 50),
-                          backgroundColor: Colors.black,
-                          elevation: 1,
-                        ),
-                        child: const Text(
-                          'Close',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+//  void _showDriverDetails() {
+//     showMaterialModalBottomSheet(
+//       context: context,
+//       backgroundColor: Colors.transparent,
+//       builder: (context) => ClipRRect(
+//         borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+//         child: Container(
+//           color: const Color(0xFFF2F2F5),
+//           child: Padding(
+//             padding: EdgeInsets.only(
+//               bottom: MediaQuery.of(context).viewInsets.bottom,
+//             ),
+//             child: Container(
+//               height: 500,
+//               child: Consumer<UserProvider>(
+//                 builder: (context, rideProvider, child) {
+//                   final journey = rideProvider.journey;
+//                   final driver = rideProvider.driver;
+//                   return Column(
+//                     children: [
+//                       if (journey != null && driver != null)
+//                         ListTile(
+//                           title: Text('Journey: ${journey.id}'),
+//                           subtitle: Text(
+//                             'Driver: ${driver.name}\n'
+//                             'Phone: ${driver.phoneNumber}\n'
+//                             'Car: ${driver}\n'
+//                             'Pickup: ${journey.pickOff}\n'
+//                             'Dropoff: ${journey.dropOff}'
+//                           ),
+//                         ),
+//                       ElevatedButton(
+//                         onPressed: () {
+//                           Navigator.pop(context);
+//                         },
+//                         style: ElevatedButton.styleFrom(
+//                           minimumSize: const Size(350, 50),
+//                           backgroundColor: Colors.black,
+//                           elevation: 1,
+//                         ),
+//                         child: const Text(
+//                           'Close',
+//                           style: TextStyle(color: Colors.white),
+//                         ),
+//                       ),
+//                     ],
+//                   );
+//                 },
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
 
   String _selectedLocation = 'Your Current Location';
   bool _isExpanded = false;
