@@ -14,13 +14,7 @@ class DriverDetailsScreen extends StatefulWidget {
   final Map<String, double> currentLocation;
   final LatLng? destinationCoordinates;
 
-  const DriverDetailsScreen({
-    Key? key,
-    required this.journey,
-    required this.driver,
-    required this.currentLocation,
-    this.destinationCoordinates,
-  }) : super(key: key);
+  const DriverDetailsScreen({Key? key, required this.journey, required this.driver, required this.currentLocation, required this.destinationCoordinates}) : super(key: key);
 
   @override
   _DriverDetailsScreenState createState() => _DriverDetailsScreenState();
