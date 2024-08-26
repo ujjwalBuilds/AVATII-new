@@ -106,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
   var driver = rideProvider.driver;
-Get.to(() => DriverDetailsScreen(journey: journey, driver: driver));
+Get.to(() => DriverDetailsScreen(journey: journey, driver: driver, currentLocation: currentCoordinates,));
 
 });
 
@@ -194,7 +194,7 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver));
   String _paymentMode = 'Cash';
   Map<String, double>? destinationCoordinates; //destionation coordinates
   String? _selectedRide;
-  Map<String, double>? currentCoordinates; //user current loaction corrdinates
+  Map<String, double> currentCoordinates = {}; //user current loaction corrdinates
   String? destinationAddress; //user destination location where he want to go
   String? currentAddress;
 
