@@ -131,17 +131,19 @@ class UserProvider with ChangeNotifier {
   Driver? get driver => _driver;
 //fetch journey details...............
 
-  Future<void> fetchJourneyDetails(String journeyId) async {
+  Future<Journey> fetchJourneyDetails(String journeyId) async {
     final response = await http.get(Uri.parse('${Appurls.fetchJourneyDetails}$journeyId'));
     if (response.statusCode == 200) {
 Map<String, dynamic> jsonData = json.decode(response.body);
-Journey _journey = Journey.fromJson(jsonData['journey']);
+Journey _journey = Journey.fromJson(jsonData);
 
       //_journey = Journey.fromJson(json.decode(response.body));
-      print(jsonData['journey']);
+      print(response.body);
       print(_journey.toString());
+     
       print('Jourrrrrrrrrrney details fetched successfully..........................................');
       notifyListeners();
+       return _journey;
     } else {
       print('Failed to get user journey details..........');
       throw Exception('Failed to load journey details');

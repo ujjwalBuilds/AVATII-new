@@ -98,8 +98,10 @@ class _HomeScreenState extends State<HomeScreen> {
   String driverId = data['driverId'];
 
   final rideProvider =Provider.of<UserProvider>(context, listen: false);
-  await rideProvider.fetchJourneyDetails(journeyId);
-    var journey = rideProvider.journey;
+ 
+ 
+ var journey= await rideProvider.fetchJourneyDetails(journeyId);
+   // var journey = rideProvider.journey;
   await rideProvider.fetchDriverDetails(driverId);
 
 
