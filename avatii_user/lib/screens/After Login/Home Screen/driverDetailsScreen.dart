@@ -1,117 +1,3 @@
-<<<<<<< HEAD
-// import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-// class DriverDetailsScreen extends StatefulWidget {
-//   final String journeyId;
-//   final String driverId;
-
-//   const DriverDetailsScreen({
-//     Key? key,
-//     required this.journeyId,
-//     required this.driverId,
-//   }) : super(key: key);
-
-//   @override
-//   _DriverDetailsScreenState createState() => _DriverDetailsScreenState();
-// }
-
-// class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
-//   GoogleMapController? _mapController;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _fetchData();
-//   }
-
-//   Future<void> _fetchData() async {
-//     final rideProvider = Provider.of<UserProvider>(context, listen: false);
-//     await rideProvider.fetchJourneyDetails(widget.journeyId);
-//     await rideProvider.fetchDriverDetails(widget.driverId);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Column(
-//         children: [
-//           // 60% of the screen for Google Map
-//           Expanded(
-//             flex: 6,
-//             child: GoogleMap(
-//               onMapCreated: (controller) {
-//                 _mapController = controller;
-//               },
-//               initialCameraPosition: CameraPosition(
-//                 target: LatLng(37.7749, -122.4194), // Set initial position here
-//                 zoom: 14,
-//               ),
-//               // Add markers, polylines, etc. as needed
-//             ),
-//           ),
-//           // 40% of the screen for Driver Details
-//           Expanded(
-//             flex: 4,
-//             child: Consumer<UserProvider>(
-//               builder: (context, rideProvider, child) {
-//                 final journey = rideProvider.journey;
-//                 final driver = rideProvider.driver;
-//                 if (journey == null || driver == null) {
-//                   return Center(child: CircularProgressIndicator());
-//                 }
-//                 return Container(
-//                   color: const Color(0xFFF2F2F5),
-//                   padding: const EdgeInsets.all(16.0),
-//                   child: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text('Journey ID: ${journey.id}', style: TextStyle(fontSize: 18)),
-//                       SizedBox(height: 8),
-//                       Text('Driver Name: ${driver.name}', style: TextStyle(fontSize: 18)),
-//                       SizedBox(height: 8),
-//                       Text('Phone: ${driver.phoneNumber}', style: TextStyle(fontSize: 18)),
-//                       SizedBox(height: 8),
-//                       Text('Car: ${driver.car}', style: TextStyle(fontSize: 18)),
-//                       SizedBox(height: 8),
-//                       Text('Pickup Location: ${journey.pickOff}', style: TextStyle(fontSize: 18)),
-//                       SizedBox(height: 8),
-//                       Text('Dropoff Location: ${journey.dropOff}', style: TextStyle(fontSize: 18)),
-//                       SizedBox(height: 16),
-//                       ElevatedButton(
-//                         onPressed: () {
-//                           Navigator.pop(context);
-//                         },
-//                         style: ElevatedButton.styleFrom(
-//                           minimumSize: const Size(double.infinity, 50),
-//                           backgroundColor: Colors.black,
-//                         ),
-//                         child: const Text(
-//                           'Close',
-//                           style: TextStyle(color: Colors.white),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 );
-//               },
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-
-
-
-
-
-
-=======
->>>>>>> b6bf35a44e2f87766a62cf62535075cc77a04eb1
 import 'package:avatii/models/driver_model.dart';
 import 'package:avatii/models/journeyModel.dart' as journey;
 import 'package:avatii/models/journeyModel.dart';
@@ -124,11 +10,6 @@ import 'package:geocoding/geocoding.dart';
 class DriverDetailsScreen extends StatefulWidget {
   final Journey? journey;
   final Driver? driver;
-<<<<<<< HEAD
-  final Map<String,double> currentLocation;
-
-  const DriverDetailsScreen({Key? key, required this.journey, required this.driver,required this.currentLocation}) : super(key: key);
-=======
   final Map<String, double> currentLocation;
   final LatLng? destinationCoordinates;
 
@@ -139,7 +20,6 @@ class DriverDetailsScreen extends StatefulWidget {
     required this.currentLocation,
     this.destinationCoordinates,
   }) : super(key: key);
->>>>>>> b6bf35a44e2f87766a62cf62535075cc77a04eb1
 
   @override
   _DriverDetailsScreenState createState() => _DriverDetailsScreenState();
