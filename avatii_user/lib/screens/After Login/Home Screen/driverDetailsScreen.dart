@@ -52,7 +52,7 @@ void _initializeSocket(){
             .build());
 
     socket?.on('connect', (_) {
-      print('connected to socket server.......');
+      print('connected to socket server.....................................');
     
     });
 
