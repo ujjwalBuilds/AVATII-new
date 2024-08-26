@@ -154,6 +154,24 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       ),
     );
   }
+// Navigator.geolocation.watchPosition((position) => {
+//   const location = {
+//     lat: position.coords.latitude,
+//     lng: position.coords.longitude
+//   };
+//   socket.emit("updateLocation", { driverId: driverId, location });
+// });
+
+
+
+
+  // Future<void> requestLocationPermissions() async {
+  //   geo.LocationPermission permission = await geo.Geolocator.requestPermission();
+  //   if (permission == geo.LocationPermission.denied ||
+  //       permission == geo.LocationPermission.deniedForever) {
+  //     // Handle permission denied
+  //   }
+  // }
 
   void _connectDriver() async {
     // String driverId = await Helperfunction.getDriverId(); // Replace with actual method to get driver ID
@@ -187,6 +205,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     });
   }
 
+
+//..............................socket io initalization ...........................
   void _connectToSocket() {
     socket = IO.io(
         Appurls.baseurl,

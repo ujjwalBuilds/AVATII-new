@@ -2,17 +2,20 @@ import 'package:avatii/constants/imageStrings.dart';
 import 'package:avatii/models/driver_model.dart';
 import 'package:avatii/models/journeyModel.dart' as journey;
 import 'package:avatii/models/journeyModel.dart';
+import 'package:avatii/url.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart';
-
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 class DriverDetailsScreen extends StatefulWidget {
   final Journey? journey;
   final Driver? driver;
   final Map<String, double> currentLocation;
   final LatLng? destinationCoordinates;
+  
 
   const DriverDetailsScreen({Key? key, required this.journey, required this.driver, required this.currentLocation, required this.destinationCoordinates}) : super(key: key);
 
@@ -25,12 +28,79 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
   Set<Polyline> _polylines = {};
   String pickupAddress = '';
   String dropoffAddress = '';
-
+  Marker? _driverMarker;
+ IO.Socket? socket;
   @override
   void initState() {
     super.initState();
     _createPolylines();
     _getAddresses();
+  _initializeSocket();
+  }
+
+
+void _initializeSocket(){
+   socket = IO.io(
+        Appurls.baseurl,
+        IO.OptionBuilder()
+            .setTransports([
+              'websocket'
+            ])
+            .enableAutoConnect()
+            .build());
+
+    socket?.on('connect', (_) {
+      print('connected to socket server.......');
+    
+    });
+
+
+    socket?.on("locationUpdate", (data) => {
+  // Update the driver's marker on the user's map
+  updateDriverMarkerOnMap(data['location'])
+  
+});
+
+ socket?.on('disconnect', (_) {
+      print('disconnected from socket server');
+    });
+
+}
+
+
+
+ // Function to update or add the driver marker on the map
+  void updateDriverMarkerOnMap(LatLng driverLocation) {
+    setState(() {
+      if (_driverMarker == null) {
+        // Add new marker if it doesn't exist
+        _driverMarker = Marker(
+          markerId: MarkerId("driver"),
+          position: driverLocation,
+          infoWindow: InfoWindow(title: "Driver Location"),
+        );
+      } else {
+        // Update the existing marker's position
+        _driverMarker = _driverMarker!.copyWith(
+          positionParam: driverLocation,
+        );
+      }
+
+      // Optionally, center the map on the driver's location
+      _mapController?.animateCamera(
+        CameraUpdate.newLatLng(driverLocation),
+      );
+    });
+  }
+
+
+
+  Future<void> requestLocationPermissions() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      // Handle permission denied
+    }
   }
 
   Future<void> _createPolylines() async {
@@ -93,6 +163,22 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
       ),
     );
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
   Future<void> _getAddresses() async {
     journey.Location? pickOffCoordinates = widget.journey?.pickOff;
@@ -157,13 +243,14 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                   ),
                   infoWindow: InfoWindow(title: 'Pickup Location'),
                 ),
-                Marker(
-                  markerId: MarkerId('dropoff'),
-                  position: dropOffLatLng,
-                  infoWindow: InfoWindow(title: 'Dropoff Location'),
-                ),
-              },
-              polylines: _polylines,
+                // Marker(
+                //   markerId: MarkerId('dropoff'),
+                //   position: dropOffLatLng,
+                //   infoWindow: InfoWindow(title: 'Dropoff Location'),
+                // ),
+                _driverMarker!=null?_driverMarker!:Marker(markerId: MarkerId('driver'))
+           },
+             // polylines: _polylines,
             ),
           ),
           // Bottom Container for Driver Details
