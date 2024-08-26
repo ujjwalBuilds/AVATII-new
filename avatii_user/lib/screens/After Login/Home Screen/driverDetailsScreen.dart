@@ -109,137 +109,18 @@
 
 
 
-// import 'package:avatii/models/driver_model.dart';
-// import 'package:avatii/models/journeyModel.dart';
-// import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-// class DriverDetailsScreen extends StatefulWidget {
-//   final Journey? journey;
-//   final Driver? driver;
-//   final Map<String, double> currentLocation;
-
-//   const DriverDetailsScreen({Key? key, required this.journey, required this.driver , required this.currentLocation}) : super(key: key);
-
-//   @override
-//   _DriverDetailsScreenState createState() => _DriverDetailsScreenState();
-// }
-
-// class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
-//   GoogleMapController? _mapController;
-
-
-//   @override
-//   Widget build(BuildContext context) {
-//     Location? pickOffcoordinates=widget.journey?.pickOff;
-//     double pickoffLatitude = widget.currentLocation['latitude'] ?? 0.0;
-//     double pickoffLongitude = widget.currentLocation['longitude'] ?? 0.0;
-//     print(pickOffcoordinates?.latitude);
-//     print(pickOffcoordinates?.longitude);
-//     Location? dropOffcoordinates=widget.journey?.dropOff;
-//     double dropoffLatitude = widget.currentLocation['latitude'] ?? 0.0;
-//     double dropoffLongitude = widget.currentLocation['longitude'] ?? 0.0;
-//     print(dropOffcoordinates?.latitude);
-//     print(dropOffcoordinates?.longitude);
-//     return Scaffold(
-//       body: Stack(
-//         children: [
-//           // Google Map
-//           Positioned.fill(
-//             child: GoogleMap(
-//               onMapCreated: (controller) {
-//                 _mapController = controller;
-//               },
-//               initialCameraPosition: CameraPosition(
-//                 // target: LatLng(widget.journey.pickOffLatitude, widget.journey.pickOffLongitude),
-//                 target: LatLng(28.7500, 77.1175),
-//                 zoom: 14.0,
-//               ),
-//               markers: {
-//                 Marker(
-//                   markerId: MarkerId('pickup'),
-//                   position: LatLng(pickOffcoordinates?.latitude ?? pickoffLatitude, pickOffcoordinates?.longitude ?? pickoffLongitude),
-//                   infoWindow: InfoWindow(title: 'Pickup Location'),
-//                 ),
-//                 Marker(
-//                   markerId: MarkerId('dropoff'),
-//                   position: LatLng(dropOffcoordinates?.latitude ?? dropoffLatitude, dropOffcoordinates?.longitude ?? dropoffLongitude),
-//                   infoWindow: InfoWindow(title: 'Dropoff Location'),
-//                 ),
-//               },
-//             ),
-//           ),
-//           // Bottom Container for Driver Details
-//           Positioned(
-//             bottom: 0,
-//             left: 0,
-//             right: 0,
-//             child: Container(
-//               height: MediaQuery.of(context).size.height * 0.4, // 40% of the screen height
-//               decoration: BoxDecoration(
-//                 color: const Color(0xFFF2F2F5),
-//                 borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-//               ),
-//               child: Padding(
-//                 padding: const EdgeInsets.all(16.0),
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Text(
-//                       'Journey ID: ${widget.journey?.id}',
-//                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-//                     ),
-//                     SizedBox(height: 8),
-//                     Text('Driver: ${widget.driver?.name}'),
-//                     Text('Phone: ${widget.driver?.phoneNumber}'),
-//                     Text('Car: BMW'),
-//                     Text('Pickup: ${widget.journey?.pickOff}'),
-//                     Text('Dropoff: ${widget.journey?.dropOff}'),
-//                     SizedBox(height: 16),
-//                     ElevatedButton(
-//                       onPressed: () {
-//                         Navigator.pop(context);
-//                       },
-//                       style: ElevatedButton.styleFrom(
-//                         minimumSize: const Size(double.infinity, 50),
-//                         backgroundColor: Colors.black,
-//                         elevation: 1,
-//                       ),
-//                       child: const Text(
-//                         'Close',
-//                         style: TextStyle(color: Colors.white),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-
-
 import 'package:avatii/models/driver_model.dart';
 import 'package:avatii/models/journeyModel.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class DriverDetailsScreen extends StatefulWidget {
   final Journey? journey;
   final Driver? driver;
-  final Map<String, double> currentLocation;
+  final Map<String,double> currentLocation;
 
-  const DriverDetailsScreen({
-    Key? key,
-    required this.journey,
-    required this.driver,
-    required this.currentLocation,
-  }) : super(key: key);
+  const DriverDetailsScreen({Key? key, required this.journey, required this.driver,required this.currentLocation}) : super(key: key);
 
   @override
   _DriverDetailsScreenState createState() => _DriverDetailsScreenState();
@@ -294,7 +175,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
         children: [
           // Google Map
           Positioned.fill(
-            child: GoogleMap(
+            child: GoogleMap( 
               onMapCreated: (controller) {
                 _mapController = controller;
               },
@@ -374,3 +255,4 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
     );
   }
 }
+
