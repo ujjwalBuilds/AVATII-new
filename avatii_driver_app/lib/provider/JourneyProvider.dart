@@ -11,7 +11,7 @@ class JourneyProvider with ChangeNotifier {
 
   String? get validationMessage => _validationMessage;
 
-  Future<void> validateOTP(String journeyId, String otp) async {
+  Future<bool> validateOTP(String journeyId, String otp) async {
     final url = Uri.parse(Appurls.validateOTP); // Replace with your backend URL
   _isvalidtingotp=true;
   notifyListeners();
@@ -27,16 +27,20 @@ _isvalidtingotp=false;
   notifyListeners();
       if (response.statusCode == 200) {
       print("otp validated succesffuly...................");
+      return false;
 
         _validationMessage = responseData['message'];
       } else {
         print("Failed to validate otp..........................");
         _validationMessage = responseData['message'] ?? 'Something went wrong';
+          notifyListeners();
+        return false;
       }
-      notifyListeners();
+    
     } catch (error) {
       _validationMessage = 'Failed to validate OTP: $error';
       notifyListeners();
+      return false;
     }
   }
 }
