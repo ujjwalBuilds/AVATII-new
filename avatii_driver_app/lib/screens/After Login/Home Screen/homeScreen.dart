@@ -1,9 +1,12 @@
-
 // Add import for socket.io-client
 import 'package:avatii_driver_app/helperFunction.dart';
 import 'package:avatii_driver_app/provider/JourneyProvider.dart';
+import 'package:avatii_driver_app/screens/After%20Login/Home%20Screen/journeyDetailsScreen.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:avatii_driver_app/Navigation%20Bar/bottomNavigationBar.dart';
 import 'package:avatii_driver_app/Url.dart';
@@ -13,6 +16,7 @@ import 'package:geocoding/geocoding.dart' hide Location;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'dart:async';
+import 'package:geolocator/geolocator.dart' as geo;
 
 import 'package:provider/provider.dart';
 
@@ -35,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   AnimationController? _animationController;
   String? driverId;
   Color accentPurpleColor = Color(0xFF6A53A1);
+  Map<String, double>? pickupCoordinates = {};
 
   Completer<GoogleMapController> _mapController = Completer();
   LocationData? _currentLocation;
@@ -64,7 +69,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       }
     });
     load();
-    
   }
 
   Future<void> _initializeLocation() async {
@@ -139,37 +143,75 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       _showRideDetailsPopup(); // Show the popup when a ride request is received
     });
 
-   socket?.on("startJourney",(data){
-print("Started journey function ho rhi hai..........................");
-var pickOffcorrdinates=data['pickOff'];
-print(pickOffcorrdinates);
-final corrdinatesofpassanger=LatLng(pickOffcorrdinates['latitude'], pickOffcorrdinates['longitude']);
-print('this is  my pick up coordinatess......................');
-    // Update the map to show the route from current location to pickup location
-    
-  setRouteToPickupLocation(corrdinatesofpassanger);
-_showArrivalBottomSheet(data['journeyId']);
-   });
-   
+    socket?.on("startJourney", (data) {
+      print("Started journey function ho rhi hai..........................");
+      var pickOffcorrdinates = data['pickOff'];
+      print(pickOffcorrdinates);
+      final corrdinatesofpassanger = LatLng(pickOffcorrdinates['latitude'], pickOffcorrdinates['longitude']);
+      print('this is  my pick up coordinatess......................');
+      // Update the map to show the route from current location to pickup location
+
+      setRouteToPickupLocation(corrdinatesofpassanger);
+      _showArrivalBottomSheet(data['journeyId']);
+      startTracking();
+      // Get.to(() => JourneyDetailsScreen(journeyId: data['journeyId']));
+    });
+
     socket?.on('disconnect', (_) {
       print('disconnected from socket server');
     });
   }
-///code for show arrival sheet bottom
+
+  // *****************************************FOR EMMITTING THE DRIVER LOCATION TO THE PASSENGER**************************************//
+
+  Future<void> requestLocationPermissions() async {
+    geo.LocationPermission permission = await geo.Geolocator.requestPermission();
+    if (permission == geo.LocationPermission.denied || permission == geo.LocationPermission.deniedForever) {
+      // Handle permission denied
+    }
+  }
+
+  void startTracking() {
+    // Check for permissions
+    geo.Geolocator.checkPermission().then((permission) {
+      if (permission == geo.LocationPermission.denied || permission == geo.LocationPermission.deniedForever) {
+        // Request permission
+        requestLocationPermissions();
+      }
+
+      // Start tracking location
+      geo.Geolocator.getPositionStream(
+        locationSettings: geo.LocationSettings(
+          accuracy: geo.LocationAccuracy.high,
+          distanceFilter: 10, // Minimum distance (in meters) to trigger update
+        ),
+      ).listen((geo.Position position) {
+        final location = {
+          'lat': position.latitude, //Drivers Latitude
+          'lng': position.longitude, //Drivers Longitude
+        };
+
+        // Emit location to the server
+        socket?.emit('updateLocation', {
+          'driverId': driverId,
+          'location': location
+        });
+      });
+    });
+  }
+
+  ///code for show arrival sheet bottom
   bool _showArrivalButton = true;
   TextEditingController _otpController = TextEditingController();
-    void _showArrivalBottomSheet(String journeyId) {
 
+  void _showArrivalBottomSheet(String journeyId) {
     showModalBottomSheet(
-
-    
-      
       context: context,
       isDismissible: false,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
-          final  journeyProvider=Provider.of<JourneyProvider>(context,listen: false);
+            final journeyProvider = Provider.of<JourneyProvider>(context, listen: false);
             return Container(
               padding: EdgeInsets.all(20.0),
               child: _showArrivalButton
@@ -186,36 +228,34 @@ _showArrivalBottomSheet(data['journeyId']);
                         ),
                       ],
                     )
-                  :
-                  journeyProvider.isvalidatingotp?CircularProgressIndicator():
-                   Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                       OtpTextField(
-            numberOfFields: 6,
-            borderColor: accentPurpleColor,
-            focusedBorderColor: accentPurpleColor,
-          //  styles: otpTextStyles,
-            showFieldAsBox: false,
-            borderWidth: 4.0,
-            //runs when a code is typed in
-           
-            //runs when every textfield is filled 
-            onSubmit: (String verificationCode) {
-              journeyProvider.validateOTP(journeyId, verificationCode);
-            }, 
-    ),
-                        
-                        
-                        SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: () {
-                            _validateOtp();
-                          },
-                          child: Text('Validate OTP'),
+                  : journeyProvider.isvalidatingotp
+                      ? CircularProgressIndicator()
+                      : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            OtpTextField(
+                              numberOfFields: 6,
+                              borderColor: accentPurpleColor,
+                              focusedBorderColor: accentPurpleColor,
+                              //  styles: otpTextStyles,
+                              showFieldAsBox: false,
+                              borderWidth: 4.0,
+                              //runs when a code is typed in
+
+                              //runs when every textfield is filled
+                              onSubmit: (String verificationCode) {
+                                journeyProvider.validateOTP(journeyId, verificationCode);
+                              },
+                            ),
+                            SizedBox(height: 10),
+                            ElevatedButton(
+                              onPressed: () {
+                                _validateOtp();
+                              },
+                              child: Text('Validate OTP'),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
             );
           },
         );
@@ -234,92 +274,73 @@ _showArrivalBottomSheet(data['journeyId']);
     }
   }
 
+  Set<Polyline> _polylines = {};
+  Set<Marker> _markers = {};
 
+  Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
+    final GoogleMapController controller = await _mapController.future;
+    final PolylinePoints polylinePoints = PolylinePoints();
 
+    // Get the driver's current location
+    LatLng driverCurrentLocation = LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
 
+    // Get route
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ', // Replace with your actual API key
+      // PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
+      // PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
 
-
-Set<Polyline> _polylines = {};
-Set<Marker> _markers = {};
-
-
-Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
-  final GoogleMapController controller = await _mapController.future;
-  final PolylinePoints polylinePoints = PolylinePoints();
-
-  // Get the driver's current location
-  LatLng driverCurrentLocation = LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
-
-  // Get route
-  PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-    
-    googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ'
-    , // Replace with your actual API key
-    // PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
-    // PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
-  
-    // Add the request parameter
-    request: PolylineRequest(
-      origin:  PointLatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-      destination:  PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
-    mode: TravelMode.driving,
-      //transitMode:  TreavelMode,
-      avoidHighways: false,
-      avoidTolls: false,
-      avoidFerries: false,
-    ),
-  );
-
-  if (result.points.isNotEmpty) {
-    List<LatLng> polylineCoordinates = result.points
-        .map((point) => LatLng(point.latitude, point.longitude))
-        .toList();
-
-    setState(() {
-      // Clear existing polylines and markers
-      _polylines.clear();
-      _markers.clear();
-
-      // Add new polyline
-      _polylines.add(Polyline(
-        polylineId: PolylineId('route'),
-        color: Colors.red,
-        points: polylineCoordinates,
-        width: 5,
-      ));
-
-      // Add markers for start and end points
-      _markers.add(Marker(
-        markerId: MarkerId('start'),
-        position: driverCurrentLocation,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-      ));
-      _markers.add(Marker(
-        markerId: MarkerId('end'),
-        position: pickOffLocation,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      ));
-    });
-
-    // Move camera to show the entire route
-    LatLngBounds bounds = LatLngBounds(
-      southwest: driverCurrentLocation,
-      northeast: pickOffLocation,
+      // Add the request parameter
+      request: PolylineRequest(
+        origin: PointLatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+        destination: PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
+        mode: TravelMode.driving,
+        //transitMode:  TreavelMode,
+        avoidHighways: false,
+        avoidTolls: false,
+        avoidFerries: false,
+      ),
     );
-    controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
-  } else {
-    print('Failed to get directions: ${result.errorMessage}');
+
+    if (result.points.isNotEmpty) {
+      List<LatLng> polylineCoordinates = result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
+
+      setState(() {
+        // Clear existing polylines and markers
+        _polylines.clear();
+        _markers.clear();
+
+        // Add new polyline
+        _polylines.add(Polyline(
+          polylineId: PolylineId('route'),
+          color: Colors.red,
+          points: polylineCoordinates,
+          width: 5,
+        ));
+
+        // Add markers for start and end points
+        _markers.add(Marker(
+          markerId: MarkerId('start'),
+          position: driverCurrentLocation,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        ));
+        _markers.add(Marker(
+          markerId: MarkerId('end'),
+          position: pickOffLocation,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        ));
+      });
+
+      // Move camera to show the entire route
+      LatLngBounds bounds = LatLngBounds(
+        southwest: driverCurrentLocation,
+        northeast: pickOffLocation,
+      );
+      controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+    } else {
+      print('Failed to get directions: ${result.errorMessage}');
+    }
   }
-}
-
-
-
-
-
-
-
-
-
 
   void _acceptRide() {
     // Notify the server that the ride was accepted
@@ -327,11 +348,10 @@ Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
       // 'driverId': 'your_driver_id', // Replace with actual driver ID
       // 'userId': _rideRequestDetails?['userId'],
       // 'journeyId': 'your_journey_id', // Replace with actual journey ID
-    'requestId':_rideRequestDetails?['requestId'],
-    'driverId':driverId
-    
+      'requestId': _rideRequestDetails?['requestId'],
+      'driverId': driverId
     });
- print('ride is accepted .............................by the driver');
+    print('ride is accepted .............................by the driver');
     // Close the popup and proceed with ride logic
     setState(() {
       _hasRideRequest = false;
