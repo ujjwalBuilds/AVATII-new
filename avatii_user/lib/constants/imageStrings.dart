@@ -4,4 +4,5 @@ class Aimages {
   static const String sedan = "assets/images/sedan_image.png";
   static const String auto = "assets/images/auto-image.png";
   static const String bike = "assets/images/bike-image.png";
+  static const String profilePhoto = "assets/images/profile_image.png";
 }
