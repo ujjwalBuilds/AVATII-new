@@ -1,4 +1,3 @@
-
 import 'package:avatii_driver_app/model/Ride_model.dart';
 import 'package:avatii_driver_app/provider/DriverProvider.dart';
 import 'package:avatii_driver_app/provider/Register_provider.dart';
@@ -25,7 +24,7 @@ class MainApp extends StatelessWidget {
       ChangeNotifierProvider(create: (context) =>RideRequestProvider()),
       ],
       child: GetMaterialApp(
- title: 'Registration Form',
+        title: 'Registration Form',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,

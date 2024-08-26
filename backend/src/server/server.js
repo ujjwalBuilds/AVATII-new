@@ -477,7 +477,7 @@ socket.on("acceptRide", async ({ requestId, driverId }) => {
     };
 
     try {
-      console.log("rekha meri jaan");
+      console.log("Ride accept details aarhi hai");
       console.log(journeyDetails);
       const { data } = await axios.post('https://avatii-backend.onrender.com/api/booking/start', journeyDetails);
       const journeyId = data.journeyId;
@@ -487,22 +487,24 @@ socket.on("acceptRide", async ({ requestId, driverId }) => {
       if (userSocketId) {
         io.to(userSocketId).emit("rideAccepted", { journeyId, driverId, ...journeyDetails });
         // Join the user to the journey room
-        socket.to(userSocketId).join(journeyId);
+        // socket.to(userSocketId).join(journeyId);
+        io.sockets.sockets.get(userSocketId)?.join(journeyId);
       } else {
         console.log(`Socket ID for user ${request.userId} not found.....`);
       }
 
       // Notify the driver to join the same room
-      // const driverSocketId = driver.socketId;
-      // if (driverSocketId) {
-      //   io.to(driverSocketId).emit("joinJourney", { journeyId, driverId });
-      //   // Join the driver to the journey room
-      //   socket.to(driverSocketId).join(journeyId);
-      // } else {
-      //   console.log(`Socket ID for driver ${driverId} not found`);
-      // }
+      const driverSocketId = driver.socketId;
+      if (driverSocketId) {
+        io.to(driverSocketId).emit("joinJourney", { journeyId, driverId });
+        // Join the driver to the journey room
+        // socket.to(driverSocketId).join(journeyId);
+        io.sockets.sockets.get(driverSocketId)?.join(journeyId);
+      } else {
+        console.log(`Socket ID for driver ${driverId} not found`);
+      }
  // Notify the driver to start the journey
-            const driverSocketId = driver.socketId;
+            // const driverSocketId = driver.socketId;
             if (driverSocketId) {
               io.to(driverSocketId).emit("startJourney", { 
                 journeyId, 
@@ -510,7 +512,9 @@ socket.on("acceptRide", async ({ requestId, driverId }) => {
                 pickOff: request.currentLocation 
               });
               // Join the driver to the journey room
-              socket.to(driverSocketId).join(journeyId);
+              // socket.to(driverSocketId).join(journeyId);
+              
+
             } else {
               console.log(`Socket ID for driver ${driverId} not found`);
             }

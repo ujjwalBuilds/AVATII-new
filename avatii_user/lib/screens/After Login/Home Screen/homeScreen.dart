@@ -3,8 +3,10 @@ import 'package:avatii/helperFunction.dart';
 import 'package:avatii/models/ride_model.dart';
 import 'package:avatii/provider/Ride_provider.dart';
 import 'package:avatii/provider/userINfo_provider.dart';
+import 'package:avatii/screens/After%20Login/Home%20Screen/driverDetailsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
@@ -62,32 +64,53 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
 
+      /*VIPIN's Code*/
+    // socket?.on('rideAccepted', (data) async{
+    //   print('..................................Ride accepted by driver for passanger........................');
+    //  String journeyId = data['journeyId'];
+    //   String driverId = data['driverId'];
 
-    socket?.on('rideAccepted', (data) async{
-      print('..................................Ride accepted by driver for passanger........................');
-     String journeyId = data['journeyId'];
-      String driverId = data['driverId'];
-
-      final rideProvider = Provider.of<UserProvider>(context, listen: false);
-      await rideProvider.fetchJourneyDetails(journeyId);
-      print('got the journey successfull..........');
-      await rideProvider.fetchDriverDetails(driverId);
+    //   final rideProvider = Provider.of<UserProvider>(context, listen: false);
+    //   await rideProvider.fetchJourneyDetails(journeyId);
+    //   print('got the journey successfull..........');
+    //   await rideProvider.fetchDriverDetails(driverId);
     
-      setState(() {
-        _isSearching = false;
-        _driverName = data['journeyId'];
-        // _driverPhone = data['driverId'];
-        // _driverCar = 'gadddi';
-        // _driverCar = data['driverCar'];
-        // _journeyId = data['journeyId'];
-        // _pickupLocation = data['pickOff'];
-        // _dropoffLocation = data['dropOff'];
-      });
+    //   setState(() {
+    //     _isSearching = false;
+    //     _driverName = data['journeyId'];
+    //     // _driverPhone = data['driverId'];
+    //     // _driverCar = 'gadddi';
+    //     // _driverCar = data['driverCar'];
+    //     // _journeyId = data['journeyId'];
+    //     // _pickupLocation = data['pickOff'];
+    //     // _dropoffLocation = data['dropOff'];
+    //   });
 
-      // print('${_driverName}.....................is journey here  id');
-      // print('${_driverPhone}.....................is driver  here for id');
-      _showDriverDetails();
-    });
+    //   // print('${_driverName}.....................is journey here  id');
+    //   // print('${_driverPhone}.....................is driver  here for id');
+    //   _showDriverDetails();
+    // });
+
+    /*UJJWAL's CODE */
+    socket?.on('rideAccepted', (data) async {
+  print('Ride accepted by driver for passenger');
+  String journeyId = data['journeyId'];
+  String driverId = data['driverId'];
+
+  final rideProvider = Get.find<UserProvider>();
+  await rideProvider.fetchJourneyDetails(journeyId);
+  await rideProvider.fetchDriverDetails(driverId);
+
+  var journey = rideProvider.journey;
+  var driver = rideProvider.driver;
+
+  if (journey != null && driver != null) {
+    Get.to(() => DriverDetailsScreen(journey: journey, driver: driver));
+  }
+});
+
+
+
 
     socket?.on('disconnect', (_) {
       print('disconnected from socket server');
