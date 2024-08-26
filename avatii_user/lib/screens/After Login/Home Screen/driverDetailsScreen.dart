@@ -168,111 +168,111 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
           ),
           // Bottom Container for Driver Details
 
-        Positioned(
-  bottom: 0,
-  left: 0,
-  right: 0,
-  child: Container(
-    height: MediaQuery.of(context).size.height * 0.4,
-    decoration: BoxDecoration(
-      color: const Color(0xFFF2F2F5),
-      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Text(
-            'Driver is on the way',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          Divider(indent: 17, endIndent: 17, color: Colors.grey.shade300),
-          Row(
-            children: [
-Stack(
-  alignment: Alignment.bottomLeft,
-  children: [
-    Image.asset(
-      'assets/images/sedan_image.png',
-      width: 100,
-      height: 100,
-    ),
-    Positioned(
-      top: 0,
-      left: 0,
-      child: CircleAvatar(
-        radius: 20,
-        backgroundColor: Colors.red.shade900, // Dark red background
-        child: CircleAvatar(
-          radius: 19,
-          backgroundImage: AssetImage('assets/images/profile_image.png'),
-        ),
-      ),
-    ),
-  ],
-),
-              // SizedBox(width: 5),
-              Expanded(
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.4,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF2F2F5),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      'Driver is on the way',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    Divider(indent: 17, endIndent: 17, color: Colors.grey.shade300),
+                    Row(
+                      children: [
+                        Stack(
+                          alignment: Alignment.bottomLeft,
+                          children: [
+                            Image.asset(
+                              'assets/images/sedan_image.png',
+                              width: 100,
+                              height: 100,
+                            ),
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              child: CircleAvatar(
+                                radius: 20,
+                                backgroundColor: Colors.red.shade900, // Dark red background
+                                child: CircleAvatar(
+                                  radius: 19,
+                                  backgroundImage: AssetImage('assets/images/profile_image.png'),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        // SizedBox(width: 5),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  style: TextStyle(color: Colors.black, fontSize: 16),
+                                  children: [
+                                    TextSpan(text: 'Pickup: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    TextSpan(text: '$pickupAddress'),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              RichText(
+                                text: TextSpan(
+                                  style: TextStyle(color: Colors.black, fontSize: 16),
+                                  children: [
+                                    TextSpan(text: 'Dropoff: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    TextSpan(text: '$dropoffAddress'),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
                     RichText(
                       text: TextSpan(
-                        style: TextStyle(color: Colors.black, fontSize: 16),
+                        style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
                         children: [
-                          TextSpan(text: 'Pickup: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                          TextSpan(text: '$pickupAddress'),
+                          TextSpan(text: 'OTP: '),
+                          TextSpan(text: widget.journey?.otp.toString() ?? "ERROR"),
                         ],
                       ),
                     ),
-                    SizedBox(height: 10),
-                    RichText(
-                      text: TextSpan(
-                        style: TextStyle(color: Colors.black, fontSize: 16),
-                        children: [
-                          TextSpan(text: 'Dropoff: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                          TextSpan(text: '$dropoffAddress'),
-                        ],
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(double.infinity, 50),
+                        backgroundColor: Colors.black,
                       ),
+                      child: Text('CALL DRIVER', style: TextStyle(color: Colors.white)),
+                    ),
+                    SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(double.infinity, 50),
+                        backgroundColor: Colors.white,
+                      ),
+                      child: Text('CANCEL RIDE', style: TextStyle(color: Colors.red)),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-          SizedBox(height: 20),
-          RichText(
-            text: TextSpan(
-              style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
-              children: [
-                TextSpan(text: 'OTP: '),
-                TextSpan(text: widget.journey?.otp.toString() ?? "ERROR"),
-              ],
             ),
           ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(double.infinity, 50),
-              backgroundColor: Colors.black,
-            ),
-            child: Text('CALL DRIVER', style: TextStyle(color: Colors.white)),
-          ),
-          SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(double.infinity, 50),
-              backgroundColor: Colors.white,
-            ),
-            child: Text('CANCEL RIDE', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    ),
-  ),
-),
         ],
       ),
     );
