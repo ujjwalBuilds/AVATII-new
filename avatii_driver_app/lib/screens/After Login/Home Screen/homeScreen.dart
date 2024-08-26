@@ -71,6 +71,74 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     load();
   }
 
+  //   Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
+  //   final GoogleMapController controller = await _mapController.future;
+  //   final PolylinePoints polylinePoints = PolylinePoints();
+
+  //   // Get the driver's current location
+  //   LatLng driverCurrentLocation = LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
+
+  //   // Get route
+  //   PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+  //     googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ', // Replace with your actual API key
+  //     // PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
+  //     // PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
+
+  //     // Add the request parameter
+  //     request: PolylineRequest(
+  //       origin: PointLatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+  //       destination: PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
+  //       mode: TravelMode.driving,
+  //       //transitMode:  TreavelMode,
+  //       avoidHighways: false,
+  //       avoidTolls: false,
+  //       avoidFerries: false,
+  //     ),
+  //   );
+
+  //   if (result.points.isNotEmpty) {
+  //     List<LatLng> polylineCoordinates = result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
+
+  //     setState(() {
+  //       // Clear existing polylines and markers
+  //       _polylines.clear();
+  //       _markers.clear();
+
+  //       // Add new polyline
+  //       _polylines.add(Polyline(
+  //         polylineId: PolylineId('route'),
+  //         color: Colors.red,
+  //         points: polylineCoordinates,
+  //         width: 5,
+  //       ));
+
+  //       // Add markers for start and end points
+  //       _markers.add(Marker(
+  //         markerId: MarkerId('start'),
+  //         position: driverCurrentLocation,
+  //         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+  //       ));
+  //       _markers.add(Marker(
+  //         markerId: MarkerId('end'),
+  //         position: pickOffLocation,
+  //         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+  //       ));
+  //     });
+
+  //     // Move camera to show the entire route
+  //     LatLngBounds bounds = LatLngBounds(
+  //       southwest: driverCurrentLocation,
+  //       northeast: pickOffLocation,
+  //     );
+  //     controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+  //   } else {
+  //     print('Failed to get directions: ${result.errorMessage}');
+  //   }
+  // }
+
+
+
+
   Future<void> _initializeLocation() async {
     final locationData = await _locationService.getLocation();
     setState(() {
@@ -151,10 +219,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       print('this is  my pick up coordinatess......................');
       // Update the map to show the route from current location to pickup location
 
-      setRouteToPickupLocation(corrdinatesofpassanger);
-      _showArrivalBottomSheet(data['journeyId']);
+      // setRouteToPickupLocation(corrdinatesofpassanger);
+      // _showArrivalBottomSheet(data['journeyId']);
       startTracking();
-      // Get.to(() => JourneyDetailsScreen(journeyId: data['journeyId']));
+      Get.to(() => JourneyDetailsScreen(journeyId: data['journeyId'], currentLocation: _currentLocation,));
     });
 
     socket?.on('disconnect', (_) {
@@ -277,70 +345,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Set<Polyline> _polylines = {};
   Set<Marker> _markers = {};
 
-  Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
-    final GoogleMapController controller = await _mapController.future;
-    final PolylinePoints polylinePoints = PolylinePoints();
-
-    // Get the driver's current location
-    LatLng driverCurrentLocation = LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
-
-    // Get route
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ', // Replace with your actual API key
-      // PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
-      // PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
-
-      // Add the request parameter
-      request: PolylineRequest(
-        origin: PointLatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-        destination: PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
-        mode: TravelMode.driving,
-        //transitMode:  TreavelMode,
-        avoidHighways: false,
-        avoidTolls: false,
-        avoidFerries: false,
-      ),
-    );
-
-    if (result.points.isNotEmpty) {
-      List<LatLng> polylineCoordinates = result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
-
-      setState(() {
-        // Clear existing polylines and markers
-        _polylines.clear();
-        _markers.clear();
-
-        // Add new polyline
-        _polylines.add(Polyline(
-          polylineId: PolylineId('route'),
-          color: Colors.red,
-          points: polylineCoordinates,
-          width: 5,
-        ));
-
-        // Add markers for start and end points
-        _markers.add(Marker(
-          markerId: MarkerId('start'),
-          position: driverCurrentLocation,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        ));
-        _markers.add(Marker(
-          markerId: MarkerId('end'),
-          position: pickOffLocation,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-        ));
-      });
-
-      // Move camera to show the entire route
-      LatLngBounds bounds = LatLngBounds(
-        southwest: driverCurrentLocation,
-        northeast: pickOffLocation,
-      );
-      controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
-    } else {
-      print('Failed to get directions: ${result.errorMessage}');
-    }
-  }
 
   void _acceptRide() {
     // Notify the server that the ride was accepted
