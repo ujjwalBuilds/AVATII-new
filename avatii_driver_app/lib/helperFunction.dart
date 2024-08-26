@@ -40,6 +40,7 @@ class Helperfunction {
  static Future<String?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('driverId');
+    print("just checking the function");
     return userId;
   }
 
