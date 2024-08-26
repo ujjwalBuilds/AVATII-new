@@ -116,8 +116,8 @@ import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class DriverDetailsScreen extends StatefulWidget {
-  final Journey journey;
-  final Driver driver;
+  final Journey? journey;
+  final Driver? driver;
 
   const DriverDetailsScreen({Key? key, required this.journey, required this.driver}) : super(key: key);
 
@@ -175,15 +175,15 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Journey ID: ${widget.journey.id}',
+                      'Journey ID: ${widget.journey?.id}',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 8),
-                    Text('Driver: ${widget.driver.name}'),
-                    Text('Phone: ${widget.driver.phoneNumber}'),
+                    Text('Driver: ${widget.driver?.name}'),
+                    Text('Phone: ${widget.driver?.phoneNumber}'),
                     Text('Car: BMW'),
-                    Text('Pickup: ${widget.journey.pickOff}'),
-                    Text('Dropoff: ${widget.journey.dropOff}'),
+                    Text('Pickup: ${widget.journey?.pickOff}'),
+                    Text('Dropoff: ${widget.journey?.dropOff}'),
                     SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {

@@ -134,7 +134,12 @@ class UserProvider with ChangeNotifier {
   Future<void> fetchJourneyDetails(String journeyId) async {
     final response = await http.get(Uri.parse('${Appurls.fetchJourneyDetails}$journeyId'));
     if (response.statusCode == 200) {
-      _journey = Journey.fromJson(json.decode(response.body));
+Map<String, dynamic> jsonData = json.decode(response.body);
+Journey _journey = Journey.fromJson(jsonData['journey']);
+
+      //_journey = Journey.fromJson(json.decode(response.body));
+      print(jsonData['journey']);
+      print(_journey.toString());
       print('Jourrrrrrrrrrney details fetched successfully..........................................');
       notifyListeners();
     } else {

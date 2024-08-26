@@ -93,20 +93,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
     /*UJJWAL's CODE */
     socket?.on('rideAccepted', (data) async {
-  print('Ride accepted by driver for passenger');
+  print('Ride accepted by driver for passenger................................');
   String journeyId = data['journeyId'];
   String driverId = data['driverId'];
 
-  final rideProvider = Get.find<UserProvider>();
+  final rideProvider =Provider.of<UserProvider>(context, listen: false);
   await rideProvider.fetchJourneyDetails(journeyId);
   await rideProvider.fetchDriverDetails(driverId);
 
   var journey = rideProvider.journey;
   var driver = rideProvider.driver;
+Get.to(() => DriverDetailsScreen(journey: journey, driver: driver));
 
-  if (journey != null && driver != null) {
-    Get.to(() => DriverDetailsScreen(journey: journey, driver: driver));
-  }
 });
 
 
