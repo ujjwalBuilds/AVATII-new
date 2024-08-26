@@ -485,6 +485,7 @@ socket.on("acceptRide", async ({ requestId, driverId }) => {
       // Notify the passenger
       const userSocketId = users.get(request.userId);
       if (userSocketId) {
+        console.log('Socket io ki ID hai ****************');
         io.to(userSocketId).emit("rideAccepted", { journeyId, driverId, ...journeyDetails });
         // Join the user to the journey room
         // socket.to(userSocketId).join(journeyId);
