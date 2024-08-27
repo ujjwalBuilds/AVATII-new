@@ -422,7 +422,7 @@ io.on("connection", (socket) => {
   });
 
   // Handle ride requests
-  socket.on("requestRide", ({ userId, currentLocation, destinationLocation }) => {
+  socket.on("requestRide", ({ userId, currentLocation, destinationLocation}) => {
     console.log(`Passenger ${userId} requested a ride from ${currentLocation} to ${destinationLocation}`);
 
     // Store the request temporarily
@@ -444,7 +444,7 @@ io.on("connection", (socket) => {
   });
 
   // Handle a driver accepting a ride request
-  socket.on("acceptRide", async ({ requestId, driverId }) => {
+  socket.on("acceptRide", async ({ requestId, driverId, distance }) => {
     const request = activeRequests.get(requestId);
     if (request) {
       console.log(`Driver ${driverId} accepted the ride request: ${requestId}`);
@@ -464,6 +464,7 @@ io.on("connection", (socket) => {
         driverId,
         pickOff: request.currentLocation,
         dropOff: request.destinationLocation,
+        distance,
       };
 
       try {
