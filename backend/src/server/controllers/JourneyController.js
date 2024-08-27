@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import Journey from "../models/JourneyModel.js";
 import dotenv from "dotenv";
+import Cost from "../models/CostingModel.js";
 
 dotenv.config();
 
@@ -140,6 +141,26 @@ export const GetJourneyInfoById = asyncHandler(async (req, res) => {
         }
 
         return res.status(200).json(journey);
+    } catch (err) {
+        return res.status(500).json({ message: `Internal Server Error: ${err.message}` });
+    }
+});
+
+export const getCosting = asyncHandler(async (req, res) => {
+    try {
+        const {VehicleType} = req.query;
+
+        if (!VehicleType) {
+            return res.status(400).json({ message: "Bad request" });
+        }
+
+        const cost = await Cost.find({VehicleType});
+
+        if (!cost) {
+            return res.status(404).json({ message: "costing not found" });
+        }
+
+        return res.status(200).json(cost);
     } catch (err) {
         return res.status(500).json({ message: `Internal Server Error: ${err.message}` });
     }

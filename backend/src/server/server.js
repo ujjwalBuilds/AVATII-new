@@ -322,6 +322,7 @@ import { Database, Resource } from '@adminjs/mongoose';
 import User from './models/UserModel.js';
 import Journey from './models/JourneyModel.js';
 import Driver from './models/DriverModel.js';
+import Cost from './models/CostingModel.js';
 
 // Connect to MongoDB
 connectDb();
@@ -334,6 +335,7 @@ const adminJs = new AdminJS({
     { resource: User },
     { resource: Journey },
     { resource: Driver },
+    { resource: Cost },
   ],
   rootPath: '/admin',
 });

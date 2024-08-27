@@ -5,7 +5,8 @@ import {
     EndJourney,
     CancelJourney,
     GetAllJourneys,
-    GetJourneyInfoById
+    GetJourneyInfoById,
+    getCosting
 } from "../controllers/JourneyController.js";
 
 const router = express.Router();
@@ -19,6 +20,7 @@ router.post("/end", EndJourney);
 router.post("/cancel", CancelJourney);
 
 router.get("/all", GetAllJourneys);
+router.get("/getCosting", getCosting);
 router.get("/:journeyId", GetJourneyInfoById);
 
 export default router;
