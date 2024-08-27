@@ -374,12 +374,10 @@ app.get("/", (req, res) => {
   res.send("server is working");
 });
 
-// Store the connected drivers and their details
 const drivers = new Map(); // Stores driver socket IDs and details
 const users = new Map(); // Stores user socket IDs
 const activeRequests = new Map();
 
-// When a client connects
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
 
@@ -406,17 +404,6 @@ io.on("connection", (socket) => {
   });
 
   // Handle driver location updates
-  // socket.on("updateLocation", ({ driverId, location }) => {
-  //   const driver = drivers.get(driverId);
-  //   if (driver) {
-  //     driver.location = location;
-  //     io.to(driver.journeyId).emit("locationUpdate", {
-  //       driverId,
-  //       location
-  //     });
-  //     console.log(`Driver ${driverId} location updated:`, location);
-  //   }
-  // });
   socket.on("updateLocation", ({ driverId, location }) => {
     const driver = drivers.get(driverId);
     if (driver) {
@@ -431,6 +418,7 @@ io.on("connection", (socket) => {
       console.log(`Driver ${driverId} location updated:`, location);
     }
   });
+
   // Handle ride requests
   socket.on("requestRide", ({ userId, currentLocation, destinationLocation }) => {
     console.log(`Passenger ${userId} requested a ride from ${currentLocation} to ${destinationLocation}`);
@@ -454,87 +442,121 @@ io.on("connection", (socket) => {
   });
 
   // Handle a driver accepting a ride request
- // Handle a driver accepting a ride request
+  socket.on("acceptRide", async ({ requestId, driverId }) => {
+    const request = activeRequests.get(requestId);
+    if (request) {
+      console.log(`Driver ${driverId} accepted the ride request: ${requestId}`);
 
+      // Remove the request from active requests
+      activeRequests.delete(requestId);
 
-socket.on("acceptRide", async ({ requestId, driverId }) => {
-  const request = activeRequests.get(requestId);
-  if (request) {
-    console.log(`Driver ${driverId} accepted the ride request.......... ${requestId}`);
+      // Mark driver as unavailable
+      const driver = drivers.get(driverId);
+      if (driver) {
+        driver.available = false;
+      }
 
-    // Remove the request from active requests
-    activeRequests.delete(requestId);
+      // Create a journey
+      const journeyDetails = {
+        passengerId: request.userId,
+        driverId,
+        pickOff: request.currentLocation,
+        dropOff: request.destinationLocation,
+      };
 
-    // Mark driver as unavailable
-    const driver = drivers.get(driverId);
-    if (driver) {
-      driver.available = false;
+      try {
+        console.log("Ride accept details:");
+        console.log(journeyDetails);
+        const { data } = await axios.post('https://avatii-backend.onrender.com/api/booking/start', journeyDetails);
+        const journeyId = data.journeyId;
+
+        // Notify the passenger
+        const userSocketId = users.get(request.userId);
+        if (userSocketId) {
+          io.to(userSocketId).emit("rideAccepted", { journeyId, driverId, ...journeyDetails });
+          io.sockets.sockets.get(userSocketId)?.join(journeyId);
+        } else {
+          console.log(`Socket ID for user ${request.userId} not found`);
+        }
+
+        // Notify the driver to join the same room
+        const driverSocketId = driver.socketId;
+        if (driverSocketId) {
+          io.to(driverSocketId).emit("joinJourney", { journeyId, driverId });
+          io.sockets.sockets.get(driverSocketId)?.join(journeyId);
+
+          // Notify the driver to start the journey
+          io.to(driverSocketId).emit("startJourney", { 
+            journeyId, 
+            driverId, 
+            pickOff: request.currentLocation,
+            dropOff: request.destinationLocation, 
+          });
+        } else {
+          console.log(`Socket ID for driver ${driverId} not found`);
+        }
+
+        console.log(`Journey ${journeyId} started with driver ${driverId} and passenger ${request.userId}`);
+      } catch (error) {
+        console.error('Error creating journey:', error);
+        socket.emit("rideError", { message: "Error creating journey" });
+      }
+    } else {
+      console.log(`Ride request ${requestId} is no longer available`);
+      socket.emit("rideUnavailable", { requestId });
     }
+  });
 
-    // Create a journey
-    const journeyDetails = {
-      passengerId: request.userId,
-      driverId,
-      pickOff: request.currentLocation,
-      dropOff: request.destinationLocation,
-    };
-
+  // Handle end journey
+  socket.on("endJourney", async ({ journeyId, driverId }) => {
     try {
-      console.log("Ride accept details aarhi hai");
-      console.log(journeyDetails);
-      const { data } = await axios.post('https://avatii-backend.onrender.com/api/booking/start', journeyDetails);
-      const journeyId = data.journeyId;
+      // Call the end journey API
+      await axios.post('https://avatii-backend.onrender.com/api/booking/end', { journeyId });
 
-      // Notify the passenger
-      const userSocketId = users.get(request.userId);
-      if (userSocketId) {
-        console.log('Socket io ki ID hai ****************');
-        io.to(userSocketId).emit("rideAccepted", { journeyId, driverId, ...journeyDetails });
-        // Join the user to the journey room
-        // socket.to(userSocketId).join(journeyId);
-        io.sockets.sockets.get(userSocketId)?.join(journeyId);
-      } else {
-        console.log(`Socket ID for user ${request.userId} not found.....`);
+      // Mark driver as available again
+      const driver = drivers.get(driverId);
+      if (driver) {
+        driver.available = true;
+        delete driver.journeyId; // Remove the journey ID from the driver
       }
 
-      // Notify the driver to join the same room
-      const driverSocketId = driver.socketId;
-      if (driverSocketId) {
-        io.to(driverSocketId).emit("joinJourney", { journeyId, driverId });
-        // Join the driver to the journey room
-        // socket.to(driverSocketId).join(journeyId);
-        io.sockets.sockets.get(driverSocketId)?.join(journeyId);
-      } else {
-        console.log(`Socket ID for driver ${driverId} not found`);
-      }
-            // Notify the driver to start the journey
-            // const driverSocketId = driver.socketId;
-            if (driverSocketId) {
-              io.to(driverSocketId).emit("startJourney", { 
-                journeyId, 
-                driverId, 
-                pickOff: request.currentLocation,
-                dropoff: request.destinationLocation, 
-              });
-              // Join the driver to the journey room
-              // socket.to(driverSocketId).join(journeyId);
-              
+      // Notify both the driver and the passenger
+      io.to(journeyId).emit("journeyEnded", { journeyId, driverId });
+      console.log(`Journey ${journeyId} ended by driver ${driverId}`);
 
-            } else {
-              console.log(`Socket ID for driver ${driverId} not found`);
-            }
-
-          
-      console.log(`Journey ${journeyId} started with driver ${driverId} and passenger ${request.userId}`);
+      // Leave the journey room
+      socket.leave(journeyId);
     } catch (error) {
-      console.error('Error creating journey:', error);
-      socket.emit("rideError", { message: "Error creating journey" });
+      console.error('Error ending journey:', error);
+      socket.emit("journeyError", { message: "Error ending journey" });
     }
-  } else {
-    console.log(`Ride request ${requestId} is no longer available`);
-    socket.emit("rideUnavailable", { requestId });
-  }
-});
+  });
+
+  // Handle cancel journey
+  socket.on("cancelJourney", async ({ journeyId, userId }) => {
+    try {
+      // Call the cancel journey API
+      await axios.post('https://avatii-backend.onrender.com/api/booking/cancel', { journeyId });
+
+      // Notify both the driver and the passenger
+      io.to(journeyId).emit("journeyCancelled", { journeyId, userId });
+      console.log(`Journey ${journeyId} cancelled by user ${userId}`);
+
+      // Mark driver as available if they were part of the journey
+      drivers.forEach((driver, driverId) => {
+        if (driver.journeyId === journeyId) {
+          driver.available = true;
+          delete driver.journeyId;
+        }
+      });
+
+      // Leave the journey room
+      socket.leave(journeyId);
+    } catch (error) {
+      console.error('Error cancelling journey:', error);
+      socket.emit("journeyError", { message: "Error cancelling journey" });
+    }
+  });
 
   // Handle disconnection
   socket.on("disconnect", () => {
@@ -552,6 +574,7 @@ socket.on("acceptRide", async ({ requestId, driverId }) => {
     });
   });
 });
+
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
