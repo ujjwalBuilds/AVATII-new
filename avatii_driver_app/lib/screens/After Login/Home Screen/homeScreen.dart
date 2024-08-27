@@ -248,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       // Update the map to show the route from current location to pickup location
 
       //setRouteToPickupLocation(corrdinatesofpassanger);
-      var drop=data['dropoff'];
+      var drop=data['dropOff'];
       final droppassangerCorrdinates=LatLng(drop['latitude'],drop['longitude']);
       //_showArrivalBottomSheet(data['journeyId']);
       startTracking();

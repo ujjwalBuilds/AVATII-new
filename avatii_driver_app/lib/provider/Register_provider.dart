@@ -10,116 +10,103 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 class DriverauthProvider with ChangeNotifier {
-bool _isLoading = false;
-bool get isLoading => _isLoading;
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
   Driver? _driver;
 
   Driver? get driver => _driver;
-Future<void> registerDriver(Driver driver) async {
-  final url = Uri.parse(Appurls.registerDriver); // Replace with your actual API URL
-_isLoading=true;
-notifyListeners();
-
-
-  try {
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(
-        driver.toJson()
-       
-      ),
-    );
-    _isLoading = false;
+  Future<void> registerDriver(Driver driver) async {
+    final url = Uri.parse(Appurls.registerDriver); // Replace with your actual API URL
+    _isLoading = true;
     notifyListeners();
-
-    if (response.statusCode == 201) {
-      print('Driver Regiseteration successfull..................................................');
-      print(response.body);
-      // final responseData = json.decode(response.body);
-      
-      // _driver = Driver.fromJson(responseData);
-
-      notifyListeners();
-    } else {
-      final errorData = json.decode(response.body);
-      print('Failed to register driver ......${response.statusCode}...${response.body}');
-      throw Exception(errorData['message']);
-    }
-  } catch (error) {
-    print('failed  to register driver.............');
-    throw error;
-  }
-}
-
-Future<void> registerwithImage(Driver driver ,File? rcimage,File? 
-liscenceImage,File? profileimage
- )async{
-  try{
-_isLoading=true;
-notifyListeners();
-
-
-String? profileImage=await Helperfunction.uploadImage(profileimage);
-print('1...............................');
-String? rcImage=await Helperfunction.uploadImage(rcimage);
-print('2.............................');
-String? LicenceImage=await Helperfunction.uploadImage(liscenceImage);
-print('3....................');
-
-
-driver.profileUrl=profileImage;
-
-
-driver.vehicle?.rcImage=rcImage;
-driver.drivingLicense?.image=LicenceImage;
-
-
-await registerDriver(driver); 
-
-
-  }catch(error){
-    print('imagee upload error..........................................');
-    print(error.toString());
-        _isLoading=false;
-        notifyListeners();
-        throw error;
-  }
-
-
-}
-
-
-
-
-
-
-
- Future<void> loginDriver(String phoneNumber) async {
-    final url = Uri.parse(Appurls.LoginDriver); // Replace with your actual API URL
 
     try {
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: json.encode(driver.toJson()),
+      );
+      _isLoading = false;
+      notifyListeners();
+
+      if (response.statusCode == 201) {
+        print('Driver Regiseteration successfull..................................................');
+        print(response.body);
+        // final responseData = json.decode(response.body);
+
+        // _driver = Driver.fromJson(responseData);
+
+        notifyListeners();
+      } else {
+        final errorData = json.decode(response.body);
+        print('Failed to register driver ......${response.statusCode}...${response.body}');
+        throw Exception(errorData['message']);
+      }
+    } catch (error) {
+      print('failed  to register driver.............');
+      throw error;
+    }
+  }
+
+  Future<void> registerwithImage(Driver driver, File? rcimage, File? liscenceImage, File? profileimage) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      String? profileImage = await Helperfunction.uploadImage(profileimage);
+      print('1...............................');
+      String? rcImage = await Helperfunction.uploadImage(rcimage);
+      print('2.............................');
+      String? LicenceImage = await Helperfunction.uploadImage(liscenceImage);
+      print('3....................');
+
+      driver.profileUrl = profileImage;
+
+      driver.vehicle?.rcImage = rcImage;
+      driver.drivingLicense?.image = LicenceImage;
+
+      await registerDriver(driver);
+    } catch (error) {
+      print('imagee upload error..........................................');
+      print(error.toString());
+      _isLoading = false;
+      notifyListeners();
+      throw error;
+    }
+  }
+
+  Future<void> loginDriver(String phoneNumber) async {
+    final url = Uri.parse(Appurls.LoginDriver); // Replace with your actual API URL
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: json.encode({
           'PhoneNumber': phoneNumber,
         }),
       );
+      _isLoading = false;
+    notifyListeners();
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-print('Login successfull.................................');
-print(response.body);
-
+        print('Login successfull.................................');
+        print(response.body);
 
         _driverId = responseData['_id'];
         _driverName = responseData['name'];
         _phoneNumber = responseData['PhoneNumber'];
         _token = responseData['token'];
-        _approved=responseData['approved'];
+        _approved = responseData['approved'];
 
         // Save data locally
         final prefs = await SharedPreferences.getInstance();
@@ -127,8 +114,7 @@ print(response.body);
         await prefs.setString('driverId', _driverId!);
         await prefs.setString('driverName', _driverName!);
         await prefs.setString('phoneNumber', _phoneNumber!);
-        await prefs.setInt('approved',_approved!);
-
+        await prefs.setInt('approved', _approved!);
 
         notifyListeners();
       } else {
@@ -140,9 +126,7 @@ print(response.body);
     }
   }
 
-
-
- String? _token;
+  String? _token;
   String? _driverId;
   String? _driverName;
   String? _phoneNumber;
@@ -170,9 +154,6 @@ print(response.body);
     notifyListeners();
   }
 
-
-
-
   Map<String, dynamic> decodeJWT(String token) {
     final parts = token.split('.');
     assert(parts.length == 3);
@@ -199,13 +180,4 @@ print(response.body);
     }
     return utf8.decode(base64Url.decode(output));
   }
-
-
-
-
-
-
-
-
-
 }
