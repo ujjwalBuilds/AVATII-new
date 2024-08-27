@@ -509,6 +509,7 @@ io.on("connection", (socket) => {
 
   // Handle end journey
   socket.on("endJourney", async ({ journeyId, driverId }) => {
+    console.log(journeyId)
     try {
       // Call the end journey API
       await axios.post('https://avatii-backend.onrender.com/api/booking/end', { journeyId });
@@ -534,6 +535,8 @@ io.on("connection", (socket) => {
 
   // Handle cancel journey
   socket.on("cancelJourney", async ({ journeyId, userId }) => {
+    console.log(journeyId);
+    console.log(userId);
     try {
       // Call the cancel journey API
       await axios.post('https://avatii-backend.onrender.com/api/booking/cancel', { journeyId });

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:avatii_driver_app/Url.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -77,6 +78,25 @@ static Future<String?> uploadImage(File? image) async {
     return null;
   }}
 
+    static Future<Map<String, double>> calculateDistance(
+    double startLatitude,
+    double startLongitude,
+    double endLatitude,
+    double endLongitude,
+  ) async {
+    double distanceInMeters = await Geolocator.distanceBetween(
+      startLatitude,
+      startLongitude,
+      endLatitude,
+      endLongitude,
+    );
 
+    double distanceInKilometers = distanceInMeters / 1000;
+
+    return {
+      'meters': distanceInMeters,
+      'kilometers': distanceInKilometers,
+    };
+  }
 
 }

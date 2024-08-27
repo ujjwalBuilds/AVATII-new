@@ -400,25 +400,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                   style: TextStyle(color: Colors.white),
                                 )),
                             const SizedBox(height: 20),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Saved Places',
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                                  ),
-                                  Icon(Icons.arrow_forward_ios, size: 16),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            _buildSavedPlace('Eleonora Hotel', '6 Glendale St. Worcester, MA 01604', '2.9 km'),
-                            _buildSavedPlace('Grand City Park', '307 Lilac Drive Munster, IN 46321', '8.3 km'),
-                            _buildSavedPlace('Mall Plaza', '8694 Essex St. Sunnyside, NY 11104', '4.4 km'),
-                            _buildSavedPlace('Hellana Restaurant', '39 Oakland St. Clementon, NJ 08021', '2.5 km'),
-                            const SizedBox(height: 20),
+                            // const Padding(
+                            //   padding: EdgeInsets.symmetric(horizontal: 12.0),
+                            //   child: Row(
+                            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            //     children: [
+                            //       Text(
+                            //         'Saved Places',
+                            //         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                            //       ),
+                            //       Icon(Icons.arrow_forward_ios, size: 16),
+                            //     ],
+                            //   ),
+                            // ),
+                            // const SizedBox(height: 12),
+                            // _buildSavedPlace('Eleonora Hotel', '6 Glendale St. Worcester, MA 01604', '2.9 km'),
+                            // _buildSavedPlace('Grand City Park', '307 Lilac Drive Munster, IN 46321', '8.3 km'),
+                            // _buildSavedPlace('Mall Plaza', '8694 Essex St. Sunnyside, NY 11104', '4.4 km'),
+                            // _buildSavedPlace('Hellana Restaurant', '39 Oakland St. Clementon, NJ 08021', '2.5 km'),
+                            // const SizedBox(height: 20),
                           ],
                         ),
                       ),
@@ -871,7 +871,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: _buildrides(
                                           rideType: 'Avatii Cab',
                                           fare: carFare,
-                                          time: '8:15pm',
                                           distance: '4 min away',
                                           details: 'Private • Most popular',
                                           image: const AssetImage(Aimages.hatchback),
@@ -888,7 +887,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: _buildrides(
                                           rideType: 'Avatii Auto',
                                           fare: autoFare,
-                                          time: '8:15pm',
                                           distance: '3 min away',
                                           details: 'Private • Popular',
                                           image: const AssetImage(Aimages.auto),
@@ -905,7 +903,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: _buildrides(
                                           rideType: 'Avatii Bike',
                                           fare: bikeFare,
-                                          time: '8:15pm',
                                           distance: '10 min away',
                                           details: 'Private • Very popular',
                                           image: const AssetImage(Aimages.bike),
@@ -1235,7 +1232,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildrides({
     required String rideType,
     required double fare,
-    required String time,
     required String distance,
     required String details,
     required ImageProvider image,
@@ -1275,20 +1271,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Text(
-                      time,
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      distance,
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 2),
+                
                 Text(
                   details,
                   style: const TextStyle(color: Colors.grey, fontSize: 12),
@@ -1424,12 +1407,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          const Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: CustomNavigationBar(),
-          ),
+          // const Positioned(
+          //   bottom: 0,
+          //   left: 0,
+          //   right: 0,
+          //   child: CustomNavigationBar(),
+          // ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
