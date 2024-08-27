@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "147460386456",
+    "project_id": "avatii-driver-app",
+    "storage_bucket": "avatii-driver-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:147460386456:android:ff0cd2755842e2f8a7aaed",
+        "android_client_info": {
+          "package_name": "com.example.avatii_driver_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAm2wgz8ubp8h8rhO56BIdf3N7858jhroA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

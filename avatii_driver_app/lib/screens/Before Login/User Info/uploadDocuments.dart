@@ -412,6 +412,7 @@
 //     );
 //   }
 // }
+import 'package:avatii_driver_app/Phone%20OTP%20auth/phoneAuth.dart';
 import 'package:avatii_driver_app/model/driver_model.dart';
 import 'package:avatii_driver_app/provider/Register_provider.dart';
 import 'package:avatii_driver_app/screens/Before%20Login/Login/signIn/signInScreen.dart';
@@ -495,7 +496,7 @@ class _UploadDocumentsScreenState extends State<UploadDocumentsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Application Submitted successfully")),
       );
-      Get.offAll(() => SignInScreen());
+      Get.offAll(() => PhoneAuth());
     }).catchError((onError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(onError.toString())),

@@ -1649,7 +1649,7 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
 
         _polylines.add(Polyline(
           polylineId: PolylineId('route_to_pickup'),
-          color: Colors.red,
+          color: Colors.black,
           points: polylineCoordinates,
           width: 5,
         ));

@@ -1,3 +1,4 @@
+import 'package:avatii_driver_app/Phone%20OTP%20auth/phoneAuth.dart';
 import 'package:avatii_driver_app/screens/Before%20Login/Login/signIn/signInScreen.dart';
 import 'package:avatii_driver_app/screens/Before%20Login/Onboarding1/onboardingItems.dart';
 import 'package:avatii_driver_app/screens/Before%20Login/User%20Info/userInfo.dart';
@@ -104,7 +105,7 @@ class _OnboardingViewState extends State<OnboardingView> {
               width: MediaQuery.of(context).size.width * 0.9,
               height: 55,
               child: TextButton(
-                onPressed: () => Get.to(()=>SignInScreen()),
+                onPressed: () => Get.to(()=>PhoneAuth()),
                 child: const Text("Login", style: TextStyle(color: Colors.white)),
               ),
             ),
