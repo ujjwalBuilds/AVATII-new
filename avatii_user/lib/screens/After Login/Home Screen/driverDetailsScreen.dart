@@ -36,6 +36,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
   //  _createPolylines();
     _getAddresses();
   _initializeSocket();
+  
   print('..............................init function over..............................................');
   }
 

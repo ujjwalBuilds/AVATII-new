@@ -511,6 +511,7 @@ socket.on("acceptRide", async ({ requestId, driverId }) => {
                 journeyId, 
                 driverId, 
                 pickOff: request.currentLocation 
+                
               });
               // Join the driver to the journey room
               // socket.to(driverSocketId).join(journeyId);
