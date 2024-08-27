@@ -2,6 +2,8 @@ import 'package:avatii_driver_app/Url.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+
 class JourneyProvider with ChangeNotifier {
   bool _isvalidtingotp = false;
   bool get isvalidatingotp => _isvalidtingotp;
@@ -41,4 +43,46 @@ class JourneyProvider with ChangeNotifier {
       return false;
     }
   }
+
+ bool isCompletingJourney = false;
+ bool get iscomplete=>isCompletingJourney;
+  String? completionErrorMessage;
+
+  Future<bool> completeJourney(String journeyId) async {
+
+    print("is ${journeyId}.....................................this is my journey id ");
+    isCompletingJourney = true;
+    notifyListeners();
+
+    try {
+      final response = await http.post(
+        Uri.parse(Appurls.EndRide),
+        headers: {
+        'Content-Type': 'application/json',
+      },
+         // Replace with your actual endpoint
+        body:json.encode({'journeyId': journeyId}),
+      );
+
+      if (response.statusCode == 200) {
+        isCompletingJourney = false;
+        notifyListeners();
+        return true;
+      } else {
+        print('failed to complete a journey.................................................${response.statusCode}.........${response.body}');
+        completionErrorMessage = 'Failed to complete the journey';
+        isCompletingJourney = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      completionErrorMessage = 'An error occurred';
+      isCompletingJourney = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+
+
 }

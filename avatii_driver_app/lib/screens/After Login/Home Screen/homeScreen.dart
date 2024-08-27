@@ -230,7 +230,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         _hasRideRequest = true;
         _rideRequestDetails = data;
       });
-      _showRideDetailsPopup(); // Show the popup when a ride request is received
+     if(_isOnline==true){
+       _showRideDetailsPopup();
+
+     } // Show the popup when a ride request is received
     });
 
     socket?.on("startJourney", (data) {
@@ -675,6 +678,11 @@ var droplocationoftheuser='';
     );
   }
 
+
+void changeDriverStatus()async{
+  await Provider.of<DriverProvider>(context, listen: false).changeDriverStatus();
+
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -691,13 +699,15 @@ var droplocationoftheuser='';
             onChanged: (value) async {
               setState(() {
                 _isOnline = value;
+                changeDriverStatus();
+                
               });
 
-              if (_isOnline) {
-                // Call the provider's method to change the driver's status
-                await Provider.of<DriverProvider>(context, listen: false).changeDriverStatus();
-                // _startAnimation();
-              }
+              // if (_isOnline) {
+              //   // Call the provider's method to change the driver's status
+                
+              //   // _startAnimation();
+              // }
             },
             activeTrackColor: Colors.blue,
             activeColor: Colors.white,

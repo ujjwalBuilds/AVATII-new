@@ -1907,11 +1907,21 @@ Widget build(BuildContext context) {
                                       child: Text('Navigate to Dropoff'),
                                     ),
                                     SizedBox(height: 10),
+                                  
+                                  journeyProvider.iscomplete?CircularProgressIndicator():
                                     ElevatedButton(
-                                      onPressed: () {
-                                        // Implement your complete journey logic here
-                                      },
-                                      child: Text('Complete Journey'),
+                                       onPressed: () async {
+                              final success = await journeyProvider.completeJourney(widget.journeyId);
+                              if (success) {
+                                _showCompletionPopup();
+                              } else {
+                                // Handle failure
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(journeyProvider.completionErrorMessage ?? 'Unknown error')),
+                                );
+                              }
+                            },
+                            child: Text('Complete Journey'),
                                     ),
                                   ],
                                 )
@@ -1922,5 +1932,62 @@ Widget build(BuildContext context) {
       ],
     ),
   );
+
+
+
+
+  
 }
+
+
+  void _showCompletionPopup() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        String selectedPaymentOption = 'Cash Payment'; // Default payment option
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+            
+              title: Text('Happy Journey!'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Payment Price: \$100'), // Replace with actual price
+                  DropdownButton<String>(
+                    value: selectedPaymentOption,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedPaymentOption = newValue!;
+                      });
+                    },
+                    items: <String>['Cash Payment', 'Online Payment']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                  if (selectedPaymentOption == 'Online Payment')
+                    Image.asset('assets/images/qr code of avati app.jpg'), // Your QR code image in assets
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop(); // Navigate back to the home screen
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 }
+
