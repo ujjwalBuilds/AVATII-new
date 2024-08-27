@@ -11,7 +11,6 @@ const earningSchema = new Schema({
     ridesNumber:{
         type:Number,
     },
-    
 }, { timestamps: true });
 
 const Earning = model("Earning", earningSchema);
