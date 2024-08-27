@@ -459,9 +459,10 @@ var droplocationoftheuser='';
       // 'userId': _rideRequestDetails?['userId'],
       // 'journeyId': 'your_journey_id', // Replace with actual journey ID
       'requestId': _rideRequestDetails?['requestId'],
-      'driverId': driverId
+      'driverId': driverId,
+      'distance':4,
     });
-    print('ride is accepted .............................by the driver');
+    print('ride is accepted ..........................6.by the driver');
     // Close the popup and proceed with ride logic
     setState(() {
       droplocationoftheuser=_rideRequestDetails?['destinationLocation'];

@@ -13,4 +13,7 @@ static final  String fetchJourneyDetails='${baseurl}/api/booking/';
 static final  String fetchDriverDetails='${baseurl}/api/user/driver/';
 
 static final  String cancelRide='${baseurl}/api/booking/cancel/';
+
+static final  String getcost='${baseurl}/api/booking/getCosting';
+
 }

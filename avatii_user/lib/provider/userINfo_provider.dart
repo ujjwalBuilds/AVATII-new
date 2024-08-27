@@ -193,4 +193,39 @@ Journey _journey = Journey.fromJson(jsonData);
       notifyListeners();
     }
   }
+
+
+
+
+
+
+
+
+
+
+Future<void> tryAutoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('token')) return;
+
+    // _token = prefs.getString('token');
+    // _userId = prefs.getString('userId');
+    // _userType = prefs.getString('userType');
+
+    // Optionally, verify the token with your backend here
+
+    notifyListeners();
+  }
+
+
+ Future<void> logout() async {
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    //_clearCacheOnLogout();
+    notifyListeners();
+    //return true;
+  }
+  
+
+
 }
