@@ -73,6 +73,25 @@ print("${loc}...............Driver ke coordinates");
   
 });
 
+
+socket?.on("journeyEnded", ( data )  {
+  print('Driver has ended the journey........................................');
+
+
+  ///pop lagana yyha pe jispe likeha hoag journey has ended ...............................
+
+});
+
+socket?.on("journeyCancelled", (data) {
+
+  print("journey has been cancel .....................................................");
+  //showCancelNotification(data['journeyId'], data['userId']);
+
+//yaha pe ek pop up aga .................cancel journey ka......................
+
+});
+
+
  socket?.on('disconnect', (_) {
       print('disconnected from socket server');
     });

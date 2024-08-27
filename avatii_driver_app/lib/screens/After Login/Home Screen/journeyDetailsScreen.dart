@@ -1319,6 +1319,8 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:avatii_driver_app/Url.dart';
+import 'package:avatii_driver_app/helperFunction.dart';
 import 'package:avatii_driver_app/provider/JourneyProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
@@ -1583,7 +1585,7 @@ import 'package:provider/provider.dart';
 //   }
 // }
 
-
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 class JourneyDetailsScreen extends StatefulWidget {
   final String journeyId;
   final LocationData? currentLocation;
@@ -1608,18 +1610,64 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
   Set<Polyline> _polylines = {};
   Set<Marker> _markers = {};
   Completer<GoogleMapController> _mapController = Completer();
+  String? driverid;
 
   bool _showArrivalButton = true;
   bool _showOtpField = false;
   bool _showButtonsAfterOtp = false;
- 
+  IO.Socket? socket;
   @override
   void initState() {
     super.initState();
     if (widget.currentLocation != null) {
       setRouteToPickupLocation(widget.pickofflocation);
     }
+    _load();
   }
+  void _load()async{
+    driverid=await Helperfunction.getUserId();
+  }
+
+
+
+  void _connectToSocket() {
+    socket = IO.io(
+        Appurls.baseurl,
+        IO.OptionBuilder()
+            .setTransports([
+              'websocket'
+            ])
+            .enableAutoConnect()
+            .build());
+
+    socket?.on('connect', (_) {
+      print('connected to socket server.......');
+      
+socket?.on("journeyCancelled", (data) {
+
+  print("journey has been cancel .....................................................");
+  showCancelNotification(data['journeyId'], data['userId']);
+});
+
+
+socket?.on("journeyEnded", ( data) {
+   print("journey has been ended ..................... ..................................................");
+  _showCompletionPopup();
+});
+
+
+
+
+
+    });}
+
+
+
+
+void  showCancelNotification(journeyId, userId) {
+ // alert(`Ride ${journeyId} has been canceled by user ${userId}.`);
+  // You can also use more sophisticated UI elements like modals or toast notifications
+}
 
   Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
     final GoogleMapController controller = await _mapController.future;
@@ -1859,6 +1907,23 @@ Widget build(BuildContext context) {
                           },
                           child: Text('Arrived'),
                         ),
+                           ElevatedButton(
+                         onPressed:() {
+                           try{
+
+                      socket?.emit("cancelJourney", { widget.journeyId,
+                                            driverid});
+                          
+                          }catch(error){
+    ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(error.toString() ?? 'Unknown error')),
+                                );
+
+                          
+                         }},
+                          child: Text('cancel ride'),
+                        ),
+
                       ],
                     )
                   : journeyProvider.isvalidatingotp
@@ -1910,15 +1975,18 @@ Widget build(BuildContext context) {
                                   journeyProvider.iscomplete?CircularProgressIndicator():
                                     ElevatedButton(
                                        onPressed: () async {
-                              final success = await journeyProvider.completeJourney(widget.journeyId);
-                              if (success) {
-                                _showCompletionPopup();
-                              } else {
-                                // Handle failure
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(journeyProvider.completionErrorMessage ?? 'Unknown error')),
+                                        try{
+
+                                            socket?.emit("endJourney", { widget.journeyId,
+                                            driverid});
+                          
+                          }catch(error){
+    ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(error.toString() ?? 'Unknown error')),
                                 );
-                              }
+
+}
+                              
                             },
                             child: Text('Complete Journey'),
                                     ),

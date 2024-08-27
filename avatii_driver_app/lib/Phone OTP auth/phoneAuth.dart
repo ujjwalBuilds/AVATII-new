@@ -42,7 +42,7 @@ class _PhoneAuthState extends State<PhoneAuth> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(backgroundColor: Colors.blue, content: Text("Login successfully")),
       );
-      Get.offAll(() => StatusCheckPage());
+     Get.to(()=>StatusCheckPage());
       // FirebaseAuth.instance.verifyPhoneNumber(
       //   verificationCompleted: (PhoneAuthCredential credential) {},
       //   verificationFailed: (FirebaseAuthException ex) {},
