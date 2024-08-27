@@ -1,5 +1,6 @@
 
 import 'package:avatii/provider/Ride_provider.dart';
+import 'package:avatii/provider/journeyINfoprovider.dart';
 import 'package:avatii/provider/userINfo_provider.dart';
 import 'package:avatii/screens/After%20Login/Home%20Screen/homeScreen.dart';
 import 'package:avatii/screens/Before%20Login/splashScreen/splashScreen.dart';
@@ -27,8 +28,13 @@ class MainApp extends StatelessWidget {
     //   ),
     //   routerConfig: router, 
     // );
-   return MultiProvider(providers: [ ChangeNotifierProvider(create: (context) => UserProvider()),
-    ChangeNotifierProvider(create: (context) => RideProvider())
+   return MultiProvider(providers: [ 
+    
+    ChangeNotifierProvider(
+            create: (context) => UserProvider()..tryAutoLogin()),
+    ChangeNotifierProvider(create: (context) => UserProvider()),
+    ChangeNotifierProvider(create: (context) => RideProvider()),
+     ChangeNotifierProvider(create: (context) => CostingProvider())
    
    
    ],

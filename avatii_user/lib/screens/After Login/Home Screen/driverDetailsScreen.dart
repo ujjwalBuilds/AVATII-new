@@ -260,6 +260,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
       journeyId,
       userId
     });
+  print("mane cancel krdi apni traf se.............");
     navigator?.pop(context);
   }
 
@@ -342,7 +343,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'Driver is on the way',
+                      'Driver will arrive in few minutes',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Divider(indent: 17, endIndent: 17, color: Colors.grey.shade300),

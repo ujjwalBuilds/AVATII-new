@@ -33,7 +33,7 @@ class Journey {
   final String driverId;
   final Location pickOff;
   final Location dropOff;
-  final int distance;
+  final double distance;
   final int otp;
   final String status;
   final DateTime createdAt;

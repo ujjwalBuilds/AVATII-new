@@ -110,8 +110,14 @@ class HelperFunction {
     String? userId = prefs.getString('userid');
     return userId;
   }
-
-  static Future<double> calculateFare(Map<String,double> pickoffcoordinates, Map<String,double> dropoffcoordinates, String vehicleType, Map<String, double> currentLocation) async {
+  static Future<double> calculateFare(
+    Map<String, double> pickoffcoordinates,
+    Map<String, double> dropoffcoordinates,
+    String vehicleType,
+    // Map<String, double> currentLocation,
+    double initialCost,
+    double perKilometreCost,
+  ) async {
     // Extract pickup coordinates
     double? pickupLatitude = pickoffcoordinates['latitude'];
     double? pickupLongitude = pickoffcoordinates['longitude'];
@@ -128,8 +134,8 @@ class HelperFunction {
       dropoffLongitude!,
     );
 
-    // Calculate fare based on distance and vehicle type
-    double fare = fareCalculator(vehicleType, distanceResult['kilometers']!);
+    // Calculate fare based on distance, vehicle type, and cost parameters
+    double fare = fareCalculator(initialCost, perKilometreCost, distanceResult['kilometers']!);
 
     return fare;
   }
@@ -155,42 +161,15 @@ class HelperFunction {
     };
   }
 
-  static double fareCalculator(String vehicleType, double distanceInKilometers) {
-    double fare = 0;
+  static double fareCalculator(double initialCost, double perKilometreCost, double distanceInKilometers) {
+    double fare;
 
-    switch (vehicleType.toLowerCase()) {
-      case 'car':
-        // First 2 km cost is fixed at 40 Rs
-        if (distanceInKilometers <= 2) {
-          fare = 40;
-        } else {
-          // 40 Rs for the first 2 km + 12 Rs per additional km
-          fare = 40 + ((distanceInKilometers - 2) * 12);
-        }
-        break;
-
-      case 'auto':
-        // First 2 km cost is fixed at 30 Rs
-        if (distanceInKilometers <= 2) {
-          fare = 30;
-        } else {
-          // 30 Rs for the first 2 km + 8 Rs per additional km
-          fare = 30 + ((distanceInKilometers - 2) * 8);
-        }
-        break;
-
-      case 'bike':
-        // First 2 km cost is fixed at 20 Rs
-        if (distanceInKilometers <= 2) {
-          fare = 20;
-        } else {
-          // 20 Rs for the first 2 km + 6 Rs per additional km
-          fare = 20 + ((distanceInKilometers - 2) * 6);
-        }
-        break;
-
-      default:
-        throw Exception('Invalid vehicle type');
+    // If the distance is less than or equal to 2 km, the fare is the initial cost
+    if (distanceInKilometers <= 2) {
+      fare = initialCost;
+    } else {
+      // If the distance is greater than 2 km, calculate the fare as initial cost + additional cost per km
+      fare = initialCost + ((distanceInKilometers - 2) * perKilometreCost);
     }
 
     return fare;

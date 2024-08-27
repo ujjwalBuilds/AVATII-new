@@ -393,7 +393,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       'driverId': driverId,
       'distance': distance,
     });
-    print('ride is accepted .............................by the driver');
+    print('ride is accepted ..........................6.by the driver');
     // Close the popup and proceed with ride logic
     setState(() {
       droplocationoftheuser = _rideRequestDetails?['destinationLocation'];

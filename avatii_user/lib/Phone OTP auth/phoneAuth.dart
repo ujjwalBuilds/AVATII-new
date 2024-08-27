@@ -28,7 +28,7 @@ class _PhoneAuthState extends State<PhoneAuth> {
     //                   Navigator.push(context, MaterialPageRoute(builder: (context) => OTPScreen(verificationid: verificationid,)));
     //                 },
     //                 codeAutoRetrievalTimeout: (String verificationId) {},
-    //                 phoneNumber: phoneController.text.toString());
+    //                 phoneNumber: "+91${phoneController.text.toString()}");
    }).catchError((error){
     ScaffoldMessenger(child: Text(error.toString()));
    }   
