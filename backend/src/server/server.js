@@ -322,6 +322,7 @@ import { Database, Resource } from '@adminjs/mongoose';
 import User from './models/UserModel.js';
 import Journey from './models/JourneyModel.js';
 import Driver from './models/DriverModel.js';
+import Cost from './models/CostingModel.js';
 
 // Connect to MongoDB
 connectDb();
@@ -334,6 +335,7 @@ const adminJs = new AdminJS({
     { resource: User },
     { resource: Journey },
     { resource: Driver },
+    { resource: Cost },
   ],
   rootPath: '/admin',
 });
@@ -420,7 +422,7 @@ io.on("connection", (socket) => {
   });
 
   // Handle ride requests
-  socket.on("requestRide", ({ userId, currentLocation, destinationLocation }) => {
+  socket.on("requestRide", ({ userId, currentLocation, destinationLocation}) => {
     console.log(`Passenger ${userId} requested a ride from ${currentLocation} to ${destinationLocation}`);
 
     // Store the request temporarily
@@ -442,7 +444,7 @@ io.on("connection", (socket) => {
   });
 
   // Handle a driver accepting a ride request
-  socket.on("acceptRide", async ({ requestId, driverId }) => {
+  socket.on("acceptRide", async ({ requestId, driverId, distance }) => {
     const request = activeRequests.get(requestId);
     if (request) {
       console.log(`Driver ${driverId} accepted the ride request: ${requestId}`);
@@ -462,6 +464,7 @@ io.on("connection", (socket) => {
         driverId,
         pickOff: request.currentLocation,
         dropOff: request.destinationLocation,
+        distance,
       };
 
       try {
@@ -520,7 +523,6 @@ io.on("connection", (socket) => {
         driver.available = true;
         delete driver.journeyId; // Remove the journey ID from the driver
       }
-
       // Notify both the driver and the passenger
       io.to(journeyId).emit("journeyEnded", { journeyId, driverId });
       console.log(`Journey ${journeyId} ended by driver ${driverId}`);

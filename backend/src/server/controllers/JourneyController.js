@@ -1,32 +1,58 @@
 import asyncHandler from "express-async-handler";
 import Journey from "../models/JourneyModel.js";
 import dotenv from "dotenv";
+import Cost from "../models/CostingModel.js";
+import Driver from "../models/DriverModel.js";
+import axios from "axios";
 
 dotenv.config();
 
 export const StartJourney = asyncHandler(async (req, res) => {
     try {
-        const { passengerId, driverId, pickOff, dropOff} = req.body;
+        const { passengerId, driverId, pickOff, dropOff, distance } = req.body;
 
-        if (!passengerId || !driverId || !pickOff || !dropOff ) {
-            return res.status(400).json({ message: "Bad request" });
+        // Validate required fields
+        if (!passengerId || !driverId || !pickOff || !dropOff || !distance) {
+            return res.status(400).json({ message: "Bad request: Missing required fields" });
         }
 
-        const otp = Math.floor(100000 + Math.random() * 900000); // Generates a 6-digit OTP
+        // Generate a 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000);
 
+        // Find the driver by ID
+        const driver = await Driver.findById(driverId);
+        if (!driver) {
+            return res.status(404).json({ message: "Driver not found" });
+        }
+        // Fetch costing details from external API
+        let fare;
+        try {
+            const cost = await Cost.find({VehicleType:driver.vehicle.Type});
+            const InitialCost = cost[0].InitialCost;
+            const CostPerKilometre = cost[0].CostPerKilometre;
+            fare = InitialCost;
+            if (distance > 2) {
+                fare += CostPerKilometre * (distance - 2);
+            }
+        } catch (error) {
+            return res.status(500).json({ message: `Failed to fetch costing: ${error.message}` });
+        }
+
+        // Create a new journey record
         const startedJourney = new Journey({
             passengerId,
             driverId,
             pickOff,
             dropOff,
-            distance:5,
+            distance:fare,
             otp,
             status: "ACTIVE"
         });
 
+        // Save the journey to the database
         await startedJourney.save();
 
-        return res.status(201).json({ message: "Journey created", journeyId:startedJourney._id });
+        return res.status(201).json({ message: "Journey created successfully", journeyId: startedJourney._id });
     } catch (err) {
         return res.status(500).json({ message: `Internal Server Error: ${err.message}` });
     }
@@ -140,6 +166,26 @@ export const GetJourneyInfoById = asyncHandler(async (req, res) => {
         }
 
         return res.status(200).json(journey);
+    } catch (err) {
+        return res.status(500).json({ message: `Internal Server Error: ${err.message}` });
+    }
+});
+
+export const getCosting = asyncHandler(async (req, res) => {
+    try {
+        const {VehicleType} = req.query;
+
+        if (!VehicleType) {
+            return res.status(400).json({ message: "Bad request" });
+        }
+
+        const cost = await Cost.find({VehicleType});
+
+        if (!cost) {
+            return res.status(404).json({ message: "costing not found" });
+        }
+
+        return res.status(200).json(cost);
     } catch (err) {
         return res.status(500).json({ message: `Internal Server Error: ${err.message}` });
     }
