@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "175683352301",
+    "project_id": "avatii-cab-new",
+    "storage_bucket": "avatii-cab-new.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:175683352301:android:48a503eb7c0bff96d2bee4",
+        "android_client_info": {
+          "package_name": "com.example.avatii"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3Pye89eVfeARbbngLBIxYSTia9CgxnKo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

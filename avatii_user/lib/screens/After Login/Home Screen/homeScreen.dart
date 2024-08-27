@@ -1,5 +1,7 @@
 import 'package:avatii/Url.dart';
 import 'package:avatii/helperFunction.dart';
+import 'package:avatii/models/journeyModel.dart' as journey;
+import 'package:avatii/models/journeyModel.dart';
 import 'package:avatii/models/ride_model.dart';
 import 'package:avatii/provider/Ride_provider.dart';
 import 'package:avatii/provider/userINfo_provider.dart';
@@ -21,6 +23,8 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  get journey => null;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -61,9 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _connectUser();
     });
 
-
-
-      /*VIPIN's Code*/
+    /*VIPIN's Code*/
     // socket?.on('rideAccepted', (data) async{
     //   print('..................................Ride accepted by driver for passanger........................');
     //  String journeyId = data['journeyId'];
@@ -73,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
     //   await rideProvider.fetchJourneyDetails(journeyId);
     //   print('got the journey successfull..........');
     //   await rideProvider.fetchDriverDetails(driverId);
-    
+
     //   setState(() {
     //     _isSearching = false;
     //     _driverName = data['journeyId'];
@@ -92,25 +94,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
     /*UJJWAL's CODE */
     socket?.on('rideAccepted', (data) async {
-  print('Ride accepted by driver for passenger................................');
-  String journeyId = data['journeyId'];
-  String driverId = data['driverId'];
+      print('Ride accepted by driver for passenger................................');
+      String journeyId = data['journeyId'];
+      String driverId = data['driverId'];
 
-  final rideProvider =Provider.of<UserProvider>(context, listen: false);
- 
- 
- var journey= await rideProvider.fetchJourneyDetails(journeyId);
-   // var journey = rideProvider.journey;
-  await rideProvider.fetchDriverDetails(driverId);
+      final rideProvider = Provider.of<UserProvider>(context, listen: false);
 
+      var journey = await rideProvider.fetchJourneyDetails(journeyId);
+      // var journey = rideProvider.journey;
+      await rideProvider.fetchDriverDetails(driverId);
 
-  var driver = rideProvider.driver;
-Get.to(() => DriverDetailsScreen(journey: journey, driver: driver,currentLocation: currentCoordinates, destinationCoordinates: LatLng(destinationCoordinates!['latitude']!,destinationCoordinates!['longitude']!),));
-
-});
-
-
-
+      var driver = rideProvider.driver;
+      Get.to(() => DriverDetailsScreen(
+            journey: journey,
+            driver: driver,
+            currentLocation: currentCoordinates,
+            destinationCoordinates: LatLng(destinationCoordinates!['latitude']!, destinationCoordinates!['longitude']!),
+          ));
+    });
 
     socket?.on('disconnect', (_) {
       print('disconnected from socket server');
@@ -129,9 +130,9 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver,currentLocatio
   LatLng _initialPosition = const LatLng(0, 0);
   bool _loading = true;
   String _paymentMode = 'Cash';
-  Map<String, double>? destinationCoordinates = {}; //destionation coordinates
+  Map<String, double> destinationCoordinates = {}; //destionation coordinates
   String? _selectedRide;
-  Map<String, double> currentCoordinates={}; //user current loaction corrdinates
+  Map<String, double> currentCoordinates = {}; //user current loaction corrdinates
   String? destinationAddress; //user destination location where he want to go
   String? currentAddress;
 
@@ -149,7 +150,7 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver,currentLocatio
   }
 
   void _load() async {
-    userid = await Helperfunction.getUserId();
+    userid = await HelperFunction.getUserId();
   }
 
   Future<void> _checkLocationPermission() async {
@@ -296,7 +297,6 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver,currentLocatio
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: Colors.white,
-                              
                                   hintStyle: const TextStyle(
                                     fontSize: 15,
                                     color: Color.fromARGB(255, 129, 129, 129),
@@ -316,16 +316,14 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver,currentLocatio
                               ),
                             ),
                             const SizedBox(height: 10),
-                            
                             GooglePlaceAutoCompleteTextField(
-                              
                               boxDecoration: BoxDecoration(
-                                border: Border.all(color: const Color(0xFFF2F2F5),)
-                              ),
+                                  border: Border.all(
+                                color: const Color(0xFFF2F2F5),
+                              )),
                               textEditingController: _destinationController,
                               googleAPIKey: "AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ",
                               inputDecoration: InputDecoration(
-                                
                                 hintText: 'Destination',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -380,10 +378,11 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver,currentLocatio
                               seperatedBuilder: const Divider(),
                               isCrossBtnShown: true,
                               containerHorizontalPadding: 10,
-                              countries: ["IN"],
+                              countries: [
+                                "IN"
+                              ],
                               placeType: PlaceType.geocode,
                             ),
-
                             const SizedBox(height: 20),
                             ElevatedButton(
                                 onPressed: () {
@@ -490,154 +489,752 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver,currentLocatio
     );
   }
 
+  // void _sheetaglaneeche() {
+  //   showMaterialModalBottomSheet(
+  //     context: context,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (context) => StatefulBuilder(
+  //       builder: (BuildContext context, StateSetter setModalState) {
+  //         return ClipRRect(
+  //           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+  //           child: SingleChildScrollView(
+  //             child: Container(
+  //               color: const Color(0xFFF2F2F5),
+  //               child: Padding(
+  //                 padding: EdgeInsets.only(
+  //                   bottom: MediaQuery.of(context).viewInsets.bottom,
+  //                 ),
+  //                 child: Container(
+  //                   height: 500,
+  //                   child: Column(
+  //                     children: [
+  //                       Expanded(
+  //                         child: SingleChildScrollView(
+  //                           padding: const EdgeInsets.all(16),
+  //                           child: Column(
+  //                             children: [
+  //                               const Align(
+  //                                 alignment: Alignment.topCenter,
+  //                                 child: Padding(
+  //                                   padding: EdgeInsets.only(top: 12, bottom: 6),
+  //                                   child: Text(
+  //                                     'Available rides',
+  //                                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+  //                                   ),
+  //                                 ),
+  //                               ),
+  //                               Divider(
+  //                                 indent: 17,
+  //                                 endIndent: 17,
+  //                                 color: Colors.grey.shade300,
+  //                               ),
+  //                               const SizedBox(height: 10),
+  //                               GestureDetector(
+  //                                 onTap: () {
+  //                                   setModalState(() {
+  //                                     _selectedRide = 'Avatii Cab';
+  //                                   });
+  //                                 },
+  //                                 child: _buildrides(
+  //                                   rideType: 'Avatii Cab',
+  //                                   price: '₹254.66',
+  //                                   time: '8:15pm',
+  //                                   distance: '4 min away',
+  //                                   details: 'Private • Most popular',
+  //                                   image: const AssetImage(Aimages.hatchback),
+  //                                   isSelected: _selectedRide == 'Avatii Cab',
+  //                                 ),
+  //                               ),
+  //                               const SizedBox(height: 15),
+  //                               GestureDetector(
+  //                                 onTap: () {
+  //                                   setModalState(() {
+  //                                     _selectedRide = 'Avatii Auto';
+  //                                   });
+  //                                 },
+  //                                 child: _buildrides(
+  //                                   rideType: 'Avatii Auto',
+  //                                   price: '₹290.57',
+  //                                   time: '8:15pm',
+  //                                   distance: '3 min away',
+  //                                   details: 'Private • Popular',
+  //                                   image: const AssetImage(Aimages.auto),
+  //                                   isSelected: _selectedRide == 'Avatii Auto',
+  //                                 ),
+  //                               ),
+  //                               const SizedBox(height: 15),
+  //                               GestureDetector(
+  //                                 onTap: () {
+  //                                   setModalState(() {
+  //                                     _selectedRide = 'Avatii Bike';
+  //                                   });
+  //                                 },
+  //                                 child: _buildrides(
+  //                                   rideType: 'Avatii Bike',
+  //                                   price: '₹350.13',
+  //                                   time: '8:15pm',
+  //                                   distance: '10 min away',
+  //                                   details: 'Private • Very popular',
+  //                                   image: const AssetImage(Aimages.bike),
+  //                                   isSelected: _selectedRide == 'Avatii Bike',
+  //                                 ),
+  //                               ),
+  //                               const SizedBox(height: 16),
+  //                               DropdownButton<String>(
+  //                                 value: _paymentMode,
+  //                                 onChanged: (String? newValue) {
+  //                                   setModalState(() {
+  //                                     _paymentMode = newValue!;
+  //                                   });
+  //                                 },
+  //                                 items: <String>[
+  //                                   'Cash',
+  //                                   'Online'
+  //                                 ].map<DropdownMenuItem<String>>((String value) {
+  //                                   return DropdownMenuItem<String>(
+  //                                     value: value,
+  //                                     child: Text(value),
+  //                                   );
+  //                                 }).toList(),
+  //                               ),
+  //                               const SizedBox(height: 10),
+  //                               Padding(
+  //                                 padding: const EdgeInsets.all(8.0),
+  //                                 child: Container(
+  //                                   width: double.infinity,
+  //                                   height: 50,
+  //                                   child: ElevatedButton(
+  //                                     onPressed: () {
+  //                                       if (_isSearching) {
+  //                                         _searchdriver();
+  //                                       } else {
+  //                                         return null;
+  //                                       }
+  //                                     },
+  //                                     style: ElevatedButton.styleFrom(
+  //                                       backgroundColor: Colors.black,
+  //                                     ),
+  //                                     child: Text('Search for ride', style: TextStyle(color: Colors.white)),
+  //                                   ),
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
+
+//   void _sheetaglaneeche() {
+//   showMaterialModalBottomSheet(
+//     context: context,
+//     backgroundColor: Colors.transparent,
+//     builder: (context) => StatefulBuilder(
+//       builder: (BuildContext context, StateSetter setModalState) {
+//         // return FutureBuilder<Map<String, double>>(
+//         return FutureBuilder<List<double>>(
+//           future: Future.wait([
+//             // HelperFunction.calculateFare(journey, 'car', currentLocation),
+//             // HelperFunction.calculateFare(journey, 'auto', currentLocation),
+//             // HelperFunction.calculateFare(journey, 'bike', currentLocation),
+//             HelperFunction.calculateFare(journey, 'car', {}),
+//             HelperFunction.calculateFare(journey, 'auto', {}),
+//             HelperFunction.calculateFare(journey, 'bike', {}),
+
+//           ]).then((fares) => {
+//             'car': fares[0],
+//             'auto': fares[1],
+//             'bike': fares[2],
+//           }),
+//           builder: (context, snapshot) {
+//             if (snapshot.connectionState == ConnectionState.waiting) {
+//               return Center(child: CircularProgressIndicator());
+//             } else if (snapshot.hasError) {
+//               return Center(child: Text('Error: ${snapshot.error}'));
+//             } else {
+//               final fares = snapshot.data!;
+//               return ClipRRect(
+//                 borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+//                 child: SingleChildScrollView(
+//                   child: Container(
+//                     color: const Color(0xFFF2F2F5),
+//                     child: Padding(
+//                       padding: EdgeInsets.only(
+//                         bottom: MediaQuery.of(context).viewInsets.bottom,
+//                       ),
+//                       child: Container(
+//                         height: 500,
+//                         child: Column(
+//                           children: [
+//                             Expanded(
+//                               child: SingleChildScrollView(
+//                                 padding: const EdgeInsets.all(16),
+//                                 child: Column(
+//                                   children: [
+//                                     const Align(
+//                                       alignment: Alignment.topCenter,
+//                                       child: Padding(
+//                                         padding: EdgeInsets.only(top: 12, bottom: 6),
+//                                         child: Text(
+//                                           'Available rides',
+//                                           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+//                                         ),
+//                                       ),
+//                                     ),
+//                                     Divider(
+//                                       indent: 17,
+//                                       endIndent: 17,
+//                                       color: Colors.grey.shade300,
+//                                     ),
+//                                     const SizedBox(height: 10),
+//                                     GestureDetector(
+//                                       onTap: () {
+//                                         setModalState(() {
+//                                           _selectedRide = 'Avatii Cab';
+//                                         });
+//                                       },
+//                                       child: _buildrides(
+//                                         rideType: 'Avatii Cab',
+//                                         fare: fares['car']!,
+//                                         time: '8:15pm',
+//                                         distance: '4 min away',
+//                                         details: 'Private • Most popular',
+//                                         image: const AssetImage(Aimages.hatchback),
+//                                         isSelected: _selectedRide == 'Avatii Cab',
+//                                       ),
+//                                     ),
+//                                     const SizedBox(height: 15),
+//                                     GestureDetector(
+//                                       onTap: () {
+//                                         setModalState(() {
+//                                           _selectedRide = 'Avatii Auto';
+//                                         });
+//                                       },
+//                                       child: _buildrides(
+//                                         rideType: 'Avatii Auto',
+//                                         fare: fares['auto']!,
+//                                         time: '8:15pm',
+//                                         distance: '3 min away',
+//                                         details: 'Private • Popular',
+//                                         image: const AssetImage(Aimages.auto),
+//                                         isSelected: _selectedRide == 'Avatii Auto',
+//                                       ),
+//                                     ),
+//                                     const SizedBox(height: 15),
+//                                     GestureDetector(
+//                                       onTap: () {
+//                                         setModalState(() {
+//                                           _selectedRide = 'Avatii Bike';
+//                                         });
+//                                       },
+//                                       child: _buildrides(
+//                                         rideType: 'Avatii Bike',
+//                                         fare: fares['bike']!,
+//                                         time: '8:15pm',
+//                                         distance: '10 min away',
+//                                         details: 'Private • Very popular',
+//                                         image: const AssetImage(Aimages.bike),
+//                                         isSelected: _selectedRide == 'Avatii Bike',
+//                                       ),
+//                                     ),
+//                                     const SizedBox(height: 16),
+//                                     DropdownButton<String>(
+//                                       value: _paymentMode,
+//                                       onChanged: (String? newValue) {
+//                                         setModalState(() {
+//                                           _paymentMode = newValue!;
+//                                         });
+//                                       },
+//                                       items: <String>[
+//                                         'Cash',
+//                                         'Online'
+//                                       ].map<DropdownMenuItem<String>>((String value) {
+//                                         return DropdownMenuItem<String>(
+//                                           value: value,
+//                                           child: Text(value),
+//                                         );
+//                                       }).toList(),
+//                                     ),
+//                                     const SizedBox(height: 10),
+//                                     Padding(
+//                                       padding: const EdgeInsets.all(8.0),
+//                                       child: Container(
+//                                         width: double.infinity,
+//                                         height: 50,
+//                                         child: ElevatedButton(
+//                                           onPressed: () {
+//                                             if (_isSearching) {
+//                                               _searchdriver();
+//                                             } else {
+//                                               return null;
+//                                             }
+//                                           },
+//                                           style: ElevatedButton.styleFrom(
+//                                             backgroundColor: Colors.black,
+//                                           ),
+//                                           child: Text('Search for ride', style: TextStyle(color: Colors.white)),
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ],
+//                                 ),
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               );
+//             }
+//           },
+//         );
+//       },
+//     ),
+//   );
+// }
+
   void _sheetaglaneeche() {
+    Journey journey;
     showMaterialModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
         builder: (BuildContext context, StateSetter setModalState) {
-          return ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-            child: SingleChildScrollView(
-              child: Container(
-                color: const Color(0xFFF2F2F5),
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom,
-                  ),
-                  child: Container(
-                    height: 500,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              children: [
-                                const Align(
-                                  alignment: Alignment.topCenter,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(top: 12, bottom: 6),
-                                    child: Text(
-                                      'Available rides',
-                                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                                    ),
-                                  ),
-                                ),
-                                Divider(
-                                  indent: 17,
-                                  endIndent: 17,
-                                  color: Colors.grey.shade300,
-                                ),
-                                const SizedBox(height: 10),
-                                GestureDetector(
-                                  onTap: () {
-                                    setModalState(() {
-                                      _selectedRide = 'Avatii Cab';
-                                    });
-                                  },
-                                  child: _buildrides(
-                                    rideType: 'Avatii Cab',
-                                    price: '₹254.66',
-                                    time: '8:15pm',
-                                    distance: '4 min away',
-                                    details: 'Private • Most popular',
-                                    image: const AssetImage(Aimages.hatchback),
-                                    isSelected: _selectedRide == 'Avatii Cab',
-                                  ),
-                                ),
-                                const SizedBox(height: 15),
-                                GestureDetector(
-                                  onTap: () {
-                                    setModalState(() {
-                                      _selectedRide = 'Avatii Auto';
-                                    });
-                                  },
-                                  child: _buildrides(
-                                    rideType: 'Avatii Auto',
-                                    price: '₹290.57',
-                                    time: '8:15pm',
-                                    distance: '3 min away',
-                                    details: 'Private • Popular',
-                                    image: const AssetImage(Aimages.auto),
-                                    isSelected: _selectedRide == 'Avatii Auto',
-                                  ),
-                                ),
-                                const SizedBox(height: 15),
-                                GestureDetector(
-                                  onTap: () {
-                                    setModalState(() {
-                                      _selectedRide = 'Avatii Bike';
-                                    });
-                                  },
-                                  child: _buildrides(
-                                    rideType: 'Avatii Bike',
-                                    price: '₹350.13',
-                                    time: '8:15pm',
-                                    distance: '10 min away',
-                                    details: 'Private • Very popular',
-                                    image: const AssetImage(Aimages.bike),
-                                    isSelected: _selectedRide == 'Avatii Bike',
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                DropdownButton<String>(
-                                  value: _paymentMode,
-                                  onChanged: (String? newValue) {
-                                    setModalState(() {
-                                      _paymentMode = newValue!;
-                                    });
-                                  },
-                                  items: <String>[
-                                    'Cash',
-                                    'Online'
-                                  ].map<DropdownMenuItem<String>>((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                ),
-                                const SizedBox(height: 10),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    width: double.infinity,
-                                    height: 50,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        if (_isSearching) {
-                                          _searchdriver();
-                                        } else {
-                                          return null;
-                                        }
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.black,
+          return FutureBuilder<List<double>>(
+            future: Future.wait([
+              HelperFunction.calculateFare(currentCoordinates,destinationCoordinates, 'car', {}),
+              HelperFunction.calculateFare(currentCoordinates,destinationCoordinates, 'auto', {}),
+              HelperFunction.calculateFare(currentCoordinates,destinationCoordinates, 'bike', {}),
+            ]),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (snapshot.hasData && snapshot.data != null) {
+                final fares = snapshot.data!;
+                final carFare = fares[0];
+                final autoFare = fares[1];
+                final bikeFare = fares[2];
+
+                return ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+                  child: SingleChildScrollView(
+                    child: Container(
+                      color: const Color(0xFFF2F2F5),
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewInsets.bottom,
+                        ),
+                        child: Container(
+                          height: 500,
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    children: [
+                                      const Align(
+                                        alignment: Alignment.topCenter,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(top: 12, bottom: 6),
+                                          child: Text(
+                                            'Available rides',
+                                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
                                       ),
-                                      child: Text('Search for ride', style: TextStyle(color: Colors.white)),
-                                    ),
+                                      Divider(
+                                        indent: 17,
+                                        endIndent: 17,
+                                        color: Colors.grey.shade300,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setModalState(() {
+                                            _selectedRide = 'Avatii Cab';
+                                          });
+                                        },
+                                        child: _buildrides(
+                                          rideType: 'Avatii Cab',
+                                          fare: carFare,
+                                          time: '8:15pm',
+                                          distance: '4 min away',
+                                          details: 'Private • Most popular',
+                                          image: const AssetImage(Aimages.hatchback),
+                                          isSelected: _selectedRide == 'Avatii Cab',
+                                        ),
+                                      ),
+                                      const SizedBox(height: 15),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setModalState(() {
+                                            _selectedRide = 'Avatii Auto';
+                                          });
+                                        },
+                                        child: _buildrides(
+                                          rideType: 'Avatii Auto',
+                                          fare: autoFare,
+                                          time: '8:15pm',
+                                          distance: '3 min away',
+                                          details: 'Private • Popular',
+                                          image: const AssetImage(Aimages.auto),
+                                          isSelected: _selectedRide == 'Avatii Auto',
+                                        ),
+                                      ),
+                                      const SizedBox(height: 15),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setModalState(() {
+                                            _selectedRide = 'Avatii Bike';
+                                          });
+                                        },
+                                        child: _buildrides(
+                                          rideType: 'Avatii Bike',
+                                          fare: bikeFare,
+                                          time: '8:15pm',
+                                          distance: '10 min away',
+                                          details: 'Private • Very popular',
+                                          image: const AssetImage(Aimages.bike),
+                                          isSelected: _selectedRide == 'Avatii Bike',
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      DropdownButton<String>(
+                                        value: _paymentMode,
+                                        onChanged: (String? newValue) {
+                                          setModalState(() {
+                                            _paymentMode = newValue!;
+                                          });
+                                        },
+                                        items: <String>[
+                                          'Cash',
+                                          'Online'
+                                        ].map<DropdownMenuItem<String>>((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          width: double.infinity,
+                                          height: 50,
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              if (_isSearching) {
+                                                _searchdriver();
+                                              } else {
+                                                return null;
+                                              }
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.black,
+                                            ),
+                                            child: Text('Search for ride', style: TextStyle(color: Colors.white)),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
+                );
+              } else {
+                return const Center(child: Text('No data available'));
+              }
+            },
           );
         },
       ),
     );
   }
 
+  // void _sheetaglaneeche() {
+  //   // Fetch the UserProvider instance
+  //   final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+  //   // Assume you have a way to get the journey ID; replace 'journeyId' with the actual ID.
+  //   final String journeyId = '${widget.journey.id}'; // Replace with the actual journey ID
+
+  //   showMaterialModalBottomSheet(
+  //     context: context,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (context) => StatefulBuilder(
+  //       builder: (BuildContext context, StateSetter setModalState) {
+  //         return FutureBuilder<Journey>(
+  //           future: userProvider.fetchJourneyDetails(journeyId),
+  //           builder: (context, snapshot) {
+  //             if (snapshot.connectionState == ConnectionState.waiting) {
+  //               return Center(child: CircularProgressIndicator());
+  //             } else if (snapshot.hasError) {
+  //               return Center(child: Text('Error: ${snapshot.error}'));
+  //             } else if (!snapshot.hasData || snapshot.data == null) {
+  //               return Center(child: Text('No data available'));
+  //             } else {
+  //               final Journey journey = snapshot.data!;
+
+  //               // Use journey data to calculate fares or other tasks
+  //               // Example:
+  //               Future<Map<String, double>> _calculateFares() async {
+  //                 return {
+  //                   'car': await HelperFunction.calculateFare(journey, 'car', {}),
+  //                   'auto': await HelperFunction.calculateFare(journey, 'auto', {}),
+  //                   'bike': await HelperFunction.calculateFare(journey, 'bike', {}),
+  //                 };
+  //               }
+
+  //               return FutureBuilder<Map<String, double>>(
+  //                 future: _calculateFares(),
+  //                 builder: (context, fareSnapshot) {
+  //                   if (fareSnapshot.connectionState == ConnectionState.waiting) {
+  //                     return Center(child: CircularProgressIndicator());
+  //                   } else if (fareSnapshot.hasError) {
+  //                     return Center(child: Text('Error: ${fareSnapshot.error}'));
+  //                   } else if (!fareSnapshot.hasData || fareSnapshot.data!.isEmpty) {
+  //                     return Center(child: Text('No fares data available'));
+  //                   } else {
+  //                     final fares = fareSnapshot.data!;
+
+  //                     return ClipRRect(
+  //                       borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+  //                       child: SingleChildScrollView(
+  //                         child: Container(
+  //                           color: const Color(0xFFF2F2F5),
+  //                           child: Padding(
+  //                             padding: EdgeInsets.only(
+  //                               bottom: MediaQuery.of(context).viewInsets.bottom,
+  //                             ),
+  //                             child: Container(
+  //                               height: 500,
+  //                               child: Column(
+  //                                 children: [
+  //                                   Expanded(
+  //                                     child: SingleChildScrollView(
+  //                                       padding: const EdgeInsets.all(16),
+  //                                       child: Column(
+  //                                         children: [
+  //                                           const Align(
+  //                                             alignment: Alignment.topCenter,
+  //                                             child: Padding(
+  //                                               padding: EdgeInsets.only(top: 12, bottom: 6),
+  //                                               child: Text(
+  //                                                 'Available rides',
+  //                                                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+  //                                               ),
+  //                                             ),
+  //                                           ),
+  //                                           Divider(
+  //                                             indent: 17,
+  //                                             endIndent: 17,
+  //                                             color: Colors.grey.shade300,
+  //                                           ),
+  //                                           const SizedBox(height: 10),
+  //                                           GestureDetector(
+  //                                             onTap: () {
+  //                                               setModalState(() {
+  //                                                 _selectedRide = 'Avatii Cab';
+  //                                               });
+  //                                             },
+  //                                             child: _buildrides(
+  //                                               rideType: 'Avatii Cab',
+  //                                               fare: fares['car']!,
+  //                                               time: '8:15pm',
+  //                                               distance: '4 min away',
+  //                                               details: 'Private • Most popular',
+  //                                               image: const AssetImage(Aimages.hatchback),
+  //                                               isSelected: _selectedRide == 'Avatii Cab',
+  //                                             ),
+  //                                           ),
+  //                                           const SizedBox(height: 15),
+  //                                           GestureDetector(
+  //                                             onTap: () {
+  //                                               setModalState(() {
+  //                                                 _selectedRide = 'Avatii Auto';
+  //                                               });
+  //                                             },
+  //                                             child: _buildrides(
+  //                                               rideType: 'Avatii Auto',
+  //                                               fare: fares['auto']!,
+  //                                               time: '8:15pm',
+  //                                               distance: '3 min away',
+  //                                               details: 'Private • Popular',
+  //                                               image: const AssetImage(Aimages.auto),
+  //                                               isSelected: _selectedRide == 'Avatii Auto',
+  //                                             ),
+  //                                           ),
+  //                                           const SizedBox(height: 15),
+  //                                           GestureDetector(
+  //                                             onTap: () {
+  //                                               setModalState(() {
+  //                                                 _selectedRide = 'Avatii Bike';
+  //                                               });
+  //                                             },
+  //                                             child: _buildrides(
+  //                                               rideType: 'Avatii Bike',
+  //                                               fare: fares['bike']!,
+  //                                               time: '8:15pm',
+  //                                               distance: '10 min away',
+  //                                               details: 'Private • Very popular',
+  //                                               image: const AssetImage(Aimages.bike),
+  //                                               isSelected: _selectedRide == 'Avatii Bike',
+  //                                             ),
+  //                                           ),
+  //                                           const SizedBox(height: 16),
+  //                                           DropdownButton<String>(
+  //                                             value: _paymentMode,
+  //                                             onChanged: (String? newValue) {
+  //                                               setModalState(() {
+  //                                                 _paymentMode = newValue!;
+  //                                               });
+  //                                             },
+  //                                             items: <String>[
+  //                                               'Cash',
+  //                                               'Online'
+  //                                             ].map<DropdownMenuItem<String>>((String value) {
+  //                                               return DropdownMenuItem<String>(
+  //                                                 value: value,
+  //                                                 child: Text(value),
+  //                                               );
+  //                                             }).toList(),
+  //                                           ),
+  //                                           const SizedBox(height: 10),
+  //                                           Padding(
+  //                                             padding: const EdgeInsets.all(8.0),
+  //                                             child: Container(
+  //                                               width: double.infinity,
+  //                                               height: 50,
+  //                                               child: ElevatedButton(
+  //                                                 onPressed: () {
+  //                                                   if (_isSearching) {
+  //                                                     _searchdriver();
+  //                                                   } else {
+  //                                                     return null;
+  //                                                   }
+  //                                                 },
+  //                                                 style: ElevatedButton.styleFrom(
+  //                                                   backgroundColor: Colors.black,
+  //                                                 ),
+  //                                                 child: Text('Search for ride', style: TextStyle(color: Colors.white)),
+  //                                               ),
+  //                                             ),
+  //                                           ),
+  //                                         ],
+  //                                       ),
+  //                                     ),
+  //                                   ),
+  //                                 ],
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     );
+  //                   }
+  //                 },
+  //               );
+  //             }
+  //           },
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
+
+  // Widget _buildrides({
+  //   required String rideType,
+  //   required String price,
+  //   required String time,
+  //   required String distance,
+  //   required String details,
+  //   required ImageProvider image,
+  //   required bool isSelected,
+  // }) {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       border: Border.all(color: isSelected ? Colors.blue : Colors.transparent, width: 2),
+  //       borderRadius: BorderRadius.circular(8),
+  //       color: Colors.white,
+  //     ),
+  //     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+  //     child: Row(
+  //       children: [
+  //         Image(
+  //           image: image,
+  //           width: 50,
+  //           height: 50,
+  //           fit: BoxFit.contain,
+  //         ),
+  //         const SizedBox(width: 16),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Text(
+  //                     rideType,
+  //                     style: const TextStyle(fontWeight: FontWeight.bold),
+  //                   ),
+  //                   Text(
+  //                     price,
+  //                     style: const TextStyle(fontWeight: FontWeight.bold),
+  //                   ),
+  //                 ],
+  //               ),
+  //               const SizedBox(height: 4),
+  //               Row(
+  //                 children: [
+  //                   Text(
+  //                     time,
+  //                     style: const TextStyle(color: Colors.grey, fontSize: 12),
+  //                   ),
+  //                   const SizedBox(width: 8),
+  //                   Text(
+  //                     distance,
+  //                     style: const TextStyle(color: Colors.grey, fontSize: 12),
+  //                   ),
+  //                 ],
+  //               ),
+  //               const SizedBox(height: 2),
+  //               Text(
+  //                 details,
+  //                 style: const TextStyle(color: Colors.grey, fontSize: 12),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   Widget _buildrides({
     required String rideType,
-    required String price,
+    required double fare,
     required String time,
     required String distance,
     required String details,
@@ -672,7 +1269,7 @@ Get.to(() => DriverDetailsScreen(journey: journey, driver: driver,currentLocatio
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      price,
+                      '₹${fare.toStringAsFixed(2)}',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],

@@ -248,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       print('${droplocationoftheuser}..................... this is my drop coordinates ..........they are in the string');
        Get.to(() => JourneyDetailsScreen(
         data: data,
-        journeyId: data['journeyId'],currentLocation: _currentLocation,pickofflocation: corrdinatesofpassanger,));
+        journeyId: data['journeyId'],currentLocation: _currentLocation,pickofflocation: corrdinatesofpassanger, dropofflocation: null,));
     });
 
     socket?.on('disconnect', (_) {
