@@ -325,6 +325,7 @@ import Driver from './models/DriverModel.js';
 
 // Connect to MongoDB
 connectDb();
+
 // Initialize AdminJS
 AdminJS.registerAdapter({ Database, Resource });
 
@@ -338,7 +339,6 @@ const adminJs = new AdminJS({
 });
 
 const adminRouter = AdminJSExpress.buildRouter(adminJs);
-
 
 // Initialize Express app
 const app = express();
@@ -363,6 +363,9 @@ app.use(cors({
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
+// Use AdminJS middleware
+app.use(adminJs.options.rootPath, adminRouter);
 
 app.use("/api/image", uploadKeRoutes);
 app.use("/api/user", userKeRoutes);
@@ -510,8 +513,8 @@ socket.on("acceptRide", async ({ requestId, driverId }) => {
               io.to(driverSocketId).emit("startJourney", { 
                 journeyId, 
                 driverId, 
-                pickOff: request.currentLocation 
-                
+                pickOff: request.currentLocation,
+                dropoff: request.destinationLocation, 
               });
               // Join the driver to the journey room
               // socket.to(driverSocketId).join(journeyId);
