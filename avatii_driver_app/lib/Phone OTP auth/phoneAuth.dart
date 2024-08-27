@@ -1,46 +1,105 @@
-import 'package:avatii_driver_app/constants/helper_functions.dart';
+import 'package:avatii_driver_app/Phone%20OTP%20auth/otpvaliScreen.dart';
+import 'package:avatii_driver_app/provider/DriverProvider.dart';
 import 'package:avatii_driver_app/provider/Register_provider.dart';
-import 'package:avatii_driver_app/screens/After%20Login/Home%20Screen/homeScreen.dart';
 import 'package:avatii_driver_app/screens/Approval_screen.dart';
-import 'package:avatii_driver_app/screens/Before%20Login/Login/otp/sendOtp.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-//import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class PhoneAuth extends StatefulWidget {
+  const PhoneAuth({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<PhoneAuth> createState() => _PhoneAuthState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
-TextEditingController _phoneNumber=TextEditingController();
+class _PhoneAuthState extends State<PhoneAuth> {
+  TextEditingController phoneController = TextEditingController();
 
-void onsubmit(){
-  Provider.of<DriverauthProvider>(context, listen: false).loginDriver(
-    _phoneNumber.text).then((_) {
+//   void onregister()async{
+//   await Provider.of<UserProvider>(context, listen: false).loginUser(
+//    phoneController.text).then((_){
+//     Get.to(()=>HomeScreen());
+//     /*Iss neeche vale code ko uncomment krdiyo pls end mein */
+//     // FirebaseAuth.instance.verifyPhoneNumber(
+//     //                 verificationCompleted: (PhoneAuthCredential credential) {},
+//     //                 verificationFailed: (FirebaseAuthException ex) {},
+//     //                 codeSent: (String verificationid, int? resendtoken) {
+//     //                   Navigator.push(context, MaterialPageRoute(builder: (context) => OTPScreen(verificationid: verificationid,)));
+//     //                 },
+//     //                 codeAutoRetrievalTimeout: (String verificationId) {},
+//     //                 phoneNumber: phoneController.text.toString());
+//    }).catchError((error){
+//     ScaffoldMessenger(child: Text(error.toString()));
+//    }
+//    );
+
+// }
+
+  void onsubmit() {
+    Provider.of<DriverauthProvider>(context, listen: false).loginDriver(phoneController.text).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-      
-        SnackBar(
-          backgroundColor: Colors.blue,
-          content: Text("Login successfully")),
+        SnackBar(backgroundColor: Colors.blue, content: Text("Login successfully")),
       );
       Get.offAll(() => StatusCheckPage());
+      // FirebaseAuth.instance.verifyPhoneNumber(
+      //   verificationCompleted: (PhoneAuthCredential credential) {},
+      //   verificationFailed: (FirebaseAuthException ex) {},
+      //   codeSent: (String verificationid, int? resendtoken) {
+      //     Navigator.push(
+      //         context,
+      //         MaterialPageRoute(
+      //             builder: (context) => OTPScreen(
+      //                   verificationid: verificationid,
+      //                 )));
+      //   },
+      //   codeAutoRetrievalTimeout: (String verificationId) {},
+      //   phoneNumber: "+91${phoneController.text.toString()}",
+      // );
     }).catchError((onError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(onError.toString())),
       );
     });
+  }
 
-}
+  // @override
+  // Widget build(BuildContext context) {
+  //   final Size screenSize = MediaQuery.of(context).size;
+  //   final userprovider=Provider.of<UserProvider>(context);
+
+  //   return Scaffold(
+  //     backgroundColor: const Color(0xFFF2F2F5),
+  //     body: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Padding(
+  //           padding: const EdgeInsets.symmetric(horizontal: 25),
+  //           child: TextField(
+  //             controller: phoneController,
+  //             keyboardType: TextInputType.number,
+  //             decoration: InputDecoration(
+  //                 hintText: "Enter Phone Number",
+  //                 suffixIcon: Icon(Icons.phone),
+  //                 border: OutlineInputBorder(
+  //                   borderRadius: BorderRadius.circular(24),
+  //                 )),
+  //           ),
+  //         ),
+  //         SizedBox(height: 30),
+  //         ElevatedButton(
+  //             onPressed: () => onregister,
+  //             child: Text('Verify Phone Number'))
+  //       ],
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
+    final userprovider = Provider.of<DriverauthProvider>(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F5),
@@ -55,10 +114,10 @@ void onsubmit(){
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Avatii  Driver',
+                      'Avatii',
                       style: TextStyle(
                         color: const Color(0xFFF212121),
-                        fontSize: screenSize.width * 0.09,
+                        fontSize: screenSize.width * 0.1,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -88,11 +147,13 @@ void onsubmit(){
                           color: const Color.fromARGB(255, 116, 116, 116),
                         ),
                       ),
+
                       SizedBox(height: screenSize.height * 0.03),
+
                       TextField(
-                        controller:_phoneNumber ,
+                        controller: phoneController,
+                        keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
-                          
                           filled: true,
                           fillColor: Colors.white,
                           hintText: 'Enter Mobile number',
@@ -110,26 +171,25 @@ void onsubmit(){
                           ),
                           suffixIcon: const Icon(Icons.arrow_forward_rounded),
                         ),
-                        keyboardType: TextInputType.phone,
                       ),
                       SizedBox(height: screenSize.height * 0.02),
 
                       // Continue Button
-                      ElevatedButton(
-                        onPressed: () {
-                         // GoRouter.of(context).push('/otp-login');
-                      onsubmit();
-                    
-                        
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all<Color>(const Color(0xFF000000)),
-                        ),
-                        child: const Text(
-                          'Send OTP',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
+                      userprovider.isLoading
+                          ? CircularProgressIndicator()
+                          : ElevatedButton(
+                              onPressed: () {
+                                print('function hitted');
+                                onsubmit();
+                              },
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all<Color>(const Color(0xFF000000)),
+                              ),
+                              child: const Text(
+                                'Send  OTP',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
                       SizedBox(height: screenSize.height * 0.02),
                     ],
                   ),

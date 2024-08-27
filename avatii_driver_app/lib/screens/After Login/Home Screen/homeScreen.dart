@@ -763,26 +763,6 @@ void changeDriverStatus()async{
                         color: Colors.black,
                       ),
                       SizedBox(width: 8),
-                      Expanded(
-                        child: DropdownButton<String>(
-                          value: _selectedLocation,
-                          isExpanded: true,
-                          items: _locations.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (newValue) {
-                            setState(() {
-                              _selectedLocation = newValue!;
-                            });
-                          },
-                        ),
-                      ),
                     ],
                   ),
                 ),
