@@ -206,7 +206,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
 
-//..............................socket io initalization ...........................
+//..............................socket io initalization .............................................................
+
+
   void _connectToSocket() {
     socket = IO.io(
         Appurls.baseurl,
@@ -228,7 +230,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         _hasRideRequest = true;
         _rideRequestDetails = data;
       });
-      _showRideDetailsPopup(); // Show the popup when a ride request is received
+     if(_isOnline==true){
+       _showRideDetailsPopup();
+
+     } // Show the popup when a ride request is received
     });
 
     socket?.on("startJourney", (data) {
@@ -243,12 +248,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       // Update the map to show the route from current location to pickup location
 
       //setRouteToPickupLocation(corrdinatesofpassanger);
+      var drop=data['dropoff'];
+      final droppassangerCorrdinates=LatLng(drop['latitude'],drop['longitude']);
       //_showArrivalBottomSheet(data['journeyId']);
       startTracking();
-      print('${droplocationoftheuser}..................... this is my drop coordinates ..........they are in the string');
+     // print('${droplocationoftheuser}..................... this is my drop coordinates ..........they are in the string');
+
+     print('${drop}......................................................is my drop location');
+     print('${data['pickOff]']}........................................ .........is my pick up location');
        Get.to(() => JourneyDetailsScreen(
         data: data,
-        journeyId: data['journeyId'],currentLocation: _currentLocation,pickofflocation: corrdinatesofpassanger, dropofflocation: null,));
+        journeyId: data['journeyId'],currentLocation:
+         _currentLocation,pickofflocation: corrdinatesofpassanger,dropofflocation:droppassangerCorrdinates,));
     });
 
     socket?.on('disconnect', (_) {
@@ -442,6 +453,7 @@ var droplocationoftheuser='';
 
   void _acceptRide() {
     // Notify the server that the ride was accepted
+    navigator?.pop(context);
     socket?.emit('acceptRide', {
       // 'driverId': 'your_driver_id', // Replace with actual driver ID
       // 'userId': _rideRequestDetails?['userId'],
@@ -612,6 +624,7 @@ var droplocationoftheuser='';
                     onPressed: _rejectRide,
                     child: Text('Ignore'),
                   ),
+
                   // "Accept" button with animated slider effect
                   SizedBox(
                     width: 120,
@@ -665,6 +678,11 @@ var droplocationoftheuser='';
     );
   }
 
+
+void changeDriverStatus()async{
+  await Provider.of<DriverProvider>(context, listen: false).changeDriverStatus();
+
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -681,13 +699,15 @@ var droplocationoftheuser='';
             onChanged: (value) async {
               setState(() {
                 _isOnline = value;
+                changeDriverStatus();
+                
               });
 
-              if (_isOnline) {
-                // Call the provider's method to change the driver's status
-                await Provider.of<DriverProvider>(context, listen: false).changeDriverStatus();
-                // _startAnimation();
-              }
+              // if (_isOnline) {
+              //   // Call the provider's method to change the driver's status
+                
+              //   // _startAnimation();
+              // }
             },
             activeTrackColor: Colors.blue,
             activeColor: Colors.white,
@@ -722,12 +742,12 @@ var droplocationoftheuser='';
             Center(child: CircularProgressIndicator()),
 
           // Positioned widget for bottom navigation bar
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: CustomNavigationBar(),
-          ),
+          // Positioned(
+          //   bottom: 0,
+          //   left: 0,
+          //   right: 0,
+          //   child: CustomNavigationBar(),
+          // ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(

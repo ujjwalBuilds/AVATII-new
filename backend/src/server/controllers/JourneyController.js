@@ -80,6 +80,8 @@ export const EndJourney = asyncHandler(async (req, res) => {
     } catch (err) {
         return res.status(500).json({ message: `Internal Server Error: ${err.message}` });
     }
+
+    
 });
 
 export const CancelJourney = asyncHandler(async (req, res) => {
