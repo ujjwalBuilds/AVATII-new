@@ -3,7 +3,7 @@ import { Schema, model } from "mongoose";
 const costSchema = new Schema({
     VehicleType:{
         type:String,
-        enum:["CAR","AUTO","BIKE"]
+        enum:["Car","Auto","Bike"]
     },
     InitialCost:{
         type:String,

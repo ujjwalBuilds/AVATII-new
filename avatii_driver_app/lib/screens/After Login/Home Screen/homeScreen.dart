@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   String? driverId;
   Color accentPurpleColor = Color(0xFF6A53A1);
   Map<String, double>? pickupCoordinates = {};
-
+  double? distance = 0.0;
   Completer<GoogleMapController> _mapController = Completer();
   LocationData? _currentLocation;
   late Location _locationService;
@@ -136,9 +136,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   //   }
   // }
 
-
-
-
   Future<void> _initializeLocation() async {
     final locationData = await _locationService.getLocation();
     setState(() {
@@ -161,9 +158,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 //   };
 //   socket.emit("updateLocation", { driverId: driverId, location });
 // });
-
-
-
 
   // Future<void> requestLocationPermissions() async {
   //   geo.LocationPermission permission = await geo.Geolocator.requestPermission();
@@ -205,9 +199,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     });
   }
 
-
 //..............................socket io initalization .............................................................
-
 
   void _connectToSocket() {
     socket = IO.io(
@@ -230,10 +222,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         _hasRideRequest = true;
         _rideRequestDetails = data;
       });
-     if(_isOnline==true){
-       _showRideDetailsPopup();
-
-     } // Show the popup when a ride request is received
+      if (_isOnline == true) {
+        _showRideDetailsPopup();
+      } // Show the popup when a ride request is received
     });
 
     socket?.on("startJourney", (data) {
@@ -241,25 +232,27 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       var pickOffcorrdinates = data['pickOff'];
       print(pickOffcorrdinates);
       final corrdinatesofpassanger = LatLng(pickOffcorrdinates['latitude'], pickOffcorrdinates['longitude']);
-     //final dropcorrdinatiesofpassanger=LatLng(droplocationoftheuser['latitude'],);
-     
+      //final dropcorrdinatiesofpassanger=LatLng(droplocationoftheuser['latitude'],);
 
       print('this is  my pick up coordinatess................................');
       // Update the map to show the route from current location to pickup location
 
       //setRouteToPickupLocation(corrdinatesofpassanger);
-      var drop=data['dropOff'];
-      final droppassangerCorrdinates=LatLng(drop['latitude'],drop['longitude']);
+      var drop = data['dropOff'];
+      final droppassangerCorrdinates = LatLng(drop['latitude'], drop['longitude']);
       //_showArrivalBottomSheet(data['journeyId']);
       startTracking();
-     // print('${droplocationoftheuser}..................... this is my drop coordinates ..........they are in the string');
+      // print('${droplocationoftheuser}..................... this is my drop coordinates ..........they are in the string');
 
-     print('${drop}......................................................is my drop location');
-     print('${data['pickOff]']}........................................ .........is my pick up location');
-       Get.to(() => JourneyDetailsScreen(
-        data: data,
-        journeyId: data['journeyId'],currentLocation:
-         _currentLocation,pickofflocation: corrdinatesofpassanger,dropofflocation:droppassangerCorrdinates,));
+      print('${drop}......................................................is my drop location');
+      print('${data['pickOff]']}........................................ .........is my pick up location');
+      Get.to(() => JourneyDetailsScreen(
+            data: data,
+            journeyId: data['journeyId'],
+            currentLocation: _currentLocation,
+            pickofflocation: corrdinatesofpassanger,
+            dropofflocation: droppassangerCorrdinates,
+          ));
     });
 
     socket?.on('disconnect', (_) {
@@ -306,152 +299,90 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   ///code for show arrival sheet bottom
-  bool _showArrivalButton = true;
-  TextEditingController _otpController = TextEditingController();
+  // bool _showArrivalButton = true;
+  // TextEditingController _otpController = TextEditingController();
 
-  void _showArrivalBottomSheet(String journeyId) {
-    showModalBottomSheet(
-      context: context,
-      isDismissible: false,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            final journeyProvider = Provider.of<JourneyProvider>(context, listen: false);
-            return Container(
-              padding: EdgeInsets.all(20.0),
-              child: _showArrivalButton
-                  ? Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _showArrivalButton = false;
-                            });
-                          },
-                          child: Text('Arrived'),
-                        ),
-                      ],
-                    )
-                  : journeyProvider.isvalidatingotp
-                      ? CircularProgressIndicator()
-                      : Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            OtpTextField(
-                            
-                              numberOfFields: 6,
-                              borderColor: accentPurpleColor,
-                              focusedBorderColor: accentPurpleColor,
-                              //  styles: otpTextStyles,
-                              showFieldAsBox: false,
-                              borderWidth: 4.0,
-                              //runs when a code is typed in
+  // void _showArrivalBottomSheet(String journeyId) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isDismissible: false,
+  //     builder: (BuildContext context) {
+  //       return StatefulBuilder(
+  //         builder: (BuildContext context, StateSetter setState) {
+  //           final journeyProvider = Provider.of<JourneyProvider>(context, listen: false);
+  //           return Container(
+  //             padding: EdgeInsets.all(20.0),
+  //             child: _showArrivalButton
+  //                 ? Column(
+  //                     mainAxisSize: MainAxisSize.min,
+  //                     children: [
+  //                       ElevatedButton(
+  //                         onPressed: () {
+  //                           setState(() {
+  //                             _showArrivalButton = false;
+  //                           });
+  //                         },
+  //                         child: Text('Arrived'),
+  //                       ),
+  //                     ],
+  //                   )
+  //                 : journeyProvider.isvalidatingotp
+  //                     ? CircularProgressIndicator()
+  //                     : Column(
+  //                         mainAxisSize: MainAxisSize.min,
+  //                         children: [
+  //                           OtpTextField(
 
-                              //runs when every textfield is filled
-                              onSubmit: (String verificationCode) {
-                                journeyProvider.validateOTP(journeyId, verificationCode);
-                              },
-                            ),
-                            SizedBox(height: 10),
-                            ElevatedButton(
-                              onPressed: () {
-                                _validateOtp();
-                              },
-                              child: Text('Validate OTP'),
-                            ),
-                          ],
-                        ),
-            );
-          },
-        );
-      },
-    );
-  }
+  //                             numberOfFields: 6,
+  //                             borderColor: accentPurpleColor,
+  //                             focusedBorderColor: accentPurpleColor,
+  //                             //  styles: otpTextStyles,
+  //                             showFieldAsBox: false,
+  //                             borderWidth: 4.0,
+  //                             //runs when a code is typed in
 
-  void _validateOtp() {
-    final otp = _otpController.text;
-    if (otp.isNotEmpty) {
-      print('Validating OTP: $otp');
-      // Add your OTP validation logic here
-      Navigator.of(context).pop(); // Close the bottom sheet after validation
-    } else {
-      print('Please enter a valid OTP');
-    }
-  }
+  //                             //runs when every textfield is filled
+  //                             onSubmit: (String verificationCode) {
+  //                               journeyProvider.validateOTP(journeyId, verificationCode);
+  //                             },
+  //                           ),
+  //                           SizedBox(height: 10),
+  //                           ElevatedButton(
+  //                             onPressed: () {
+  //                               _validateOtp();
+  //                             },
+  //                             child: Text('Validate OTP'),
+  //                           ),
+  //                         ],
+  //                       ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+
+  // void _validateOtp() {
+  //   final otp = _otpController.text;
+  //   if (otp.isNotEmpty) {
+  //     print('Validating OTP: $otp');
+  //     // Add your OTP validation logic here
+  //     Navigator.of(context).pop(); // Close the bottom sheet after validation
+  //   } else {
+  //     print('Please enter a valid OTP');
+  //   }
+  // }
 
   Set<Polyline> _polylines = {};
   Set<Marker> _markers = {};
 
-  // Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
-  //   final GoogleMapController controller = await _mapController.future;
-  //   final PolylinePoints polylinePoints = PolylinePoints();
+  var droplocationoftheuser = '';
 
-  //   // Get the driver's current location
-  //   LatLng driverCurrentLocation = LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
-
-  //   // Get route
-  //   PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-  //     googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ', // Replace with your actual API key
-  //     // PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
-  //     // PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
-
-  //     // Add the request parameter
-  //     request: PolylineRequest(
-  //       origin: PointLatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-  //       destination: PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
-  //       mode: TravelMode.driving,
-  //       //transitMode:  TreavelMode,
-  //       avoidHighways: false,
-  //       avoidTolls: false,
-  //       avoidFerries: false,
-  //     ),
-  //   );
-
-  //   if (result.points.isNotEmpty) {
-  //     List<LatLng> polylineCoordinates = result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
-
-  //     setState(() {
-  //       // Clear existing polylines and markers
-  //       _polylines.clear();
-  //       _markers.clear();
-
-  //       // Add new polyline
-  //       _polylines.add(Polyline(
-  //         polylineId: PolylineId('route'),
-  //         color: Colors.red,
-  //         points: polylineCoordinates,
-  //         width: 5,
-  //       ));
-
-  //       // Add markers for start and end points
-  //       _markers.add(Marker(
-  //         markerId: MarkerId('start'),
-  //         position: driverCurrentLocation,
-  //         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-  //       ));
-  //       _markers.add(Marker(
-  //         markerId: MarkerId('end'),
-  //         position: pickOffLocation,
-  //         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-  //       ));
-  //     });
-
-  //     // Move camera to show the entire route
-  //     LatLngBounds bounds = LatLngBounds(
-  //       southwest: driverCurrentLocation,
-  //       northeast: pickOffLocation,
-  //     );
-  //     controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
-  //   } else {
-  //     print('Failed to get directions: ${result.errorMessage}');
-  //   }
-  // }
-
-
-var droplocationoftheuser='';
-
-  void _acceptRide() {
+  void _acceptRide() async {
+    var pick = _rideRequestDetails?['currentLocation'];
+    var drop = _rideRequestDetails?['destinationLocation'];
+    var d = await Helperfunction.calculateDistance(pick['latitude'], pick['longitude'], drop['latitude'], drop['longitude']);
+    distance = d['kilometers'];
     // Notify the server that the ride was accepted
     navigator?.pop(context);
     socket?.emit('acceptRide', {
@@ -460,16 +391,16 @@ var droplocationoftheuser='';
       // 'journeyId': 'your_journey_id', // Replace with actual journey ID
       'requestId': _rideRequestDetails?['requestId'],
       'driverId': driverId,
-      'distance':4,
+      'distance': distance,
     });
     print('ride is accepted ..........................6.by the driver');
     // Close the popup and proceed with ride logic
     setState(() {
-      droplocationoftheuser=_rideRequestDetails?['destinationLocation'];
+      droplocationoftheuser = _rideRequestDetails?['destinationLocation'];
+      print('dropoff ka url aarha hai #########################################***************');
       _hasRideRequest = false;
-      
-      _rideRequestDetails = null;
 
+      _rideRequestDetails = null;
     });
 
     // Close the popup
@@ -615,7 +546,6 @@ var droplocationoftheuser='';
             children: [
               Text('From: $fromAddress'),
               Text('To: $toAddress'),
-              Text('Estimated Earnings: ₹100'), // Example data
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -679,11 +609,10 @@ var droplocationoftheuser='';
     );
   }
 
+  void changeDriverStatus() async {
+    await Provider.of<DriverProvider>(context, listen: false).changeDriverStatus();
+  }
 
-void changeDriverStatus()async{
-  await Provider.of<DriverProvider>(context, listen: false).changeDriverStatus();
-
-}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -701,12 +630,11 @@ void changeDriverStatus()async{
               setState(() {
                 _isOnline = value;
                 changeDriverStatus();
-                
               });
 
               // if (_isOnline) {
               //   // Call the provider's method to change the driver's status
-                
+
               //   // _startAnimation();
               // }
             },
@@ -749,47 +677,26 @@ void changeDriverStatus()async{
           //   right: 0,
           //   child: CustomNavigationBar(),
           // ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 8, right: 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Icon(
-                        Icons.location_on,
-                        color: Colors.black,
-                      ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: DropdownButton<String>(
-                          value: _selectedLocation,
-                          isExpanded: true,
-                          items: _locations.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (newValue) {
-                            setState(() {
-                              _selectedLocation = newValue!;
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: Column(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          //       Padding(
+          //         padding: const EdgeInsets.only(left: 8, right: 4),
+          //         child: Row(
+          //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //           children: [
+          //             Icon(
+          //               Icons.location_on,
+          //               color: Colors.black,
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );

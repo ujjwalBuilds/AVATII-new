@@ -555,8 +555,6 @@
 // //   }
 // // }
 
-
-
 // import 'dart:async';
 
 // import 'package:avatii_driver_app/provider/JourneyProvider.dart';
@@ -567,8 +565,6 @@
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:location/location.dart';
 // import 'package:provider/provider.dart';
-
-
 
 // class JourneyDetailsScreen extends StatefulWidget {
 //   final String journeyId;
@@ -822,7 +818,6 @@
 //   }
 // }
 
-
 // // class JourneyDetailsScreen extends StatefulWidget {
 // //   final String journeyId;
 // //  final LocationData? currentLocation;
@@ -842,18 +837,14 @@
 // //   late bool _showArrivalButton = true;
 // //  Set<Marker> _markers = {};
 // //    Completer<GoogleMapController> _mapController = Completer();
-  
 
 // //   @override
 // //   void initState() {
 // //     super.initState();
 // //      setRouteToPickupLocation(widget.pickofflocation);
-    
+
 // //     }
 
-
-
-  
 // //   Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
 // //     final GoogleMapController controller = await _mapController.future;
 // //     final PolylinePoints polylinePoints = PolylinePoints();
@@ -919,7 +910,6 @@
 // //     }
 // //   }
 
-
 // //   // void _validateOtp() {
 // //   //   final otp = _otpController.text;
 // //   //   if (otp.isNotEmpty) {
@@ -930,7 +920,6 @@
 // //   //     print('Please enter a valid OTP');
 // //   //   }
 // //   // }
-
 
 // //   @override
 // //   Widget build(BuildContext context) {
@@ -956,11 +945,11 @@
 //                   // Add your markers
 //                   Marker(
 //                     markerId: MarkerId('driver marker'),
-                    
+
 //                     ),
 //                   Marker(
 //                     markerId: MarkerId('user marker'),
-                    
+
 //                     ),
 //                 },
 //                 polylines: {
@@ -1012,7 +1001,7 @@
 //                               },
 //                             ),
 //                             SizedBox(height: 10),
-                          
+
 //                           ],
 //                         ),
 //                 ),
@@ -1331,7 +1320,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
-
 // class JourneyDetailsScreen extends StatefulWidget {
 //   final String journeyId;
 //   final LocationData? currentLocation;
@@ -1360,7 +1348,7 @@ import 'package:provider/provider.dart';
 //   bool _showArrivalButton = true;
 //   bool _showOtpField = false;
 //   bool _showButtonsAfterOtp = false;
- 
+
 //   @override
 //   void initState() {
 //     super.initState();
@@ -1373,7 +1361,6 @@ import 'package:provider/provider.dart';
 
 //     LatLng driverCurrentLocation =
 //         LatLng(widget.currentLocation!.latitude!, widget.currentLocation!.longitude!);
-
 
 //     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
 //       googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ', // Replace with your actual API key
@@ -1586,6 +1573,7 @@ import 'package:provider/provider.dart';
 // }
 
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+
 class JourneyDetailsScreen extends StatefulWidget {
   final String journeyId;
   final LocationData? currentLocation;
@@ -1611,6 +1599,8 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
   Set<Marker> _markers = {};
   Completer<GoogleMapController> _mapController = Completer();
   String? driverid;
+  String pickupAddress = '';
+  String dropoffAddress = '';
 
   bool _showArrivalButton = true;
   bool _showOtpField = false;
@@ -1623,12 +1613,42 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
       setRouteToPickupLocation(widget.pickofflocation);
     }
     _load();
-  }
-  void _load()async{
-    driverid=await Helperfunction.getUserId();
+    _getAddresses();
   }
 
+  void _load() async {
+    driverid = await Helperfunction.getUserId();
+  }
+  
 
+  Future<void> _getAddresses() async {
+    // journey.Location? pickOffCoordinates = widget.journey?.pickOff;
+    LatLng dropOffLatLng = widget.dropofflocation ??
+        LatLng(
+          widget.dropofflocation.latitude ?? widget.currentLocation!.latitude! ?? 0.0,
+          widget.dropofflocation.longitude ?? widget.currentLocation!.longitude! ?? 0.0,
+        );
+
+    try {
+      List<Placemark> pickupPlacemarks = await placemarkFromCoordinates(
+        widget.pickofflocation.latitude ?? widget.currentLocation!.latitude! ?? 0.0,
+        widget.pickofflocation.longitude ?? widget.currentLocation!.longitude! ?? 0.0,
+      );
+
+      List<Placemark> dropoffPlacemarks = await placemarkFromCoordinates(
+        dropOffLatLng.latitude,
+        dropOffLatLng.longitude,
+      );
+
+      setState(() {
+        pickupAddress = '${pickupPlacemarks[0].name}, ${pickupPlacemarks[0].thoroughfare}, ${pickupPlacemarks[0].administrativeArea}, ${pickupPlacemarks[0].locality}, ${pickupPlacemarks[0].postalCode}';
+        dropoffAddress = '${dropoffPlacemarks[0].name}, ${dropoffPlacemarks[0].thoroughfare}, ${dropoffPlacemarks[0].administrativeArea}, ${dropoffPlacemarks[0].locality}, ${dropoffPlacemarks[0].postalCode}';
+        // "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}"
+      });
+    } catch (e) {
+      print('Error getting addresses: $e');
+    }
+  }
 
   void _connectToSocket() {
     socket = IO.io(
@@ -1642,31 +1662,38 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
 
     socket?.on('connect', (_) {
       print('connected to socket server.......');
-      
-socket?.on("journeyCancelled", (data) {
 
-  print("journey has been cancel .....................................................");
-  showCancelNotification(data['journeyId'], data['userId']);
-});
+      socket?.on("journeyCancelled", (data) {
+        print("journey has been cancel .....................................................");
+        showCancelNotification(context);
+      });
 
+      socket?.on("journeyEnded", (data) {
+        print("journey has been ended ..................... ..................................................");
+        _showCompletionPopup();
+      });
+    });
+  }
 
-socket?.on("journeyEnded", ( data) {
-   print("journey has been ended ..................... ..................................................");
-  _showCompletionPopup();
-});
-
-
-
-
-
-    });}
-
-
-
-
-void  showCancelNotification(journeyId, userId) {
- // alert(`Ride ${journeyId} has been canceled by user ${userId}.`);
-  // You can also use more sophisticated UI elements like modals or toast notifications
+void showCancelNotification(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Ride Canceled',style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+        content: Text('Ride has been canceled by user.'),
+        actions: <Widget>[
+          TextButton(
+            child: Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Dismiss the dialog
+              Navigator.of(context).pop(); // Dismiss the dialog
+            },
+          ),
+        ],
+      );
+    },
+  );
 }
 
   Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
@@ -1674,7 +1701,7 @@ void  showCancelNotification(journeyId, userId) {
     final PolylinePoints polylinePoints = PolylinePoints();
 
     LatLng driverCurrentLocation = LatLng(
-      widget.currentLocation!.latitude!, 
+      widget.currentLocation!.latitude!,
       widget.currentLocation!.longitude!,
     );
 
@@ -1688,8 +1715,7 @@ void  showCancelNotification(journeyId, userId) {
     );
 
     if (result.points.isNotEmpty) {
-      List<LatLng> polylineCoordinates =
-          result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
+      List<LatLng> polylineCoordinates = result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
 
       setState(() {
         _polylines.clear();
@@ -1725,19 +1751,16 @@ void  showCancelNotification(journeyId, userId) {
     }
   }
 
+
 //   Future<void> setRouteToDropoffLocation(LatLng dropOffLocation) async {
 
-
 // print('${widget.dropofflocation}.............................................this is my droplocation');
-
-
-
 
 //     final GoogleMapController controller = await _mapController.future;
 //     final PolylinePoints polylinePoints = PolylinePoints();
 
 //     LatLng driverCurrentLocation = LatLng(
-//       widget.currentLocation!.latitude!, 
+//       widget.currentLocation!.latitude!,
 //       widget.currentLocation!.longitude!,
 //     );
 
@@ -1787,225 +1810,307 @@ void  showCancelNotification(journeyId, userId) {
 //     }
 //   }
 
-Future<void> setRouteToDropoffLocation(LatLng dropOffLocation) async {
-  final GoogleMapController controller = await _mapController.future;
-  final PolylinePoints polylinePoints = PolylinePoints();
+  Future<void> setRouteToDropoffLocation(LatLng dropOffLocation) async {
+    final GoogleMapController controller = await _mapController.future;
+    final PolylinePoints polylinePoints = PolylinePoints();
 
-  LatLng driverCurrentLocation = LatLng(
-    widget.currentLocation!.latitude!,
-    widget.currentLocation!.longitude!,
-  );
+    LatLng driverCurrentLocation = LatLng(
+      widget.currentLocation!.latitude!,
+      widget.currentLocation!.longitude!,
+    );
 
-  print('Driver Current Location: $driverCurrentLocation........................................................');
-  print('Dropoff Location: $dropOffLocation................................................................');
+    print('Driver Current Location: $driverCurrentLocation........................................................');
+    print('Dropoff Location: $dropOffLocation................................................................');
 
-  PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-    googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ',
-    request: PolylineRequest(
-      origin: PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
-      destination: PointLatLng(dropOffLocation.latitude, dropOffLocation.longitude),
-      mode: TravelMode.driving,
-    ),
-  );
-
-  if (result.points.isNotEmpty) {
-    List<LatLng> polylineCoordinates =
-        result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
-
-    setState(() {
-      _polylines.clear();
-      _markers.clear();
-
-      _polylines.add(Polyline(
-        polylineId: PolylineId('route_to_dropoff'),
-        color: Colors.blue,
-        points: polylineCoordinates,
-        width: 5,
-      ));
-
-      _markers.add(Marker(
-        markerId: MarkerId('start'),
-        position: driverCurrentLocation,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-      ));
-      _markers.add(Marker(
-        markerId: MarkerId('end'),
-        position: dropOffLocation,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      ));
-    });
-
-    LatLngBounds bounds = LatLngBounds(
-      southwest: LatLng(
-        min(driverCurrentLocation.latitude, dropOffLocation.latitude),
-        min(driverCurrentLocation.longitude, dropOffLocation.longitude),
-      ),
-      northeast: LatLng(
-        max(driverCurrentLocation.latitude, dropOffLocation.latitude),
-        max(driverCurrentLocation.longitude, dropOffLocation.longitude),
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ',
+      request: PolylineRequest(
+        origin: PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
+        destination: PointLatLng(dropOffLocation.latitude, dropOffLocation.longitude),
+        mode: TravelMode.driving,
       ),
     );
-    controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
-  } else {
-    print('Failed to get directions: ${result.errorMessage}');
-  }
-}
 
+    if (result.points.isNotEmpty) {
+      List<LatLng> polylineCoordinates = result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
 
-@override
-Widget build(BuildContext context) {
-  final journeyProvider = Provider.of<JourneyProvider>(context);
+      setState(() {
+        _polylines.clear();
+        _markers.clear();
 
-  return Scaffold(
-    body: Stack(
-      children: [
-        Positioned.fill(
-          child: GoogleMap(
-            onMapCreated: (GoogleMapController controller) {
-              _mapController.complete(controller);
-            },
-            initialCameraPosition: widget.currentLocation != null
-                ? CameraPosition(
-                    target: LatLng(
-                      widget.currentLocation!.latitude!, 
-                      widget.currentLocation!.longitude!,
-                    ),
-                    zoom: 12.0,
-                  )
-                : CameraPosition(
-                    target: LatLng(0.0, 0.0),
-                    zoom: 2.0,
-                  ),
-            markers: _markers,
-            polylines: _polylines,
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-          ),
+        _polylines.add(Polyline(
+          polylineId: PolylineId('route_to_dropoff'),
+          color: Colors.blue,
+          points: polylineCoordinates,
+          width: 5,
+        ));
+
+        _markers.add(Marker(
+          markerId: MarkerId('start'),
+          position: driverCurrentLocation,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        ));
+        _markers.add(Marker(
+          markerId: MarkerId('end'),
+          position: dropOffLocation,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        ));
+      });
+
+      LatLngBounds bounds = LatLngBounds(
+        southwest: LatLng(
+          min(driverCurrentLocation.latitude, dropOffLocation.latitude),
+          min(driverCurrentLocation.longitude, dropOffLocation.longitude),
         ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.4,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF2F2F5),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: _showArrivalButton
-                  ? Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _showArrivalButton = false;
-                              _showOtpField = true;
-                            });
-                          },
-                          child: Text('Arrived'),
-                        ),
-                           ElevatedButton(
-                         onPressed:() {
-                           try{
+        northeast: LatLng(
+          max(driverCurrentLocation.latitude, dropOffLocation.latitude),
+          max(driverCurrentLocation.longitude, dropOffLocation.longitude),
+        ),
+      );
+      controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+    } else {
+      print('Failed to get directions: ${result.errorMessage}');
+    }
+  }
 
-                      socket?.emit("cancelJourney", { widget.journeyId,
-                                            driverid});
-                          
-                          }catch(error){
-    ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(error.toString() ?? 'Unknown error')),
-                                );
+  @override
+  Widget build(BuildContext context) {
+    final journeyProvider = Provider.of<JourneyProvider>(context);
 
-                          
-                         }},
-                          child: Text('cancel ride'),
-                        ),
-
-                      ],
+    return Scaffold(
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: GoogleMap(
+              onMapCreated: (GoogleMapController controller) {
+                _mapController.complete(controller);
+              },
+              initialCameraPosition: widget.currentLocation != null
+                  ? CameraPosition(
+                      target: LatLng(
+                        widget.currentLocation!.latitude!,
+                        widget.currentLocation!.longitude!,
+                      ),
+                      zoom: 12.0,
                     )
-                  : journeyProvider.isvalidatingotp
-                      ? Center(child: CircularProgressIndicator())
-                      : _showOtpField
-                          ? Column(
-                              mainAxisSize: MainAxisSize.min,
+                  : CameraPosition(
+                      target: LatLng(0.0, 0.0),
+                      zoom: 2.0,
+                    ),
+              markers: _markers,
+              polylines: _polylines,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: SingleChildScrollView(
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.35,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF2F2F5),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: _showArrivalButton
+                      ? Column(
+                          children: [
+                            Text(
+                              'Ride assigned',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            Divider(indent: 17, endIndent: 17, color: Colors.grey.shade300),
+                            Row(
                               children: [
-                                if (journeyProvider.validationMessage != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: Text(
-                                      journeyProvider.validationMessage!,
-                                      style: TextStyle(color: Colors.red),
-                                    ),
+                                CircleAvatar(
+                                  radius: 50,
+                                  backgroundColor: Colors.black, // Dark red background
+                                  child: CircleAvatar(
+                                    radius: 49,
+                                    backgroundImage: AssetImage('assets/images/avatii-driver-logo.png'),
                                   ),
-                                OtpTextField(
-                                  numberOfFields: 6,
-                                  borderColor: Theme.of(context).primaryColor,
-                                  focusedBorderColor: Theme.of(context).primaryColor,
-                                  showFieldAsBox: false,
-                                  borderWidth: 4.0,
-                                  onSubmit: (String verificationCode) {
-                                    journeyProvider.validateOTP(widget.data['journeyId'], verificationCode).then((isSuccess) {
-                                      if (isSuccess) {
-                                        setState(() {
-                                          _showOtpField = false;
-                                          _showButtonsAfterOtp = true;
-                                        });
-                                      }
-                                    });
-                                  },
                                 ),
-                                SizedBox(height: 10),
+                                SizedBox(width: 15),
+                                // Column(
+                                //   crossAxisAlignment: CrossAxisAlignment.start,
+                                //   children: [
+                                //     RichText(
+                                //       text: TextSpan(
+                                //         style: TextStyle(color: Colors.black, fontSize: 16),
+                                //         children: [
+                                //           TextSpan(text: 'Pickup: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                //           TextSpan(text: '$pickupAddress'),
+                                //         ],
+                                //       ),
+                                //     ),
+                                //     SizedBox(height: 10),
+                                //     RichText(
+                                //       text: TextSpan(
+                                //         style: TextStyle(color: Colors.black, fontSize: 16),
+                                //         children: [
+                                //           TextSpan(text: 'Dropoff: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                //           TextSpan(text: '$dropoffAddress'),
+                                //         ],
+                                //       ),
+                                //     ),
+                                //   ],
+                                // ),
+                                Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text.rich(
+                      TextSpan(
+                        style: TextStyle(color: Colors.black, fontSize: 15),
+                        children: [
+              TextSpan(text: 'Pickup: ', style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(text: pickupAddress),
+                        ],
+                      ),
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                    SizedBox(height: 10),
+                    Text.rich(
+                      TextSpan(
+                        style: TextStyle(color: Colors.black, fontSize: 15),
+                        children: [
+              TextSpan(text: 'Dropoff: ', style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(text: dropoffAddress),
+                        ],
+                      ),
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                  ],
+                ),
+              ),
                               ],
-                            )
-                          : _showButtonsAfterOtp
+                            ),
+                            SizedBox(height: 10),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _showArrivalButton = false;
+                                  _showOtpField = true;
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size(350, 50),
+                                backgroundColor: Colors.black,
+                                elevation: 1,
+                              ),
+                              child: Text(
+                                'Arrived',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            ElevatedButton(
+                              onPressed: () {
+                                try {
+                                  socket?.emit("cancelJourney", {
+                                    widget.journeyId,
+                                    driverid
+                                  });
+                                } catch (error) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(error.toString() ?? 'Unknown error')),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size(350, 50),
+                                backgroundColor: Colors.white,
+                                elevation: 1,
+                              ),
+                              child: Text(
+                                'Cancel ride',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        )
+                      : journeyProvider.isvalidatingotp
+                          ? Center(child: CircularProgressIndicator())
+                          : _showOtpField
                               ? Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        setRouteToDropoffLocation(widget.dropofflocation);
+                                    Text('Enter OTP to start the ride', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),),
+                                    if (journeyProvider.validationMessage != null)
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 8.0),
+                                        child: Text(
+                                          journeyProvider.validationMessage!,
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    OtpTextField(
+                                      numberOfFields: 6,
+                                      borderColor: Theme.of(context).primaryColor,
+                                      focusedBorderColor: Theme.of(context).primaryColor,
+                                      showFieldAsBox: false,
+                                      borderWidth: 4.0,
+                                      onSubmit: (String verificationCode) {
+                                        journeyProvider.validateOTP(widget.data['journeyId'], verificationCode).then((isSuccess) {
+                                          if (isSuccess) {
+                                            setState(() {
+                                              _showOtpField = false;
+                                              _showButtonsAfterOtp = true;
+                                            });
+                                          }
+                                        });
                                       },
-                                      child: Text('Navigate to Dropoff'),
                                     ),
                                     SizedBox(height: 10),
-                                  
-                                  journeyProvider.iscomplete?CircularProgressIndicator():
-                                    ElevatedButton(
-                                       onPressed: () async {
-                                        try{
-
-                                            socket?.emit("endJourney", { widget.journeyId,
-                                            driverid});
-                          
-                          }catch(error){
-    ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(error.toString() ?? 'Unknown error')),
-                                );
-
-}
-                              
-                            },
-                            child: Text('Complete Journey'),
-                                    ),
                                   ],
                                 )
-                              : Container(),
+                              : _showButtonsAfterOtp
+                                  ? Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            setRouteToDropoffLocation(widget.dropofflocation);
+                                          },
+                                          child: Text('Navigate to Dropoff'),
+                                        ),
+                                        SizedBox(height: 10),
+                                        journeyProvider.iscomplete
+                                            ? CircularProgressIndicator()
+                                            : ElevatedButton(
+                                                onPressed: () async {
+                                                  try {
+                                                    socket?.emit("endJourney", {
+                                                      widget.journeyId,
+                                                      driverid
+                                                    });
+                                                  } catch (error) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(content: Text(error.toString() ?? 'Unknown error')),
+                                                    );
+                                                  }
+                                                },
+                                                child: Text('Complete Journey'),
+                                              ),
+                                      ],
+                                    )
+                                  : Container(),
+                ),
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-
-
-
-
-  
-}
-
+        ],
+      ),
+    );
+  }
 
   void _showCompletionPopup() {
     showDialog(
@@ -2016,7 +2121,6 @@ Widget build(BuildContext context) {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-            
               title: Text('Happy Journey!'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -2029,16 +2133,17 @@ Widget build(BuildContext context) {
                         selectedPaymentOption = newValue!;
                       });
                     },
-                    items: <String>['Cash Payment', 'Online Payment']
-                        .map<DropdownMenuItem<String>>((String value) {
+                    items: <String>[
+                      'Cash Payment',
+                      'Online Payment'
+                    ].map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value),
                       );
                     }).toList(),
                   ),
-                  if (selectedPaymentOption == 'Online Payment')
-                    Image.asset('assets/images/qr code of avati app.jpg'), // Your QR code image in assets
+                  if (selectedPaymentOption == 'Online Payment') Image.asset('assets/images/qr code of avati app.jpg'), // Your QR code image in assets
                 ],
               ),
               actions: <Widget>[
@@ -2057,4 +2162,3 @@ Widget build(BuildContext context) {
     );
   }
 }
-

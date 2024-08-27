@@ -6,7 +6,10 @@ const DriverSchema = new Schema({
     age: Number,
     PhoneNumber: { type: String, required: true, unique: true },
     vehicle: {
-        Type: String,
+        Type:{
+            type:String,
+            enum:["Car","Auto","Bike"],
+        },
         RcImage: String,
         RegistrationNumber: { type: String, unique: true }
     },

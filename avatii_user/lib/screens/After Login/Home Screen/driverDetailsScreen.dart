@@ -13,12 +13,12 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:url_launcher/url_launcher.dart';
+
 class DriverDetailsScreen extends StatefulWidget {
   final Journey? journey;
   final Driver? driver;
   final Map<String, double> currentLocation;
   final LatLng? destinationCoordinates;
-  
 
   const DriverDetailsScreen({Key? key, required this.journey, required this.driver, required this.currentLocation, required this.destinationCoordinates}) : super(key: key);
 
@@ -32,23 +32,24 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
   String pickupAddress = '';
   String dropoffAddress = '';
   Marker? _driverMarker;
- IO.Socket? socket;
- String? userid;
+  IO.Socket? socket;
+  String? userid;
   @override
   void initState() {
     super.initState();
-  //  _createPolylines();
+    //  _createPolylines();
     _getAddresses();
-  _initializeSocket();
-  
-  print('..............................init function over..............................................');
+    _initializeSocket();
+
+    print('..............................init function over..............................................');
   }
 
- void _load() async {
+  void _load() async {
     userid = await HelperFunction.getUserId();
   }
-void _initializeSocket(){
-   socket = IO.io(
+
+  void _initializeSocket() {
+    socket = IO.io(
         Appurls.baseurl,
         IO.OptionBuilder()
             .setTransports([
@@ -59,48 +60,81 @@ void _initializeSocket(){
 
     socket?.on('connect', (_) {
       print('connected to socket server.....................................');
-    
     });
 
+    socket?.on("locationUpdate", (data) {
+      // Update the driver's marker on the user's map
+      print("Driver ki updated location aa rhi hai mere pass.................................");
+      var loc = data['location'];
+      print("${loc}...............Driver ke coordinates");
+      var location = LatLng(loc['lat'], loc['lng']);
+      updateDriverMarkerOnMap(data['location']);
+    });
 
-    socket?.on("locationUpdate", (data)  {
-  // Update the driver's marker on the user's map
-  print("Driver ki updated location aa rhi hai mere pass.................................");
-var loc=data['location'];
-print("${loc}...............Driver ke coordinates");
-  var location=LatLng(loc['lat'], loc['lng']);
-  updateDriverMarkerOnMap(data['location']);
-  
-});
+    socket?.on("journeyEnded", (data) {
+      print('Driver has ended the journey........................................');
 
+      ///pop lagana yyha pe jispe likeha hoag journey has ended ...............................
+    });
 
-socket?.on("journeyEnded", ( data )  {
-  print('Driver has ended the journey........................................');
-
-
-  ///pop lagana yyha pe jispe likeha hoag journey has ended ...............................
-
-});
-
-socket?.on("journeyCancelled", (data) {
-
-  print("journey has been cancel .....................................................");
-  //showCancelNotification(data['journeyId'], data['userId']);
+    socket?.on("journeyCancelled", (data) {
+      print("journey has been cancel .....................................................");
+      //showCancelNotification(data['journeyId'], data['userId']);
 
 //yaha pe ek pop up aga .................cancel journey ka......................
-
-});
-
-
- socket?.on('disconnect', (_) {
-      print('disconnected from socket server');
+      showCancelNotification(context);
     });
 
+    socket?.on('disconnect', (_) {
+      print('disconnected from socket server');
+    });
+  }
+
+  void showJourneyEndedNotification(BuildContext context, String journeyId) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Ride Completed 🎉'),
+        content: Text('Journey has ended pls pay the driver'),
+        actions: <Widget>[
+          TextButton(
+            child: Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Dismiss the dialog
+              Navigator.of(context).pop(); // Dismiss the dialog
+            },
+          ),
+        ],
+      );
+    },
+  );
 }
 
 
 
- // Function to update or add the driver marker on the map
+  void showCancelNotification(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Ride Canceled', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          content: Text('Ride has been canceled by user.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Function to update or add the driver marker on the map
   void updateDriverMarkerOnMap(LatLng driverLocation) {
     setState(() {
       if (_driverMarker == null) {
@@ -124,12 +158,9 @@ socket?.on("journeyCancelled", (data) {
     });
   }
 
-
-
   Future<void> requestLocationPermissions() async {
     LocationPermission permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
       // Handle permission denied
     }
   }
@@ -224,14 +255,14 @@ socket?.on("journeyCancelled", (data) {
     }
   }
 
-
-
-void  cancelRide(journeyId, userId) {
-  socket?.emit("cancelJourney", { journeyId, userId });
+  void cancelRide(journeyId, userId) {
+    socket?.emit("cancelJourney", {
+      journeyId,
+      userId
+    });
   print("mane cancel krdi apni traf se.............");
-  navigator?.pop(context);
-}
-  
+    navigator?.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -258,41 +289,41 @@ void  cancelRide(journeyId, userId) {
                 target: LatLng(pickoffLatitude, pickoffLongitude),
                 zoom: 12.0,
               ),
-          //     markers: {
-          //       Marker(
-          //         markerId: MarkerId('pickup'),
-          //         position: LatLng(
-          //           pickOffCoordinates?.latitude ?? pickoffLatitude,
-          //           pickOffCoordinates?.longitude ?? pickoffLongitude,
-          //         ),
-          //         infoWindow: InfoWindow(title: 'Pickup Location'),
-          //       ),
-          //       Marker(
-          //         markerId: MarkerId('dropoff'),
-          //         position: dropOffLatLng,
-          //         infoWindow: InfoWindow(title: 'Dropoff Location'),
-          //       ),
-          //       _driverMarker!=null?_driverMarker!:Marker(markerId: MarkerId('driver'))
-          //  },
-          markers: {
-  Marker(
-    markerId: MarkerId('pickup'),
-    position: LatLng(
-      pickOffCoordinates?.latitude ?? pickoffLatitude,
-      pickOffCoordinates?.longitude ?? pickoffLongitude,
-    ),
-    infoWindow: InfoWindow(title: 'Pickup Location'),
-    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan), // cyan marker
-  ),
-  Marker(
-    markerId: MarkerId('dropoff'),
-    position: dropOffLatLng,
-    infoWindow: InfoWindow(title: 'Dropoff Location'),
-    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed), // Red marker
-  ),
-},
+              //     markers: {
+              //       Marker(
+              //         markerId: MarkerId('pickup'),
+              //         position: LatLng(
+              //           pickOffCoordinates?.latitude ?? pickoffLatitude,
+              //           pickOffCoordinates?.longitude ?? pickoffLongitude,
+              //         ),
+              //         infoWindow: InfoWindow(title: 'Pickup Location'),
+              //       ),
+              //       Marker(
+              //         markerId: MarkerId('dropoff'),
+              //         position: dropOffLatLng,
+              //         infoWindow: InfoWindow(title: 'Dropoff Location'),
+              //       ),
+              //       _driverMarker!=null?_driverMarker!:Marker(markerId: MarkerId('driver'))
+              //  },
+              markers: {
+                Marker(
+                  markerId: MarkerId('pickup'),
+                  position: LatLng(
+                    pickOffCoordinates?.latitude ?? pickoffLatitude,
+                    pickOffCoordinates?.longitude ?? pickoffLongitude,
+                  ),
+                  infoWindow: InfoWindow(title: 'Pickup Location'),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan), // cyan marker
+                ),
+                Marker(
+                  markerId: MarkerId('dropoff'),
+                  position: dropOffLatLng,
+                  infoWindow: InfoWindow(title: 'Dropoff Location'),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed), // Red marker
+                ),
+              },
 
-             polylines: _polylines,
+              polylines: _polylines,
             ),
           ),
           // Bottom Container for Driver Details
@@ -382,16 +413,16 @@ void  cancelRide(journeyId, userId) {
                     SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {
-                       final phoneNumber = widget.driver?.phoneNumber;
-                       if (phoneNumber != null) {
-                         final Uri url = Uri(scheme: 'tel', path: phoneNumber);
-                         if (await canLaunchUrl(url)) {
-                           await launchUrl(url);
-                         } else {
-                           // Handle the error if the phone app cannot be launched
-                           print('Could not launch $url');
-                         }
-                       }
+                        final phoneNumber = widget.driver?.phoneNumber;
+                        if (phoneNumber != null) {
+                          final Uri url = Uri(scheme: 'tel', path: phoneNumber);
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url);
+                          } else {
+                            // Handle the error if the phone app cannot be launched
+                            print('Could not launch $url');
+                          }
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(double.infinity, 50),
@@ -402,10 +433,7 @@ void  cancelRide(journeyId, userId) {
                     SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: () {
-                        cancelRide(widget.journey?.id
-                      , userid);
-
-                        
+                        cancelRide(widget.journey?.id, userid);
                       },
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(double.infinity, 50),
@@ -423,4 +451,3 @@ void  cancelRide(journeyId, userId) {
     );
   }
 }
-

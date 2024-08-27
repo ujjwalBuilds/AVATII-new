@@ -3,6 +3,7 @@ import Journey from "../models/JourneyModel.js";
 import dotenv from "dotenv";
 import Cost from "../models/CostingModel.js";
 import Driver from "../models/DriverModel.js";
+import axios from "axios";
 
 dotenv.config();
 
@@ -23,17 +24,12 @@ export const StartJourney = asyncHandler(async (req, res) => {
         if (!driver) {
             return res.status(404).json({ message: "Driver not found" });
         }
-
         // Fetch costing details from external API
         let fare;
         try {
-            const response = await axios.get(`https://avatii-backend.onrender.com/api/booking/getCosting`, {
-                params: { VehicleType: driver.vehicle.Type }
-            });
-
-            const { InitialCost, CostPerKilometre } = response.data;
-
-            // Calculate fare
+            const cost = await Cost.find({VehicleType:driver.vehicle.Type});
+            const InitialCost = cost[0].InitialCost;
+            const CostPerKilometre = cost[0].CostPerKilometre;
             fare = InitialCost;
             if (distance > 2) {
                 fare += CostPerKilometre * (distance - 2);

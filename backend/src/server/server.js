@@ -512,6 +512,7 @@ io.on("connection", (socket) => {
 
   // Handle end journey
   socket.on("endJourney", async ({ journeyId, driverId }) => {
+    console.log(journeyId)
     try {
       // Call the end journey API
       await axios.post('https://avatii-backend.onrender.com/api/booking/end', { journeyId });
@@ -522,7 +523,6 @@ io.on("connection", (socket) => {
         driver.available = true;
         delete driver.journeyId; // Remove the journey ID from the driver
       }
-
       // Notify both the driver and the passenger
       io.to(journeyId).emit("journeyEnded", { journeyId, driverId });
       console.log(`Journey ${journeyId} ended by driver ${driverId}`);
@@ -537,6 +537,8 @@ io.on("connection", (socket) => {
 
   // Handle cancel journey
   socket.on("cancelJourney", async ({ journeyId, userId }) => {
+    console.log(journeyId);
+    console.log(userId);
     try {
       // Call the cancel journey API
       await axios.post('https://avatii-backend.onrender.com/api/booking/cancel', { journeyId });
