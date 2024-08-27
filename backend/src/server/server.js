@@ -513,7 +513,8 @@ socket.on("acceptRide", async ({ requestId, driverId }) => {
               io.to(driverSocketId).emit("startJourney", { 
                 journeyId, 
                 driverId, 
-                pickOff: request.currentLocation 
+                pickOff: request.currentLocation,
+                dropoff: request.destinationLocation, 
               });
               // Join the driver to the journey room
               // socket.to(driverSocketId).join(journeyId);
