@@ -63,7 +63,7 @@ class OtpLoginScreen extends StatelessWidget {
                 // Row(
                 //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 //   children: List.generate(6, (index) {
-                // //    return _buildOtpField(context, otpNotifier, index, otpState[index]);
+                //    return _buildOtpField(context, otpNotifier, index, otpState[index]);
                 //   }),
                 // ),
                 const SizedBox(height: 20),
@@ -162,3 +162,93 @@ class OtpLoginScreen extends StatelessWidget {
     );
   }
 }
+
+
+
+// import 'package:avatii/new%20OTP%20approach/auth_controller.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:get/get.dart';
+// import 'package:avatii/providers.dart';
+
+// class OtpLoginScreen extends ConsumerWidget {
+//   final String phoneNumber;
+//   OtpLoginScreen({required this.phoneNumber});
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final otpNotifier = ref.watch(otpProvider.notifier);
+//     final authController = Get.find<AuthController>();
+//     final Size screenSize = MediaQuery.of(context).size;
+
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       body: SafeArea(
+//         child: Padding(
+//           padding: const EdgeInsets.all(16.0),
+//           child: Column(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               Text(
+//                 'Enter OTP',
+//                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+//               ),
+//               SizedBox(height: 20),
+//               Row(
+//                 mainAxisAlignment: MainAxisAlignment.center,
+//                 children: List.generate(6, (index) {
+//                   return SizedBox(
+//                     width: 40,
+//                     child: TextField(
+//                       autofocus: index == 0,
+//                       onChanged: (value) {
+//                         otpNotifier.updateOtp(index, value);
+//                         if (index < 5 && value.isNotEmpty) {
+//                           FocusScope.of(context).nextFocus();
+//                         }
+//                       },
+//                       textAlign: TextAlign.center,
+//                       keyboardType: TextInputType.number,
+//                       maxLength: 1,
+//                       decoration: InputDecoration(
+//                         counterText: '',
+//                         border: OutlineInputBorder(
+//                           borderRadius: BorderRadius.circular(8),
+//                         ),
+//                       ),
+//                     ),
+//                   );
+//                 }),
+//               ),
+//               SizedBox(height: 20),
+//               ElevatedButton(
+//                 onPressed: () async {
+//                   try {
+//                     authController.verifyOtp(otpNotifier.otp);
+//                   } catch (e) {
+//                     ScaffoldMessenger.of(context).showSnackBar(
+//                       SnackBar(content: Text(e.toString())),
+//                     );
+//                   }
+//                 },
+//                 child: Text('Verify OTP'),
+//               ),
+//               TextButton(
+//                 onPressed: () async {
+//                   try {
+//                     authController.resendOtp(phoneNumber);
+//                   } catch (e) {
+//                     ScaffoldMessenger.of(context).showSnackBar(
+//                       SnackBar(content: Text(e.toString())),
+//                     );
+//                   }
+//                 },
+//                 child: Text('Resend OTP'),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

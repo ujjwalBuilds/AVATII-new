@@ -1,27 +1,34 @@
+import 'package:avatii/Phone%20OTP%20auth/otpvaliScreen.dart';
 import 'package:avatii/provider/userINfo_provider.dart';
 import 'package:avatii/screens/After%20Login/Home%20Screen/homeScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-//import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LogInScreen extends StatefulWidget {
-  const LogInScreen({super.key});
+class PhoneAuth extends StatefulWidget {
+  const PhoneAuth({super.key});
 
   @override
-  State<LogInScreen> createState() => _LogInScreenState();
+  State<PhoneAuth> createState() => _PhoneAuthState();
 }
 
-class _LogInScreenState extends State<LogInScreen> {
-TextEditingController _phoneNumber=TextEditingController();
+class _PhoneAuthState extends State<PhoneAuth> {
+  TextEditingController phoneController = TextEditingController();
 
-
-void onregister()async{
+  void onregister()async{
   await Provider.of<UserProvider>(context, listen: false).loginUser(
-   _phoneNumber.text).then((_){
+   phoneController.text).then((_){
     Get.to(()=>HomeScreen());
+    /*Iss neeche vale code ko uncomment krdiyo pls end mein */
+    // FirebaseAuth.instance.verifyPhoneNumber(
+    //                 verificationCompleted: (PhoneAuthCredential credential) {},
+    //                 verificationFailed: (FirebaseAuthException ex) {},
+    //                 codeSent: (String verificationid, int? resendtoken) {
+    //                   Navigator.push(context, MaterialPageRoute(builder: (context) => OTPScreen(verificationid: verificationid,)));
+    //                 },
+    //                 codeAutoRetrievalTimeout: (String verificationId) {},
+    //                 phoneNumber: phoneController.text.toString());
    }).catchError((error){
     ScaffoldMessenger(child: Text(error.toString()));
    }   
@@ -29,9 +36,39 @@ void onregister()async{
                         
 
 }
+  // @override
+  // Widget build(BuildContext context) {
+  //   final Size screenSize = MediaQuery.of(context).size;
+  //   final userprovider=Provider.of<UserProvider>(context);
 
+  //   return Scaffold(
+  //     backgroundColor: const Color(0xFFF2F2F5),
+  //     body: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Padding(
+  //           padding: const EdgeInsets.symmetric(horizontal: 25),
+  //           child: TextField(
+  //             controller: phoneController,
+  //             keyboardType: TextInputType.number,
+  //             decoration: InputDecoration(
+  //                 hintText: "Enter Phone Number",
+  //                 suffixIcon: Icon(Icons.phone),
+  //                 border: OutlineInputBorder(
+  //                   borderRadius: BorderRadius.circular(24),
+  //                 )),
+  //           ),
+  //         ),
+  //         SizedBox(height: 30),
+  //         ElevatedButton(
+  //             onPressed: () => onregister,
+  //             child: Text('Verify Phone Number'))
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  @override
+    @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final userprovider=Provider.of<UserProvider>(context);
@@ -85,31 +122,9 @@ void onregister()async{
 
                       SizedBox(height: screenSize.height * 0.03),
                       
-                      // TextField(
-                      //   controller: _phoneNumber,
-                      //   decoration: InputDecoration(
-                      //     filled: true,
-                      //     fillColor: Colors.white,
-                      //     hintText: 'Enter Mobile number',
-                      //     hintStyle: const TextStyle(
-                      //       color: Color.fromARGB(255, 108, 107, 107),
-                      //       fontWeight: FontWeight.normal,
-                      //     ),
-                          // enabledBorder: OutlineInputBorder(
-                          //   borderRadius: BorderRadius.circular(screenSize.width * 0.06),
-                          //   borderSide: BorderSide(color: Colors.grey.withOpacity(0.5)),
-                          // ),
-                      //     focusedBorder: OutlineInputBorder(
-                      //       borderSide: const BorderSide(color: Colors.blueAccent),
-                      //       borderRadius: BorderRadius.circular(screenSize.width * 0.06),
-                      //     ),
-                      //     suffixIcon: const Icon(Icons.arrow_forward_rounded),
-                      //   ),
-                      //   keyboardType: TextInputType.phone,
-                      // ),
                       TextField(
-              // controller: _phoneController,
-              keyboardType: TextInputType.number,
+              controller: phoneController,
+              keyboardType: TextInputType.phone,
               decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -136,8 +151,6 @@ void onregister()async{
                      userprovider.isLoading ? CircularProgressIndicator():
                       ElevatedButton(
                         onPressed: () {
-                         // GoRouter.of(context).push('/otp-login');
-                       // Get.to(()=>OtpLoginScreen());
                        print('function hitted');
                           onregister();
                         },

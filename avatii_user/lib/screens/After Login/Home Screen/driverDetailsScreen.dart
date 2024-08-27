@@ -225,23 +225,41 @@ print("${loc}...............Driver ke coordinates");
                 target: LatLng(pickoffLatitude, pickoffLongitude),
                 zoom: 12.0,
               ),
-              markers: {
-                Marker(
-                  markerId: MarkerId('pickup'),
-                  position: LatLng(
-                    pickOffCoordinates?.latitude ?? pickoffLatitude,
-                    pickOffCoordinates?.longitude ?? pickoffLongitude,
-                  ),
-                  infoWindow: InfoWindow(title: 'Pickup Location'),
-                ),
-                // Marker(
-                //   markerId: MarkerId('dropoff'),
-                //   position: dropOffLatLng,
-                //   infoWindow: InfoWindow(title: 'Dropoff Location'),
-                // ),
-                _driverMarker!=null?_driverMarker!:Marker(markerId: MarkerId('driver'))
-           },
-             // polylines: _polylines,
+          //     markers: {
+          //       Marker(
+          //         markerId: MarkerId('pickup'),
+          //         position: LatLng(
+          //           pickOffCoordinates?.latitude ?? pickoffLatitude,
+          //           pickOffCoordinates?.longitude ?? pickoffLongitude,
+          //         ),
+          //         infoWindow: InfoWindow(title: 'Pickup Location'),
+          //       ),
+          //       Marker(
+          //         markerId: MarkerId('dropoff'),
+          //         position: dropOffLatLng,
+          //         infoWindow: InfoWindow(title: 'Dropoff Location'),
+          //       ),
+          //       _driverMarker!=null?_driverMarker!:Marker(markerId: MarkerId('driver'))
+          //  },
+          markers: {
+  Marker(
+    markerId: MarkerId('pickup'),
+    position: LatLng(
+      pickOffCoordinates?.latitude ?? pickoffLatitude,
+      pickOffCoordinates?.longitude ?? pickoffLongitude,
+    ),
+    infoWindow: InfoWindow(title: 'Pickup Location'),
+    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan), // cyan marker
+  ),
+  Marker(
+    markerId: MarkerId('dropoff'),
+    position: dropOffLatLng,
+    infoWindow: InfoWindow(title: 'Dropoff Location'),
+    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed), // Red marker
+  ),
+},
+
+             polylines: _polylines,
             ),
           ),
           // Bottom Container for Driver Details
