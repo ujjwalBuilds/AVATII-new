@@ -13,7 +13,9 @@ const router = express.Router();
 
 router.post("/start", StartJourney);
 router.post("/validate-otp", ValidateOTP);
+
 router.post("/end", EndJourney);
+
 router.post("/cancel", CancelJourney);
 
 router.get("/all", GetAllJourneys);
