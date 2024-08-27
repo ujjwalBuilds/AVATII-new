@@ -522,7 +522,6 @@ io.on("connection", (socket) => {
         driver.available = true;
         delete driver.journeyId; // Remove the journey ID from the driver
       }
-
       // Notify both the driver and the passenger
       io.to(journeyId).emit("journeyEnded", { journeyId, driverId });
       console.log(`Journey ${journeyId} ended by driver ${driverId}`);
