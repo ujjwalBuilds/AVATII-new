@@ -973,6 +973,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ),
+<<<<<<< HEAD
                             );
                           } else {
                             return const Center(child: Text('No data available'));
@@ -982,6 +983,27 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                   });
             }));
+=======
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                return const Center(child: Text('No data available'));
+              }
+            },
+
+              );
+        
+       }} );
+    
+      },
+      ),
+    );
+>>>>>>> 7d674a246baef1a5246a48f3289b9cdfc55865e8
   }
 
   // void _sheetaglaneeche() {
