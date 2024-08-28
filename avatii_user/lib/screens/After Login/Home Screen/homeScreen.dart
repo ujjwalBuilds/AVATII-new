@@ -215,7 +215,8 @@ class _HomeScreenState extends State<HomeScreen> {
       if (placemarks != Null) {
         Placemark place = placemarks[0];
         setState(() {
-          currentAddress = "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
+         // pickupAddress = '${pickupPlacemarks[0].name}, ${pickupPlacemarks[0].thoroughfare}, ${pickupPlacemarks[0].administrativeArea}, ${pickupPlacemarks[0].locality}, ${pickupPlacemarks[0].postalCode}';
+          currentAddress = "${place.name}, ${place.thoroughfare}, ${place.administrativeArea}, ${place.locality},${place.postalCode}";
         });
       } else {
         setState(() {
@@ -824,15 +825,15 @@ void _sheetaglaneeche() {
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else {
-              final carCost = costingProvider.costData['Car']!;
-              final autoCost = costingProvider.costData['Auto']!;
-              final bikeCost = costingProvider.costData['Bike']!;
+              final carCost = costingProvider.costData['Car'];
+              final autoCost = costingProvider.costData['Auto'];
+              final bikeCost = costingProvider.costData['Bike'];
 
               return FutureBuilder<List<double>>(
                 future: Future.wait([
-                  HelperFunction.calculateFare(currentCoordinates, destinationCoordinates, 'car', carCost.initialCost,carCost.costPerKilometre),
-                  HelperFunction.calculateFare(currentCoordinates, destinationCoordinates, 'auto',autoCost.initialCost,autoCost.costPerKilometre ),
-                  HelperFunction.calculateFare(currentCoordinates, destinationCoordinates, 'bike', bikeCost.initialCost,bikeCost.costPerKilometre),
+                  HelperFunction.calculateFare(currentCoordinates, destinationCoordinates, 'car', carCost?.initialCost,carCost?.costPerKilometre),
+                  HelperFunction.calculateFare(currentCoordinates, destinationCoordinates, 'auto',autoCost?.initialCost,autoCost?.costPerKilometre ),
+                  HelperFunction.calculateFare(currentCoordinates, destinationCoordinates, 'bike', bikeCost?.initialCost,bikeCost?.costPerKilometre),
                 ]),
                 builder: (context, fareSnapshot) {
                   if (fareSnapshot.connectionState == ConnectionState.waiting) {

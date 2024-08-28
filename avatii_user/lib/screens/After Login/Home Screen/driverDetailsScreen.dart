@@ -40,6 +40,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
     //  _createPolylines();
     _getAddresses();
     _initializeSocket();
+    _createPolylines();
 
     print('..............................init function over..............................................');
   }
