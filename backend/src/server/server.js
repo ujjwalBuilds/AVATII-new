@@ -327,10 +327,8 @@ import Cost from './models/CostingModel.js';
 // Connect to MongoDB
 connectDb();
 
-// Initialize AdminJS
-AdminJS.registerAdapter({ Database, Resource });
-
-const adminJs = new AdminJS({
+// AdminJS configuration
+const adminOptions = {
   resources: [
     { resource: User },
     { resource: Journey },
@@ -338,7 +336,18 @@ const adminJs = new AdminJS({
     { resource: Cost },
   ],
   rootPath: '/admin',
-});
+  branding: {
+    companyName: 'Avatii Admin',
+    logo:'',  
+    softwareBrothers:false,
+    customCSS: './admin-custom.css',
+  },
+}
+
+// Initialize AdminJS
+AdminJS.registerAdapter({ Database, Resource });
+
+const adminJs = new AdminJS(adminOptions);
 
 const adminRouter = AdminJSExpress.buildRouter(adminJs);
 
