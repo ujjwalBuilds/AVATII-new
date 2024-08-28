@@ -115,8 +115,8 @@ class HelperFunction {
     Map<String, double> dropoffcoordinates,
     String vehicleType,
     // Map<String, double> currentLocation,
-    double initialCost,
-    double perKilometreCost,
+    double? initialCost,
+    double? perKilometreCost,
   ) async {
     // Extract pickup coordinates
     double? pickupLatitude = pickoffcoordinates['latitude'];
@@ -135,6 +135,9 @@ class HelperFunction {
     );
 
     // Calculate fare based on distance, vehicle type, and cost parameters
+    print('${vehicleType}.........................................................');
+    print('${initialCost}...................................................');
+    print('${perKilometreCost}...............................................');
     double fare = fareCalculator(initialCost, perKilometreCost, distanceResult['kilometers']!);
 
     return fare;
@@ -154,6 +157,7 @@ class HelperFunction {
     );
 
     double distanceInKilometers = distanceInMeters / 1000;
+    print('${distanceInKilometers}.....................................................');
 
     return {
       'meters': distanceInMeters,
@@ -161,17 +165,42 @@ class HelperFunction {
     };
   }
 
-  static double fareCalculator(double initialCost, double perKilometreCost, double distanceInKilometers) {
-    double fare;
+//   static double fareCalculator(double? initialCost, double? perKilometreCost, double distanceInKilometers) {
+//     double fare;
+// print('${distanceInKilometers}..............................is the fare distance price............');
+//     // If the distance is less than or equal to 2 km, the fare is the initial cost
+//     if (distanceInKilometers <= 2) {
+//       fare= initialCost??0;
+//     } else {
+//       print('..................................yha pe aa rha hai fair calculator.............');
+//       // If the distance is greater than 2 km, calculate the fare as initial cost + additional cost per km
+//       fare = initialCost??0 + ((distanceInKilometers - 2) * (perKilometreCost??0));
+//    print('${fare}............................#######################################');
+   
+//     }
+// print('${fare}..................................is the fare of the drive');
+//     return fare;
+//   }
+// }
+static double fareCalculator(double? initialCost, double? perKilometreCost, double distanceInKilometers) {
+    // Ensure the initial cost and per kilometre cost are not null
+    double initial = initialCost ?? 0;
+    double perKm = perKilometreCost ?? 0;
 
-    // If the distance is less than or equal to 2 km, the fare is the initial cost
+    print('Distance: $distanceInKilometers km');
+    print('Initial Cost: $initial');
+    print('Cost per Kilometre: $perKm');
+
+    double fare;
+    
     if (distanceInKilometers <= 2) {
-      fare = initialCost;
+        fare = initial;
     } else {
-      // If the distance is greater than 2 km, calculate the fare as initial cost + additional cost per km
-      fare = initialCost + ((distanceInKilometers - 2) * perKilometreCost);
+        // Calculate the additional cost beyond 2 km
+        fare = initial + ((distanceInKilometers - 2) * perKm);
     }
 
+    print('Calculated Fare: $fare');
     return fare;
-  }
+}
 }
