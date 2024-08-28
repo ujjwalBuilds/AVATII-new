@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:avatii/constants/imageStrings.dart';
 import 'package:avatii/helperFunction.dart';
 import 'package:avatii/models/driver_model.dart';
@@ -173,67 +175,85 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
       // Handle permission denied
     }
   }
+Future<void> _createPolylines() async {
+  journey.Location? pickOffCoordinates = widget.journey?.pickOff;
 
-  Future<void> _createPolylines() async {
-    journey.Location? pickOffCoordinates = widget.journey?.pickOff;
+  // Set the pickup and drop-off coordinates, falling back to current location if necessary
+  LatLng pickOffLatLng = LatLng(
+    pickOffCoordinates?.latitude ?? widget.currentLocation['latitude'] ?? 0.0,
+    pickOffCoordinates?.longitude ?? widget.currentLocation['longitude'] ?? 0.0,
+  );
 
-    LatLng pickOffLatLng = LatLng(
-      pickOffCoordinates?.latitude ?? widget.currentLocation['latitude'] ?? 0.0,
-      pickOffCoordinates?.longitude ?? widget.currentLocation['longitude'] ?? 0.0,
-    );
-
-    LatLng dropOffLatLng = widget.destinationCoordinates ??
-        LatLng(
-          widget.journey?.dropOff?.latitude ?? widget.currentLocation['latitude'] ?? 0.0,
-          widget.journey?.dropOff?.longitude ?? widget.currentLocation['longitude'] ?? 0.0,
-        );
-
-    print("Pickup Coordinates: $pickOffLatLng"); // Debugging
-    print("Dropoff Coordinates: $dropOffLatLng"); // Debugging
-
-    PolylinePoints polylinePoints = PolylinePoints();
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ',
-      request: PolylineRequest(
-        origin: PointLatLng(pickOffLatLng.latitude, pickOffLatLng.longitude),
-        destination: PointLatLng(dropOffLatLng.latitude, dropOffLatLng.longitude),
-        mode: TravelMode.driving,
-      ),
-    );
-
-    List<LatLng> polylineCoordinates = [];
-
-    if (result.points.isNotEmpty) {
-      result.points.forEach((PointLatLng point) {
-        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-      });
-      print("Polyline Points: $polylineCoordinates"); // Debugging
-    } else {
-      print("No polyline points found!"); // Debugging
-    }
-
-    setState(() {
-      _polylines.add(
-        Polyline(
-          polylineId: PolylineId('route'),
-          points: polylineCoordinates,
-          color: Colors.black,
-          width: 5,
-        ),
+  LatLng dropOffLatLng = widget.destinationCoordinates ??
+      LatLng(
+        widget.journey?.dropOff?.latitude ?? widget.currentLocation['latitude'] ?? 0.0,
+        widget.journey?.dropOff?.longitude ?? widget.currentLocation['longitude'] ?? 0.0,
       );
-    });
 
-    // Center the map to show the route
-    _mapController?.animateCamera(
-      CameraUpdate.newLatLngBounds(
-        LatLngBounds(
-          southwest: pickOffLatLng,
-          northeast: dropOffLatLng,
-        ),
-        100.0,
+  // Debugging: Print coordinates to ensure they're correct
+  print("Pickup Coordinates: $pickOffLatLng");
+  print("Dropoff Coordinates: $dropOffLatLng");
+
+  // Ensure that the coordinates are valid
+  if (pickOffLatLng.latitude == 0.0 && pickOffLatLng.longitude == 0.0) {
+    print("Invalid pickup coordinates, cannot create polyline.");
+    return;
+  }
+
+  if (dropOffLatLng.latitude == 0.0 && dropOffLatLng.longitude == 0.0) {
+    print("Invalid drop-off coordinates, cannot create polyline.");
+    return;
+  }
+
+  PolylinePoints polylinePoints = PolylinePoints();
+  PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+    googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ',
+    request: PolylineRequest(
+      origin: PointLatLng(pickOffLatLng.latitude, pickOffLatLng.longitude),
+      destination: PointLatLng(dropOffLatLng.latitude, dropOffLatLng.longitude),
+      mode: TravelMode.driving,
+    ),
+  );
+
+  List<LatLng> polylineCoordinates = [];
+
+  if (result.points.isNotEmpty) {
+    for (var point in result.points) {
+      polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+    }
+    print("Polyline Points: $polylineCoordinates");
+  } else {
+    print("No polyline points found!");
+  }
+
+  setState(() {
+    _polylines.add(
+      Polyline(
+        polylineId: PolylineId('route'),
+        points: polylineCoordinates,
+        color: Colors.black,
+        width: 5,
       ),
     );
-  }
+  });
+
+  // Calculate bounds for camera update
+  LatLngBounds bounds = LatLngBounds(
+    southwest: LatLng(
+      min(pickOffLatLng.latitude, dropOffLatLng.latitude),
+      min(pickOffLatLng.longitude, dropOffLatLng.longitude),
+    ),
+    northeast: LatLng(
+      max(pickOffLatLng.latitude, dropOffLatLng.latitude),
+      max(pickOffLatLng.longitude, dropOffLatLng.longitude),
+    ),
+  );
+
+  // Update the camera to fit the polyline within the view
+  _mapController?.animateCamera(
+    CameraUpdate.newLatLngBounds(bounds, 100.0),
+  );
+}
 
   Future<void> _getAddresses() async {
     journey.Location? pickOffCoordinates = widget.journey?.pickOff;
@@ -349,128 +369,130 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      'Ride Assigned',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    Divider(indent: 17, endIndent: 17, color: Colors.grey.shade300),
-                    Row(
-                      children: [
-                        Stack(
-                          alignment: Alignment.bottomLeft,
-                          children: [
-                            Image.asset(
-                              'assets/images/sedan_image.png',
-                              width: 100,
-                              height: 100,
-                            ),
-                            Positioned(
-                              top: 0,
-                              left: 0,
-                              child: CircleAvatar(
-                                radius: 20,
-                                backgroundColor: Colors.red.shade900, // Dark red background
-                                child: CircleAvatar(
-                                  radius: 19,
-                                  backgroundImage: AssetImage('assets/images/profile_image.png'),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        // SizedBox(width: 5),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Text(
+                        'Ride Assigned',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      Divider(indent: 17, endIndent: 17, color: Colors.grey.shade300),
+                      Row(
+                        children: [
+                          Stack(
+                            alignment: Alignment.bottomLeft,
                             children: [
-                              RichText(
-                                text: TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 16),
-                                  children: [
-                                    TextSpan(text: 'Driver Name: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                                    TextSpan(text: widget.driver?.name),
-                                  ],
-                                ),
+                              Image.asset(
+                                'assets/images/sedan_image.png',
+                                width: 100,
+                                height: 100,
                               ),
-                              const SizedBox(height: 3),
-                              RichText(
-                                text: TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 16),
-                                  children: [
-                                    TextSpan(text: 'Ride Fare: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                                    TextSpan(text: "₹${widget.journey?.distance}"),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              RichText(
-                                text: TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 16),
-                                  children: [
-                                    TextSpan(text: 'Pickup: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                                    TextSpan(text: '$pickupAddress'),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              RichText(
-                                text: TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 16),
-                                  children: [
-                                    TextSpan(text: 'Dropoff: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                                    TextSpan(text: '$dropoffAddress'),
-                                  ],
+                              Positioned(
+                                top: 0,
+                                left: 0,
+                                child: CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: Colors.red.shade900, // Dark red background
+                                  child: CircleAvatar(
+                                    radius: 19,
+                                    backgroundImage: AssetImage('assets/images/profile_image.png'),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    RichText(
-                      text: TextSpan(
-                        style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
-                        children: [
-                          TextSpan(text: 'OTP: '),
-                          TextSpan(text: widget.journey?.otp.toString() ?? "ERROR"),
+                          // SizedBox(width: 5),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(color: Colors.black, fontSize: 16),
+                                    children: [
+                                      TextSpan(text: 'Driver Name: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                      TextSpan(text: widget.driver?.name),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(color: Colors.black, fontSize: 16),
+                                    children: [
+                                      TextSpan(text: 'Ride Fare: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                      TextSpan(text: "₹${widget.journey?.distance}"),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(color: Colors.black, fontSize: 16),
+                                    children: [
+                                      TextSpan(text: 'Pickup: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                      TextSpan(text: '$pickupAddress'),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(color: Colors.black, fontSize: 16),
+                                    children: [
+                                      TextSpan(text: 'Dropoff: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                      TextSpan(text: '$dropoffAddress'),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () async {
-                        final phoneNumber = widget.driver?.phoneNumber;
-                        if (phoneNumber != null) {
-                          final Uri url = Uri(scheme: 'tel', path: phoneNumber);
-                          if (await canLaunchUrl(url)) {
-                            await launchUrl(url);
-                          } else {
-                            // Handle the error if the phone app cannot be launched
-                            print('Could not launch $url');
+                      SizedBox(height: 20),
+                      RichText(
+                        text: TextSpan(
+                          style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
+                          children: [
+                            TextSpan(text: 'OTP: '),
+                            TextSpan(text: widget.journey?.otp.toString() ?? "ERROR"),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final phoneNumber = widget.driver?.phoneNumber;
+                          if (phoneNumber != null) {
+                            final Uri url = Uri(scheme: 'tel', path: phoneNumber);
+                            if (await canLaunchUrl(url)) {
+                              await launchUrl(url);
+                            } else {
+                              // Handle the error if the phone app cannot be launched
+                              print('Could not launch $url');
+                            }
                           }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
-                        backgroundColor: Colors.black,
+                        },
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 50),
+                          backgroundColor: Colors.black,
+                        ),
+                        child: Text('CALL DRIVER', style: TextStyle(color: Colors.white)),
                       ),
-                      child: Text('CALL DRIVER', style: TextStyle(color: Colors.white)),
-                    ),
-                    SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () {
-                        cancelRide(widget.journey?.id, userid);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
-                        backgroundColor: Colors.white,
+                      SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          cancelRide(widget.journey?.id, userid);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 50),
+                          backgroundColor: Colors.white,
+                        ),
+                        child: Text('CANCEL RIDE', style: TextStyle(color: Colors.red)),
                       ),
-                      child: Text('CANCEL RIDE', style: TextStyle(color: Colors.red)),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
