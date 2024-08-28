@@ -61,7 +61,10 @@ class UserProvider with ChangeNotifier {
 
   // Login User
   Future<void> loginUser(String phoneNumber) async {
-    final url = Appurls.loginuser; // Replace with your actual backend URL
+    final url = Appurls.loginuser; 
+    // Replace with your actual backend URL
+    _isLoading=true;
+    notifyListeners();
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -72,7 +75,8 @@ class UserProvider with ChangeNotifier {
           'phoneNumber': phoneNumber,
         }),
       );
-
+_isLoading=false;
+    notifyListeners();
       if (response.statusCode == 200) {
         print('Login ..........................successfull');
         final responseData = json.decode(response.body);

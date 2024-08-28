@@ -1670,7 +1670,7 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
       });
 
       socket?.on("journeyEnded", (data) {
-        print("journey has been ended ..................... ..................................................");
+        print("journey has been ended ........#############################################............. ..................................................");
         _showCompletionPopup();
       });
     });
@@ -2028,8 +2028,8 @@ LatLngBounds _createBounds(LatLng point1, LatLng point2) {
                               onPressed: () {
                                 try {
                                   socket?.emit("cancelJourney", {
-                                    widget.journeyId,
-                                    driverid
+                                    "journeyId": widget.journeyId,
+                                                       "driverId": driverid
                                   });
                                 } catch (error) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -2106,9 +2106,10 @@ LatLngBounds _createBounds(LatLng point1, LatLng point2) {
                                             : ElevatedButton(
                                                 onPressed: () async {
                                                   try {
+                                                    print('jourenyId of the user end journey..................by the driver.....................${widget.journeyId}');
                                                     socket?.emit("endJourney", {
-                                                      widget.journeyId,
-                                                      driverid
+                                                      "journeyId": widget.journeyId,
+                                                       "driverId": driverid
                                                     });
                                                   } catch (error) {
                                                     ScaffoldMessenger.of(context).showSnackBar(
