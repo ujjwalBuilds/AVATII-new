@@ -114,7 +114,7 @@ class _PhoneAuthState extends State<PhoneAuth> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Avatii',
+                      'Avatii Driver',
                       style: TextStyle(
                         color: const Color(0xFFF212121),
                         fontSize: screenSize.width * 0.1,

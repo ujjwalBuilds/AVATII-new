@@ -2087,12 +2087,18 @@ LatLngBounds _createBounds(LatLng point1, LatLng point2) {
                               : _showButtonsAfterOtp
                                   ? Column(
                                       mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         ElevatedButton(
                                           onPressed: () {
                                             setRouteToDropoffLocation(widget.dropofflocation);
                                           },
-                                          child: Text('Navigate to Dropoff'),
+                                          style: ElevatedButton.styleFrom(
+                                minimumSize: const Size(350, 50),
+                                backgroundColor: Colors.black,
+                                elevation: 1,
+                              ),
+                                          child: Text('Navigate to Dropoff',style: TextStyle(color: Colors.white),),
                                         ),
                                         SizedBox(height: 10),
                                         journeyProvider.iscomplete
