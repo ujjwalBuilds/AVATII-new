@@ -3,6 +3,7 @@ import 'package:avatii/helperFunction.dart';
 import 'package:avatii/models/driver_model.dart';
 import 'package:avatii/models/journeyModel.dart' as journey;
 import 'package:avatii/models/journeyModel.dart';
+import 'package:avatii/screens/After%20Login/Home%20Screen/homeScreen.dart';
 import 'package:avatii/url.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -37,7 +38,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    //  _createPolylines();
+    _createPolylines();
     _getAddresses();
     _initializeSocket();
 
@@ -73,13 +74,14 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
 
     socket?.on("journeyEnded", (data) {
       print('Driver has ended the journey........................................');
+      showJourneyEndedNotification(context);
 
       ///pop lagana yyha pe jispe likeha hoag journey has ended ...............................
     });
 
     socket?.on("journeyCancelled", (data) {
       print("journey has been cancel .....................................................");
-      //showCancelNotification(data['journeyId'], data['userId']);
+      showCancelNotification(context);
 
 //yaha pe ek pop up aga .................cancel journey ka......................
       showCancelNotification(context);
@@ -90,42 +92,48 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
     });
   }
 
-  void showJourneyEndedNotification(BuildContext context, String journeyId) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Ride Completed 🎉'),
-        content: Text('Journey has ended pls pay the driver'),
-        actions: <Widget>[
-          TextButton(
-            child: Text('OK'),
-            onPressed: () {
-              Navigator.of(context).pop(); // Dismiss the dialog
-              Navigator.of(context).pop(); // Dismiss the dialog
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
-
-
-  void showCancelNotification(BuildContext context) {
+  void showJourneyEndedNotification(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Ride Canceled', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-          content: Text('Ride has been canceled by user.'),
+          title: Text('Ride Completed 🎉'),
+          content: Text('Journey has ended pls pay the driver!!'),
           actions: <Widget>[
             TextButton(
               child: Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop(); // Dismiss the dialog
                 Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showCancelNotification(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Ride Cancellation', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          content: Text('Ride cancelled succesfully'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                // Navigator.of(context).pop(); // Dismiss the dialog
+                // Navigator.of(context).pop(); // Dismiss the dialog
+                // Navigator.of(context).pop(); // Dismiss the dialog
+                // Navigator.of(context).pop(); // Dismiss the dialog
+                // Navigator.of(context).pop(); // Dismiss the dialog
+                // Navigator.of(context).pop(); // Dismiss the dialog
+                Get.offAll(() => HomeScreen());
               },
             ),
           ],
@@ -257,11 +265,11 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
 
   void cancelRide(journeyId, userId) {
     socket?.emit("cancelJourney", {
-      journeyId,
-      userId
+      "journeyId" : journeyId,
+      "userId" : userId,
     });
-  print("mane cancel krdi apni traf se.............");
-    navigator?.pop(context);
+    print("mane cancel krdi apni traf se.............");
+    // navigator?.pop(context);
   }
 
   @override
@@ -343,7 +351,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'Driver will arrive in few minutes',
+                      'Ride Assigned',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Divider(indent: 17, endIndent: 17, color: Colors.grey.shade300),
@@ -376,6 +384,26 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              RichText(
+                                text: TextSpan(
+                                  style: TextStyle(color: Colors.black, fontSize: 16),
+                                  children: [
+                                    TextSpan(text: 'Driver Name: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    TextSpan(text: widget.driver?.name),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              RichText(
+                                text: TextSpan(
+                                  style: TextStyle(color: Colors.black, fontSize: 16),
+                                  children: [
+                                    TextSpan(text: 'Ride Fare: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    TextSpan(text: "₹${widget.journey?.distance}"),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 3),
                               RichText(
                                 text: TextSpan(
                                   style: TextStyle(color: Colors.black, fontSize: 16),
