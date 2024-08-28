@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class DriverauthProvider with ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+  bool get isAuth => _token != null;
 
   Driver? _driver;
 
@@ -179,5 +180,14 @@ class DriverauthProvider with ChangeNotifier {
         throw Exception('Illegal base64url string!');
     }
     return utf8.decode(base64Url.decode(output));
+  }
+
+  Future<void> tryAutoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('token')) return;
+
+    // Optionally, verify the token with your backend here
+    _token = prefs.getString('token');
+    notifyListeners();
   }
 }
