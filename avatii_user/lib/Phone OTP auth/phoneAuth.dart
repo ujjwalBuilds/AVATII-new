@@ -19,16 +19,16 @@ class _PhoneAuthState extends State<PhoneAuth> {
   void onregister()async{
   await Provider.of<UserProvider>(context, listen: false).loginUser(
    phoneController.text).then((_){
-    Get.to(()=>HomeScreen());
+  //  Get.to(()=>HomeScreen());
     /*Iss neeche vale code ko uncomment krdiyo pls end mein */
-    // FirebaseAuth.instance.verifyPhoneNumber(
-    //                 verificationCompleted: (PhoneAuthCredential credential) {},
-    //                 verificationFailed: (FirebaseAuthException ex) {},
-    //                 codeSent: (String verificationid, int? resendtoken) {
-    //                   Navigator.push(context, MaterialPageRoute(builder: (context) => OTPScreen(verificationid: verificationid,)));
-    //                 },
-    //                 codeAutoRetrievalTimeout: (String verificationId) {},
-    //                 phoneNumber: "+91${phoneController.text.toString()}");
+    FirebaseAuth.instance.verifyPhoneNumber(
+                    verificationCompleted: (PhoneAuthCredential credential) {},
+                    verificationFailed: (FirebaseAuthException ex) {},
+                    codeSent: (String verificationid, int? resendtoken) {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => OTPScreen(verificationid: verificationid,)));
+                    },
+                    codeAutoRetrievalTimeout: (String verificationId) {},
+                    phoneNumber: "+91${phoneController.text.toString()}");
    }).catchError((error){
     ScaffoldMessenger(child: Text(error.toString()));
    }   

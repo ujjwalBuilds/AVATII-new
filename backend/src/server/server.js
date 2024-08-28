@@ -537,7 +537,7 @@ io.on("connection", (socket) => {
       console.log(`Journey ${journeyId} ended by driver ${driverId}`);
 
       // Leave the journey room
-      socket.leave(journeyId);
+       socket.leave(journeyId);
     } catch (error) {
       console.error('Error ending journey:', error);
       socket.emit("journeyError", { message: "Error ending journey" });
