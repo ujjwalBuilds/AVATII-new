@@ -3,6 +3,7 @@ import 'package:avatii_driver_app/provider/DriverProvider.dart';
 import 'package:avatii_driver_app/provider/JourneyProvider.dart';
 import 'package:avatii_driver_app/provider/Register_provider.dart';
 import 'package:avatii_driver_app/provider/Ride_request_provider.dart';
+import 'package:avatii_driver_app/screens/After%20Login/Home%20Screen/homeScreen.dart';
 import 'package:avatii_driver_app/screens/Before%20Login/Onboarding1/onboardingView.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -23,10 +24,12 @@ class MainApp extends StatelessWidget {
     return MultiProvider(
       
       providers: [
-       ChangeNotifierProvider(create: (context) => DriverauthProvider()),
-         ChangeNotifierProvider(create: (context) =>DriverProvider()),
-      ChangeNotifierProvider(create: (context) =>RideRequestProvider()),
-      ChangeNotifierProvider(create: (context) =>JourneyProvider()),
+      ChangeNotifierProvider(create: (context) => DriverauthProvider()..tryAutoLogin()),
+      ChangeNotifierProvider(create: (context) => DriverauthProvider()),
+      ChangeNotifierProvider(create: (context) => DriverProvider()),
+      ChangeNotifierProvider(create: (context) => RideRequestProvider()),
+      ChangeNotifierProvider(create: (context) => JourneyProvider()),
+      
       
       ],
       child: GetMaterialApp(
@@ -37,9 +40,18 @@ class MainApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
           fontFamily: 'Poppins',
         ),
-        home: OnboardingView(),
-
-
+        // home: OnboardingView(),
+        home: Consumer<DriverauthProvider>(
+          builder: (context, authProvider, _) {
+            if (authProvider.isAuth) {
+              // If the user is authenticated, navigate to the main screen
+              return HomeScreen();
+            } else {
+              // If the user is not authenticated, show the onboarding screen
+              return OnboardingView();
+            }
+          },
+        ),
 
 ),
       

@@ -1311,7 +1311,9 @@ import 'dart:math';
 import 'package:avatii_driver_app/Url.dart';
 import 'package:avatii_driver_app/helperFunction.dart';
 import 'package:avatii_driver_app/provider/JourneyProvider.dart';
+import 'package:avatii_driver_app/screens/After%20Login/Home%20Screen/homeScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart';
@@ -1611,16 +1613,16 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
     super.initState();
     if (widget.currentLocation != null) {
       setRouteToPickupLocation(widget.pickofflocation);
-    }  _load();
+    }
+    _load();
     _connectToSocket();
-  
+
     _getAddresses();
   }
 
   void _load() async {
     driverid = await Helperfunction.getUserId();
   }
-  
 
   Future<void> _getAddresses() async {
     // journey.Location? pickOffCoordinates = widget.journey?.pickOff;
@@ -1663,106 +1665,111 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
 
     socket?.on('connect', (_) {
       print('connected to socket server.......');
-
-      socket?.on("journeyCancelled", (data) {
-        print("journey has been cancel .....................................................");
-        showCancelNotification(context);
-      });
-
-      socket?.on("journeyEnded", (data) {
-        print("journey has been ended ........#############################################............. ..................................................");
-        _showCompletionPopup();
-      });
+    });
+    socket?.on("journeyCancelled", (data) {
+      print("journey has been cancel .....................................................");
+      showCancelNotification(context);
+    });
+    socket?.on("journeyEnded", (data) {
+      print("journey has been ended ........#############################################............. ..................................................");
+      _showCompletionPopup();
     });
   }
 
-void showCancelNotification(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Ride Canceled',style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-        content: Text('Ride has been canceled by user.'),
-        actions: <Widget>[
-          TextButton(
-            child: Text('OK'),
-            onPressed: () {
-              Navigator.of(context).pop(); // Dismiss the dialog
-              Navigator.of(context).pop(); // Dismiss the dialog
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
-  final GoogleMapController controller = await _mapController.future;
-  final PolylinePoints polylinePoints = PolylinePoints();
-
-  LatLng driverCurrentLocation = LatLng(
-    widget.currentLocation!.latitude!,
-    widget.currentLocation!.longitude!,
-  );
-
-  PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-    googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ', // Use your actual API key
-    request: PolylineRequest(
-      origin: PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
-      destination: PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
-      mode: TravelMode.driving,
-    ),
-  );
-
-  if (result.points.isNotEmpty) {
-    List<LatLng> polylineCoordinates = result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
-
-    setState(() {
-      _polylines.clear();
-      _markers.clear();
-
-      _polylines.add(Polyline(
-        polylineId: PolylineId('route_to_pickup'),
-        color: Colors.black,
-        points: polylineCoordinates,
-        width: 5,
-      ));
-
-      _markers.add(Marker(
-        markerId: MarkerId('start'),
-        position: driverCurrentLocation,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-      ));
-      _markers.add(Marker(
-        markerId: MarkerId('end'),
-        position: pickOffLocation,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      ));
+  void _connectDriver() async {
+    // String driverId = await Helperfunction.getDriverId(); // Replace with actual method to get driver ID
+    print('Driver is connected just abhi hua hai.........***************************');
+    socket?.emit('driverConnect', {
+      'driverId': driverid
     });
-
-    // Calculate the bounds
-    LatLngBounds bounds = _createBounds(driverCurrentLocation, pickOffLocation);
-    controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
-  } else {
-    print('Failed to get directions: ${result.errorMessage}');
   }
-}
+
+  void showCancelNotification(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Ride Canceled', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          content: Text('Ride has been canceled by user.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
+    final GoogleMapController controller = await _mapController.future;
+    final PolylinePoints polylinePoints = PolylinePoints();
+
+    LatLng driverCurrentLocation = LatLng(
+      widget.currentLocation!.latitude!,
+      widget.currentLocation!.longitude!,
+    );
+
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ', // Use your actual API key
+      request: PolylineRequest(
+        origin: PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
+        destination: PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
+        mode: TravelMode.driving,
+      ),
+    );
+
+    if (result.points.isNotEmpty) {
+      List<LatLng> polylineCoordinates = result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
+
+      setState(() {
+        _polylines.clear();
+        _markers.clear();
+
+        _polylines.add(Polyline(
+          polylineId: PolylineId('route_to_pickup'),
+          color: Colors.black,
+          points: polylineCoordinates,
+          width: 5,
+        ));
+
+        _markers.add(Marker(
+          markerId: MarkerId('start'),
+          position: driverCurrentLocation,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        ));
+        _markers.add(Marker(
+          markerId: MarkerId('end'),
+          position: pickOffLocation,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        ));
+      });
+
+      // Calculate the bounds
+      LatLngBounds bounds = _createBounds(driverCurrentLocation, pickOffLocation);
+      controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+    } else {
+      print('Failed to get directions: ${result.errorMessage}');
+    }
+  }
 
 // Helper function to calculate bounds correctly
-LatLngBounds _createBounds(LatLng point1, LatLng point2) {
-  final southwest = LatLng(
-    (point1.latitude <= point2.latitude) ? point1.latitude : point2.latitude,
-    (point1.longitude <= point2.longitude) ? point1.longitude : point2.longitude,
-  );
-  final northeast = LatLng(
-    (point1.latitude >= point2.latitude) ? point1.latitude : point2.latitude,
-    (point1.longitude >= point2.longitude) ? point1.longitude : point2.longitude,
-  );
+  LatLngBounds _createBounds(LatLng point1, LatLng point2) {
+    final southwest = LatLng(
+      (point1.latitude <= point2.latitude) ? point1.latitude : point2.latitude,
+      (point1.longitude <= point2.longitude) ? point1.longitude : point2.longitude,
+    );
+    final northeast = LatLng(
+      (point1.latitude >= point2.latitude) ? point1.latitude : point2.latitude,
+      (point1.longitude >= point2.longitude) ? point1.longitude : point2.longitude,
+    );
 
-  return LatLngBounds(southwest: southwest, northeast: northeast);
-}
-
-
+    return LatLngBounds(southwest: southwest, northeast: northeast);
+  }
 
 //   Future<void> setRouteToDropoffLocation(LatLng dropOffLocation) async {
 
@@ -1947,62 +1954,38 @@ LatLngBounds _createBounds(LatLng point1, LatLng point2) {
                                   ),
                                 ),
                                 SizedBox(width: 15),
-                                // Column(
-                                //   crossAxisAlignment: CrossAxisAlignment.start,
-                                //   children: [
-                                //     RichText(
-                                //       text: TextSpan(
-                                //         style: TextStyle(color: Colors.black, fontSize: 16),
-                                //         children: [
-                                //           TextSpan(text: 'Pickup: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                                //           TextSpan(text: '$pickupAddress'),
-                                //         ],
-                                //       ),
-                                //     ),
-                                //     SizedBox(height: 10),
-                                //     RichText(
-                                //       text: TextSpan(
-                                //         style: TextStyle(color: Colors.black, fontSize: 16),
-                                //         children: [
-                                //           TextSpan(text: 'Dropoff: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                                //           TextSpan(text: '$dropoffAddress'),
-                                //         ],
-                                //       ),
-                                //     ),
-                                //   ],
-                                // ),
                                 Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text.rich(
-                      TextSpan(
-                        style: TextStyle(color: Colors.black, fontSize: 15),
-                        children: [
-              TextSpan(text: 'Pickup: ', style: TextStyle(fontWeight: FontWeight.bold)),
-              TextSpan(text: pickupAddress),
-                        ],
-                      ),
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ),
-                    SizedBox(height: 10),
-                    Text.rich(
-                      TextSpan(
-                        style: TextStyle(color: Colors.black, fontSize: 15),
-                        children: [
-              TextSpan(text: 'Dropoff: ', style: TextStyle(fontWeight: FontWeight.bold)),
-              TextSpan(text: dropoffAddress),
-                        ],
-                      ),
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ),
-                  ],
-                ),
-              ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text.rich(
+                                        TextSpan(
+                                          style: TextStyle(color: Colors.black, fontSize: 15),
+                                          children: [
+                                            TextSpan(text: 'Pickup: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                            TextSpan(text: pickupAddress),
+                                          ],
+                                        ),
+                                        softWrap: true,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                      ),
+                                      SizedBox(height: 10),
+                                      Text.rich(
+                                        TextSpan(
+                                          style: TextStyle(color: Colors.black, fontSize: 15),
+                                          children: [
+                                            TextSpan(text: 'Dropoff: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                            TextSpan(text: dropoffAddress),
+                                          ],
+                                        ),
+                                        softWrap: true,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                             SizedBox(height: 10),
@@ -2029,7 +2012,7 @@ LatLngBounds _createBounds(LatLng point1, LatLng point2) {
                                 try {
                                   socket?.emit("cancelJourney", {
                                     "journeyId": widget.journeyId,
-                                                       "driverId": driverid
+                                    "userId": driverid
                                   });
                                 } catch (error) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -2055,7 +2038,10 @@ LatLngBounds _createBounds(LatLng point1, LatLng point2) {
                               ? Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text('Enter OTP to start the ride', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),),
+                                    Text(
+                                      'Enter OTP to start the ride',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    ),
                                     if (journeyProvider.validationMessage != null)
                                       Padding(
                                         padding: const EdgeInsets.only(bottom: 8.0),
@@ -2064,57 +2050,151 @@ LatLngBounds _createBounds(LatLng point1, LatLng point2) {
                                           style: TextStyle(color: Colors.red),
                                         ),
                                       ),
+                                    // OtpTextField(
+                                    //   numberOfFields: 6,
+                                    //   borderColor: Theme.of(context).primaryColor,
+                                    //   focusedBorderColor: Theme.of(context).primaryColor,
+                                    //   showFieldAsBox: false,
+                                    //   borderWidth: 4.0,
+                                    //   onSubmit: (String verificationCode) {
+                                    //     journeyProvider.validateOTP(widget.data['journeyId'], verificationCode).then((isSuccess) {
+                                    //       if (isSuccess) {
+                                    //         setState(() {
+                                    //           _showOtpField = false;
+                                    //           _showButtonsAfterOtp = true;
+                                    //         });
+                                    //       }
+                                    //     });
+                                    //   },
+                                    //   keyboardType: TextInputType.number,
+                                    // ),
                                     OtpTextField(
-                                      numberOfFields: 6,
-                                      borderColor: Theme.of(context).primaryColor,
-                                      focusedBorderColor: Theme.of(context).primaryColor,
-                                      showFieldAsBox: false,
-                                      borderWidth: 4.0,
-                                      onSubmit: (String verificationCode) {
-                                        journeyProvider.validateOTP(widget.data['journeyId'], verificationCode).then((isSuccess) {
-                                          if (isSuccess) {
-                                            setState(() {
-                                              _showOtpField = false;
-                                              _showButtonsAfterOtp = true;
-                                            });
-                                          }
-                                        });
-                                      },
-                                    ),
+  numberOfFields: 6,
+  borderColor: Theme.of(context).primaryColor,
+  focusedBorderColor: Theme.of(context).primaryColor,
+  showFieldAsBox: false,
+  borderWidth: 4.0,
+  keyboardType: TextInputType.number,
+  autoFocus: true, // Ensures the field is focused automatically
+  inputFormatters: <TextInputFormatter>[
+    FilteringTextInputFormatter.digitsOnly, // Restrict input to numbers
+  ],
+  onSubmit: (String verificationCode) {
+    journeyProvider.validateOTP(widget.data['journeyId'], verificationCode).then((isSuccess) {
+      if (isSuccess) {
+        setState(() {
+          _showOtpField = false;
+          _showButtonsAfterOtp = true;
+        });
+      }
+    });
+  },
+),
+
                                     SizedBox(height: 10),
                                   ],
                                 )
                               : _showButtonsAfterOtp
-                                  ? Column(
-                                      mainAxisSize: MainAxisSize.min,
+                                  ? SingleChildScrollView(
+                                    child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                              'Ride assigned',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            Divider(indent: 17, endIndent: 17, color: Colors.grey.shade300),
+                                          Row(
+                                                                  children: [
+                                                                    CircleAvatar(
+                                    radius: 50,
+                                    backgroundColor: Colors.black, // Dark red background
+                                    child: CircleAvatar(
+                                      radius: 49,
+                                      backgroundImage: AssetImage('assets/images/avatii-driver-logo.png'),
+                                    ),
+                                                                    ),
+                                                                    SizedBox(width: 15),
+                                                                    Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            setRouteToDropoffLocation(widget.dropofflocation);
-                                          },
-                                          child: Text('Navigate to Dropoff'),
+                                        Text.rich(
+                                          TextSpan(
+                                            style: TextStyle(color: Colors.black, fontSize: 15),
+                                            children: [
+                                              TextSpan(text: 'Pickup: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                              TextSpan(text: pickupAddress),
+                                            ],
+                                          ),
+                                          softWrap: true,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
                                         ),
                                         SizedBox(height: 10),
-                                        journeyProvider.iscomplete
-                                            ? CircularProgressIndicator()
-                                            : ElevatedButton(
-                                                onPressed: () async {
-                                                  try {
-                                                    print('jourenyId of the user end journey..................by the driver.....................${widget.journeyId}');
-                                                    socket?.emit("endJourney", {
-                                                      "journeyId": widget.journeyId,
-                                                       "driverId": driverid
-                                                    });
-                                                  } catch (error) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(content: Text(error.toString() ?? 'Unknown error')),
-                                                    );
-                                                  }
-                                                },
-                                                child: Text('Complete Journey'),
-                                              ),
+                                        Text.rich(
+                                          TextSpan(
+                                            style: TextStyle(color: Colors.black, fontSize: 15),
+                                            children: [
+                                              TextSpan(text: 'Dropoff: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                              TextSpan(text: dropoffAddress),
+                                            ],
+                                          ),
+                                          softWrap: true,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                        ),
                                       ],
-                                    )
+                                    ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                SizedBox(height: 30),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              setRouteToDropoffLocation(widget.dropofflocation);
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              minimumSize: const Size(350, 50),
+                                              backgroundColor: Colors.black,
+                                              elevation: 1,
+                                            ),
+                                            child: Text(
+                                              'Navigate to Dropoff',
+                                              style: TextStyle(color: Colors.white),
+                                            ),
+                                          ),
+                                          SizedBox(height: 20),
+                                          journeyProvider.iscomplete
+                                              ? CircularProgressIndicator()
+                                              : ElevatedButton(
+                                                  onPressed: () async {
+                                                    try {
+                                                      print('jourenyId of the user end journey..................by the driver.....................${widget.journeyId}');
+                                                      socket?.emit("endJourney", {
+                                                        "journeyId": widget.journeyId,
+                                                        "driverId": driverid
+                                                      });
+                                                    } catch (error) {
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(content: Text(error.toString() ?? 'Unknown error')),
+                                                      );
+                                                    }
+                                                  },
+                                                  style: ElevatedButton.styleFrom(
+                                                    minimumSize: const Size(350, 50),
+                                                    backgroundColor: Colors.white,
+                                                    elevation: 1,
+                                                  ),
+                                                  child: Text(
+                                                    'Complete Journey',
+                                                    style: TextStyle(color: Colors.black),
+                                                  ),
+                                                ),
+                                        ],
+                                      ),
+                                  )
                                   : Container(),
                 ),
               ),
@@ -2138,7 +2218,7 @@ LatLngBounds _createBounds(LatLng point1, LatLng point2) {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Payment Price: \$100'), // Replace with actual price
+                  // Text('Payment Price: \$100'), // Replace with actual price
                   DropdownButton<String>(
                     value: selectedPaymentOption,
                     onChanged: (String? newValue) {
@@ -2163,8 +2243,7 @@ LatLngBounds _createBounds(LatLng point1, LatLng point2) {
                 TextButton(
                   child: Text('OK'),
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop(); // Navigate back to the home screen
+                    Get.offAll(() => HomeScreen()); // Navigate back to the home screen
                   },
                 ),
               ],

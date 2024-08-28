@@ -67,33 +67,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _connectUser();
     });
 
-    /*VIPIN's Code*/
-    // socket?.on('rideAccepted', (data) async{
-    //   print('..................................Ride accepted by driver for passanger........................');
-    //  String journeyId = data['journeyId'];
-    //   String driverId = data['driverId'];
-
-    //   final rideProvider = Provider.of<UserProvider>(context, listen: false);
-    //   await rideProvider.fetchJourneyDetails(journeyId);
-    //   print('got the journey successfull..........');
-    //   await rideProvider.fetchDriverDetails(driverId);
-
-    //   setState(() {
-    //     _isSearching = false;
-    //     _driverName = data['journeyId'];
-    //     // _driverPhone = data['driverId'];
-    //     // _driverCar = 'gadddi';
-    //     // _driverCar = data['driverCar'];
-    //     // _journeyId = data['journeyId'];
-    //     // _pickupLocation = data['pickOff'];
-    //     // _dropoffLocation = data['dropOff'];
-    //   });
-
-    //   // print('${_driverName}.....................is journey here  id');
-    //   // print('${_driverPhone}.....................is driver  here for id');
-    //   _showDriverDetails();
-    // });
-
     /*UJJWAL's CODE */
     socket?.on('rideAccepted', (data) async {
       print('Ride accepted by driver for passenger................................');
