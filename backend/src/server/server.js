@@ -529,10 +529,13 @@ socket.on("endJourney", async ({ journeyId, driverId }) => {
     const driver = drivers.get(driverId);
     if (driver) {
       driver.available = true;
-      delete driver.journeyId; // Remove the journey ID from the driver
+      delete driver.journeyId;
+
+      // Notify the driver directly
+      io.to(driver.socketId).emit("journeyEnded", { journeyId, driverId });
     }
 
-    // Notify both the driver and the passenger
+    // Notify the passenger (and any other sockets in the journey room)
     io.to(journeyId).emit("journeyEnded", { journeyId, driverId });
 
     console.log(`Journey ${journeyId} ended by driver ${driverId}`);
@@ -550,19 +553,26 @@ socket.on("cancelJourney", async ({ journeyId, userId }) => {
   console.log(journeyId);
   console.log(userId);
   try {
-    // Call the cancel journey API
     await axios.post('https://avatii-backend.onrender.com/api/booking/cancel', { journeyId });
 
-    // Notify both the driver and the passenger
-    io.to(journeyId).emit("journeyCancelled", { journeyId, userId });
+    let driverSocketId;
 
     // Find and update the driver associated with this journey
     drivers.forEach((driver, driverId) => {
       if (driver.journeyId === journeyId) {
         driver.available = true;
         delete driver.journeyId;
+        driverSocketId = driver.socketId;
       }
     });
+
+    // Notify the driver directly if found
+    if (driverSocketId) {
+      io.to(driverSocketId).emit("journeyCancelled", { journeyId, userId });
+    }
+
+    // Notify the passenger (and any other sockets in the journey room)
+    io.to(journeyId).emit("journeyCancelled", { journeyId, userId });
 
     console.log(`Journey ${journeyId} cancelled by user ${userId}`);
 
