@@ -1696,61 +1696,72 @@ void showCancelNotification(BuildContext context) {
     },
   );
 }
+Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
+  final GoogleMapController controller = await _mapController.future;
+  final PolylinePoints polylinePoints = PolylinePoints();
 
-  Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
-    final GoogleMapController controller = await _mapController.future;
-    final PolylinePoints polylinePoints = PolylinePoints();
+  LatLng driverCurrentLocation = LatLng(
+    widget.currentLocation!.latitude!,
+    widget.currentLocation!.longitude!,
+  );
 
-    LatLng driverCurrentLocation = LatLng(
-      widget.currentLocation!.latitude!,
-      widget.currentLocation!.longitude!,
-    );
+  PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+    googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ', // Use your actual API key
+    request: PolylineRequest(
+      origin: PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
+      destination: PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
+      mode: TravelMode.driving,
+    ),
+  );
 
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ',
-      request: PolylineRequest(
-        origin: PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
-        destination: PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
-        mode: TravelMode.driving,
-      ),
-    );
+  if (result.points.isNotEmpty) {
+    List<LatLng> polylineCoordinates = result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
 
-    if (result.points.isNotEmpty) {
-      List<LatLng> polylineCoordinates = result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
+    setState(() {
+      _polylines.clear();
+      _markers.clear();
 
-      setState(() {
-        _polylines.clear();
-        _markers.clear();
+      _polylines.add(Polyline(
+        polylineId: PolylineId('route_to_pickup'),
+        color: Colors.black,
+        points: polylineCoordinates,
+        width: 5,
+      ));
 
-        _polylines.add(Polyline(
-          polylineId: PolylineId('route_to_pickup'),
-          color: Colors.black,
-          points: polylineCoordinates,
-          width: 5,
-        ));
+      _markers.add(Marker(
+        markerId: MarkerId('start'),
+        position: driverCurrentLocation,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      ));
+      _markers.add(Marker(
+        markerId: MarkerId('end'),
+        position: pickOffLocation,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      ));
+    });
 
-        _markers.add(Marker(
-          markerId: MarkerId('start'),
-          position: driverCurrentLocation,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        ));
-        _markers.add(Marker(
-          markerId: MarkerId('end'),
-          position: pickOffLocation,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-        ));
-      });
-
-      // Update the camera bounds based on the route
-      LatLngBounds bounds = LatLngBounds(
-        southwest: driverCurrentLocation,
-        northeast: pickOffLocation,
-      );
-      controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
-    } else {
-      print('Failed to get directions: ${result.errorMessage}');
-    }
+    // Calculate the bounds
+    LatLngBounds bounds = _createBounds(driverCurrentLocation, pickOffLocation);
+    controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+  } else {
+    print('Failed to get directions: ${result.errorMessage}');
   }
+}
+
+// Helper function to calculate bounds correctly
+LatLngBounds _createBounds(LatLng point1, LatLng point2) {
+  final southwest = LatLng(
+    (point1.latitude <= point2.latitude) ? point1.latitude : point2.latitude,
+    (point1.longitude <= point2.longitude) ? point1.longitude : point2.longitude,
+  );
+  final northeast = LatLng(
+    (point1.latitude >= point2.latitude) ? point1.latitude : point2.latitude,
+    (point1.longitude >= point2.longitude) ? point1.longitude : point2.longitude,
+  );
+
+  return LatLngBounds(southwest: southwest, northeast: northeast);
+}
+
 
 
 //   Future<void> setRouteToDropoffLocation(LatLng dropOffLocation) async {
