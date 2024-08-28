@@ -1611,8 +1611,9 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
     super.initState();
     if (widget.currentLocation != null) {
       setRouteToPickupLocation(widget.pickofflocation);
-    }
-    _load();
+    }  _load();
+    _connectToSocket();
+  
     _getAddresses();
   }
 
