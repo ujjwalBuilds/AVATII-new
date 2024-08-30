@@ -1316,263 +1316,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:geocoding/geocoding.dart';
+import 'package:geocoding/geocoding.dart'hide Location;
+import 'package:geolocator/geolocator.dart' ;
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
+import 'package:location/location.dart ' hide LocationAccuracy;
 import 'package:provider/provider.dart';
-
-// class JourneyDetailsScreen extends StatefulWidget {
-//   final String journeyId;
-//   final LocationData? currentLocation;
-//   final data;
-//   final pickofflocation;
-//   final dropofflocation; // Add this
-
-//   JourneyDetailsScreen({
-//     Key? key,
-//     required this.journeyId,
-//     required this.data,
-//     required this.currentLocation,
-//     required this.pickofflocation,
-//     required this.dropofflocation, // Add this
-//   }) : super(key: key);
-
-//   @override
-//   _JourneyDetailsScreenState createState() => _JourneyDetailsScreenState();
-// }
-
-// class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
-//   Set<Polyline> _polylines = {};
-//   Set<Marker> _markers = {};
-//   Completer<GoogleMapController> _mapController = Completer();
-
-//   bool _showArrivalButton = true;
-//   bool _showOtpField = false;
-//   bool _showButtonsAfterOtp = false;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     setRouteToPickupLocation(widget.pickofflocation);
-//   }
-
-//   Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
-//     final GoogleMapController controller = await _mapController.future;
-//     final PolylinePoints polylinePoints = PolylinePoints();
-
-//     LatLng driverCurrentLocation =
-//         LatLng(widget.currentLocation!.latitude!, widget.currentLocation!.longitude!);
-
-//     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-//       googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ', // Replace with your actual API key
-//       request: PolylineRequest(
-//         origin: PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
-//         destination: PointLatLng(pickOffLocation.latitude, pickOffLocation.longitude),
-//         mode: TravelMode.driving,
-//         avoidHighways: false,
-//         avoidTolls: false,
-//         avoidFerries: false,
-//       ),
-//     );
-
-//     if (result.points.isNotEmpty) {
-//       List<LatLng> polylineCoordinates =
-//           result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
-
-//       setState(() {
-//         _polylines.clear();
-//         _markers.clear();
-
-//         _polylines.add(Polyline(
-//           polylineId: PolylineId('route_to_pickup'),
-//           color: Colors.red,
-//           points: polylineCoordinates,
-//           width: 5,
-//         ));
-
-//         _markers.add(Marker(
-//           markerId: MarkerId('start'),
-//           position: driverCurrentLocation,
-//           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-//         ));
-//         _markers.add(Marker(
-//           markerId: MarkerId('end'),
-//           position: pickOffLocation,
-//           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-//         ));
-//       });
-
-//       LatLngBounds bounds = LatLngBounds(
-//         southwest: driverCurrentLocation,
-//         northeast: pickOffLocation,
-//       );
-//       controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
-//     } else {
-//       print('Failed to get directions: ${result.errorMessage}');
-//     }
-//   }
-
-//   Future<void> setRouteToDropoffLocation(LatLng dropOffLocation) async {
-//     final destinationcoordinat=LatLng(widget.dropofflocation['latitude'], widget.dropofflocation['longitude']);
-//     final GoogleMapController controller = await _mapController.future;
-//     final PolylinePoints polylinePoints = PolylinePoints();
-//     print('{widget.dropofflocation}....................................................drop location is this...............');
-
-//     LatLng driverCurrentLocation =
-//         LatLng(widget.currentLocation!.latitude!, widget.currentLocation!.longitude!);
-
-//     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-//       googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ', // Replace with your actual API key
-//       request: PolylineRequest(
-//         origin: PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
-//         destination: PointLatLng(dropOffLocation.latitude, dropOffLocation.longitude),
-//         mode: TravelMode.driving,
-//         avoidHighways: false,
-//         avoidTolls: false,
-//         avoidFerries: false,
-//       ),
-//     );
-
-//     if (result.points.isNotEmpty) {
-//       List<LatLng> polylineCoordinates =
-//           result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
-
-//       setState(() {
-//         _polylines.clear();
-//         _markers.clear();
-
-//         _polylines.add(Polyline(
-//           polylineId: PolylineId('route_to_dropoff'),
-//           color: Colors.blue,
-//           points: polylineCoordinates,
-//           width: 5,
-//         ));
-
-//         _markers.add(Marker(
-//           markerId: MarkerId('start'),
-//           position: driverCurrentLocation,
-//           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-//         ));
-//         _markers.add(Marker(
-//           markerId: MarkerId('end'),
-//           position: dropOffLocation,
-//           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-//         ));
-//       });
-
-//       LatLngBounds bounds = LatLngBounds(
-//         southwest: driverCurrentLocation,
-//         northeast: dropOffLocation,
-//       );
-//       controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
-//     } else {
-//       print('Failed to get directions: ${result.errorMessage}');
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     Color accentPurpleColor = Color(0xFF6A53A1);
-//     final journeyProvider = Provider.of<JourneyProvider>(context, listen: false);
-
-//     return Scaffold(
-//       body: Stack(
-//         children: [
-//           Positioned.fill(
-//             child: GoogleMap(
-//               onMapCreated: (GoogleMapController controller) {
-//                 _mapController.complete(controller);
-//               },
-//               initialCameraPosition: CameraPosition(
-//                 target: LatLng(0.0, 0.0),
-//                 zoom: 12.0,
-//               ),
-//               markers: _markers,
-//               polylines: _polylines,
-//             ),
-//           ),
-//           Positioned(
-//             bottom: 0,
-//             left: 0,
-//             right: 0,
-//             child: Container(
-//               height: MediaQuery.of(context).size.height * 0.4,
-//               decoration: BoxDecoration(
-//                 color: const Color(0xFFF2F2F5),
-//                 borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-//               ),
-//               child: Padding(
-//                 padding: const EdgeInsets.all(16.0),
-//                 child: _showArrivalButton
-//                     ? Column(
-//                         mainAxisSize: MainAxisSize.min,
-//                         children: [
-//                           ElevatedButton(
-//                             onPressed: () {
-//                               setState(() {
-//                                 _showArrivalButton = false;
-//                                 _showOtpField = true;
-//                               });
-//                             },
-//                             child: Text('Arrived'),
-//                           ),
-//                         ],
-//                       )
-//                     : journeyProvider.isvalidatingotp
-//                         ? Center(child: CircularProgressIndicator())
-//                         : _showOtpField
-//                             ? Column(
-//                                 mainAxisSize: MainAxisSize.min,
-//                                 children: [
-//                                   OtpTextField(
-//                                     numberOfFields: 6,
-//                                     borderColor: accentPurpleColor,
-//                                     focusedBorderColor: accentPurpleColor,
-//                                     showFieldAsBox: false,
-//                                     borderWidth: 4.0,
-//                                     onSubmit: (String verificationCode) {
-//                                       journeyProvider.validateOTP(widget.data['journeyId'], verificationCode).then((isSuccess) {
-//                                         if (isSuccess) {
-//                                           setState(() {
-//                                             _showOtpField = false;
-//                                             _showButtonsAfterOtp = true;
-//                                           });
-//                                         }
-//                                       });
-//                                     },
-//                                   ),
-//                                   SizedBox(height: 10),
-//                                 ],
-//                               )
-//                             : _showButtonsAfterOtp
-//                                 ? Column(
-//                                     mainAxisSize: MainAxisSize.min,
-//                                     children: [
-//                                       ElevatedButton(
-//                                         onPressed: () {
-//                                           setRouteToDropoffLocation(widget.dropofflocation);
-//                                         },
-//                                         child: Text('Navigate to Dropoff'),
-//                                       ),
-//                                       SizedBox(height: 10),
-//                                       ElevatedButton(
-//                                         onPressed: () {
-//                                           // Implement your complete journey logic here
-//                                         },
-//                                         child: Text('Complete Journey'),
-//                                       ),
-//                                     ],
-//                                   )
-//                                 : Container(), // Empty container to cover other cases
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
 
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
@@ -1599,6 +1348,7 @@ class JourneyDetailsScreen extends StatefulWidget {
 class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
   Set<Polyline> _polylines = {};
   Set<Marker> _markers = {};
+  Marker? _marker1;
   Completer<GoogleMapController> _mapController = Completer();
   String? driverid;
   String pickupAddress = '';
@@ -1607,22 +1357,69 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
   bool _showArrivalButton = true;
   bool _showOtpField = false;
   bool _showButtonsAfterOtp = false;
+    StreamSubscription<Position>? _positionStreamSubscription;
+ LocationData? _currentLocation;
+     late Location _locationService;
   IO.Socket? socket;
   @override
   void initState() {
     super.initState();
     if (widget.currentLocation != null) {
-      setRouteToPickupLocation(widget.pickofflocation);
+      setRouteToPickupLocation(widget.pickofflocation,null);
     }
     _load();
     _connectToSocket();
 
+//this is for updating marker of the car driver........................
+_locationService = Location();
+  // _locationService.onLocationChanged.listen((LocationData newLocation) {
+  //     if (mounted) {
+  //       setState(() {
+  //         _currentLocation = newLocation;
+  //         _updateMarker(newLocation);
+  //       });
+  //     }
+  //   });
+
+  // for getting the jorney info and fair info.......  
+    
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final postProvider = Provider.of<JourneyProvider>(context, listen: false);
+      // if (!postProvider.isLoaded) {
+      //   postProvider.fetchPostcards();
+      // }
+    });
     _getAddresses();
+    _startListeningToLocationChanges();
   }
 
   void _load() async {
     driverid = await Helperfunction.getUserId();
   }
+
+
+//for updating marker.................................
+
+  Future<void> _updateMarker(LocationData newLocation) async {
+    final heading = newLocation.heading ?? 0.0; // Get the heading (direction)
+
+    final BitmapDescriptor rotatedMarker = await BitmapDescriptor.asset(
+      ImageConfiguration(size: Size(120, 60)), // Adjust size as needed
+      'assets/images/car-icon.png',
+    );
+
+    setState(() {
+      _marker1 = Marker(
+        markerId: MarkerId("current_location"),
+        position: LatLng(newLocation.latitude!, newLocation.longitude!),
+        icon: rotatedMarker,
+        rotation: heading, // Rotate the marker according to the heading
+        anchor: Offset(0.5, 0.5), // Center the marker image
+      );
+    });
+  }
+
 
   Future<void> _getAddresses() async {
     // journey.Location? pickOffCoordinates = widget.journey?.pickOff;
@@ -1696,7 +1493,9 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
               child: Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop(); // Dismiss the dialog
-                Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.of(context).pop();
+                 // Dismiss the dialog
+                 
               },
             ),
           ],
@@ -1704,12 +1503,40 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
       },
     );
   }
+   void _startListeningToLocationChanges() {
+    // Replace with the package you're using for location updates
+    //final locationOptions = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
+    print('Started to listen driver location changes');
+    _positionStreamSubscription = Geolocator.getPositionStream(locationSettings: LocationSettings(accuracy:LocationAccuracy.high,distanceFilter: 5)).listen((Position position) {
+      if (position != null) {
+        LatLng newDriverLocation = LatLng(position.latitude, position.longitude);
+        _updateRoute(newDriverLocation);
+      }
+    });
+  }
+  Future<void> _updateRoute(LatLng newDriverLocation) async {
+    final GoogleMapController controller = await _mapController.future;
 
-  Future<void> setRouteToPickupLocation(LatLng pickOffLocation) async {
+    // Update the route to the pickup location
+    if (_showArrivalButton) {
+      setRouteToPickupLocation(widget.pickofflocation, newDriverLocation);
+    } else {
+      // Update the route to the dropoff location
+      setRouteToDropoffLocation(widget.dropofflocation, newDriverLocation);
+    }
+  }
+
+
+  Future<void> setRouteToPickupLocation(LatLng pickOffLocation,LatLng? driverCurrentLocation) async {
     final GoogleMapController controller = await _mapController.future;
     final PolylinePoints polylinePoints = PolylinePoints();
 
-    LatLng driverCurrentLocation = LatLng(
+    //  driverCurrentLocation ?? = LatLng(
+    //   widget.currentLocation!.latitude!,
+    //   widget.currentLocation!.longitude!,
+    // );
+
+ driverCurrentLocation ??= LatLng(
       widget.currentLocation!.latitude!,
       widget.currentLocation!.longitude!,
     );
@@ -1732,16 +1559,12 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
 
         _polylines.add(Polyline(
           polylineId: PolylineId('route_to_pickup'),
-          color: Colors.black,
+          color: Colors.red,
           points: polylineCoordinates,
           width: 5,
         ));
 
-        _markers.add(Marker(
-          markerId: MarkerId('start'),
-          position: driverCurrentLocation,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        ));
+        _markers.add(_marker1!);
         _markers.add(Marker(
           markerId: MarkerId('end'),
           position: pickOffLocation,
@@ -1771,75 +1594,76 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
     return LatLngBounds(southwest: southwest, northeast: northeast);
   }
 
-//   Future<void> setRouteToDropoffLocation(LatLng dropOffLocation) async {
+  // Future<void> setRouteToDropoffLocation(LatLng dropOffLocation) async {
+  //   final GoogleMapController controller = await _mapController.future;
+  //   final PolylinePoints polylinePoints = PolylinePoints();
 
-// print('${widget.dropofflocation}.............................................this is my droplocation');
+  //   LatLng driverCurrentLocation = LatLng(
+  //     widget.currentLocation!.latitude!,
+  //     widget.currentLocation!.longitude!,
+  //   );
 
-//     final GoogleMapController controller = await _mapController.future;
-//     final PolylinePoints polylinePoints = PolylinePoints();
+  //   print('Driver Current Location: $driverCurrentLocation........................................................');
+  //   print('Dropoff Location: $dropOffLocation................................................................');
 
-//     LatLng driverCurrentLocation = LatLng(
-//       widget.currentLocation!.latitude!,
-//       widget.currentLocation!.longitude!,
-//     );
+  //   PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+  //     googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ',
+  //     request: PolylineRequest(
+  //       origin: PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
+  //       destination: PointLatLng(dropOffLocation.latitude, dropOffLocation.longitude),
+  //       mode: TravelMode.driving,
+  //     ),
+  //   );
 
-//     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-//       googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ',
-//       request: PolylineRequest(
-//         origin: PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
-//         destination: PointLatLng(dropOffLocation.latitude, dropOffLocation.longitude),
-//         mode: TravelMode.driving,
-//       ),
-//     );
+  //   if (result.points.isNotEmpty) {
+  //     List<LatLng> polylineCoordinates = result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
 
-//     if (result.points.isNotEmpty) {
-//       List<LatLng> polylineCoordinates =
-//           result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
+  //     setState(() {
+  //       _polylines.clear();
+  //       _markers.clear();
 
-//       setState(() {
-//         _polylines.clear();
-//         _markers.clear();
+  //       _polylines.add(Polyline(
+  //         polylineId: PolylineId('route_to_dropoff'),
+  //         color: Colors.blue,
+  //         points: polylineCoordinates,
+  //         width: 5,
+  //       ));
 
-//         _polylines.add(Polyline(
-//           polylineId: PolylineId('route_to_dropoff'),
-//           color: Colors.blue,
-//           points: polylineCoordinates,
-//           width: 5,
-//         ));
+  //       _markers.add(Marker(
+  //         markerId: MarkerId('start'),
+  //         position: driverCurrentLocation,
+  //         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+  //       ));
+  //       _markers.add(Marker(
+  //         markerId: MarkerId('end'),
+  //         position: dropOffLocation,
+  //         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+  //       ));
+  //     });
 
-//         _markers.add(Marker(
-//           markerId: MarkerId('start'),
-//           position: driverCurrentLocation,
-//           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-//         ));
-//         _markers.add(Marker(
-//           markerId: MarkerId('end'),
-//           position: dropOffLocation,
-//           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-//         ));
-//       });
-
-//       LatLngBounds bounds = LatLngBounds(
-//         southwest: driverCurrentLocation,
-//         northeast: dropOffLocation,
-//       );
-//       controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
-//     } else {
-//       print('Failed to get directions: ${result.errorMessage}');
-//     }
-//   }
-
-  Future<void> setRouteToDropoffLocation(LatLng dropOffLocation) async {
+  //     LatLngBounds bounds = LatLngBounds(
+  //       southwest: LatLng(
+  //         min(driverCurrentLocation.latitude, dropOffLocation.latitude),
+  //         min(driverCurrentLocation.longitude, dropOffLocation.longitude),
+  //       ),
+  //       northeast: LatLng(
+  //         max(driverCurrentLocation.latitude, dropOffLocation.latitude),
+  //         max(driverCurrentLocation.longitude, dropOffLocation.longitude),
+  //       ),
+  //     );
+  //     controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+  //   } else {
+  //     print('Failed to get directions: ${result.errorMessage}');
+  //   }
+  // }
+  Future<void> setRouteToDropoffLocation(LatLng dropOffLocation, [LatLng? driverCurrentLocation]) async {
     final GoogleMapController controller = await _mapController.future;
     final PolylinePoints polylinePoints = PolylinePoints();
 
-    LatLng driverCurrentLocation = LatLng(
+    driverCurrentLocation ??= LatLng(
       widget.currentLocation!.latitude!,
       widget.currentLocation!.longitude!,
     );
-
-    print('Driver Current Location: $driverCurrentLocation........................................................');
-    print('Dropoff Location: $dropOffLocation................................................................');
 
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ',
@@ -1864,11 +1688,7 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
           width: 5,
         ));
 
-        _markers.add(Marker(
-          markerId: MarkerId('start'),
-          position: driverCurrentLocation,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        ));
+        //_markers.add(_marker1!);
         _markers.add(Marker(
           markerId: MarkerId('end'),
           position: dropOffLocation,
@@ -1876,16 +1696,7 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
         ));
       });
 
-      LatLngBounds bounds = LatLngBounds(
-        southwest: LatLng(
-          min(driverCurrentLocation.latitude, dropOffLocation.latitude),
-          min(driverCurrentLocation.longitude, dropOffLocation.longitude),
-        ),
-        northeast: LatLng(
-          max(driverCurrentLocation.latitude, dropOffLocation.latitude),
-          max(driverCurrentLocation.longitude, dropOffLocation.longitude),
-        ),
-      );
+      LatLngBounds bounds = _createBounds(driverCurrentLocation, dropOffLocation);
       controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
     } else {
       print('Failed to get directions: ${result.errorMessage}');

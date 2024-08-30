@@ -663,13 +663,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
 
 
-@override
-Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
   final use = Provider.of<DriverauthProvider>(context);
-  return Scaffold(
-    appBar: AppBar(
-      automaticallyImplyLeading: false,
-      backgroundColor: Colors.black,
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.black,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -679,30 +679,30 @@ Widget build(BuildContext context) {
                 Scaffold.of(context).openDrawer(); // Opens the drawer
               },
               child: Text(
-                'Avatii',
-                style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w500),
-              ),
+          'Avatii',
+          style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w500),
+        ),
             ),
           ),
           SizedBox(width: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Switch(
-                value: _isOnline,
-                onChanged: (value) async {
-                  setState(() {
-                    _isOnline = value;
-                    changeDriverStatus();
-                  });
-                },
-                activeTrackColor: Colors.blue,
-                activeColor: Colors.white,
-              ),
-              Text(
-                _isOnline ? 'Online' : 'Offline',
+          Switch(
+            value: _isOnline,
+            onChanged: (value) async {
+              setState(() {
+                _isOnline = value;
+                changeDriverStatus();
+              });
+            },
+            activeTrackColor: Colors.blue,
+            activeColor: Colors.white,
+          ),
+          Text(
+            _isOnline ? 'Online' : 'Offline',
                 style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
+          ),
             ],
           ),
           Row(
@@ -778,32 +778,33 @@ Widget build(BuildContext context) {
           ),
         ],
       ),
-    ),
-    body: Stack(
-      children: [
-        if (_currentLocation != null)
-          GoogleMap(
-            polylines: _polylines,
-            initialCameraPosition: CameraPosition(
-              target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+      ),
+      body: Stack(
+        children: [
+          if (_currentLocation != null)
+            GoogleMap(
+              polylines: _polylines,
+              initialCameraPosition: CameraPosition(
+                target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
               zoom: 16.0,
-            ),
-            markers: _marker != null
-                ? {
-                    _marker!
-                  }
-                : {},
-            myLocationEnabled: true,
-            onMapCreated: (GoogleMapController controller) {
-              _mapController.complete(controller);
-            },
-          )
-        else
-          Center(child: CircularProgressIndicator()),
-      ],
-    ),
-  );
-}
+              ),
+              markers: _marker != null
+                  ? {
+                      _marker!
+                    }
+                  : {},
+              myLocationEnabled: true,
+              onMapCreated: (GoogleMapController controller) {
+                _mapController.complete(controller);
+              },
+            )
+          else
+            Center(child: CircularProgressIndicator()),
+
+        ],
+      ),
+    );
+  }
 
 
 }
