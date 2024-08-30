@@ -5,6 +5,7 @@ import 'package:avatii_driver_app/provider/Register_provider.dart';
 import 'package:avatii_driver_app/provider/Ride_request_provider.dart';
 import 'package:avatii_driver_app/screens/After%20Login/Home%20Screen/homeScreen.dart';
 import 'package:avatii_driver_app/screens/Before%20Login/Onboarding1/onboardingView.dart';
+import 'package:avatii_driver_app/screens/Before%20Login/splashScreen/splashScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,7 +26,7 @@ class MainApp extends StatelessWidget {
       
       providers: [
       ChangeNotifierProvider(create: (context) => DriverauthProvider()..tryAutoLogin()),
-      ChangeNotifierProvider(create: (context) => DriverauthProvider()),
+      // ChangeNotifierProvider(create: (context) => DriverauthProvider()),
       ChangeNotifierProvider(create: (context) => DriverProvider()),
       ChangeNotifierProvider(create: (context) => RideRequestProvider()),
       ChangeNotifierProvider(create: (context) => JourneyProvider()),
@@ -48,7 +49,7 @@ class MainApp extends StatelessWidget {
               return HomeScreen();
             } else {
               // If the user is not authenticated, show the onboarding screen
-              return OnboardingView();
+              return SplashScreen();
             }
           },
         ),

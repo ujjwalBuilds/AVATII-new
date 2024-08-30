@@ -1,12 +1,17 @@
 // Add import for socket.io-client
 import 'package:avatii_driver_app/helperFunction.dart';
 import 'package:avatii_driver_app/provider/JourneyProvider.dart';
+import 'package:avatii_driver_app/provider/Register_provider.dart';
+import 'package:avatii_driver_app/screens/After%20Login/Home%20Screen/aboutUsPage.dart';
 import 'package:avatii_driver_app/screens/After%20Login/Home%20Screen/journeyDetailsScreen.dart';
+import 'package:avatii_driver_app/screens/After%20Login/Home%20Screen/qrCodePage.dart';
+import 'package:avatii_driver_app/screens/Before%20Login/Onboarding1/onboardingView.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:avatii_driver_app/Navigation%20Bar/bottomNavigationBar.dart';
 import 'package:avatii_driver_app/Url.dart';
@@ -555,92 +560,250 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.black,
-        title: Text(
-          'Avatii',
-          style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w500),
-        ),
-        actions: [
-          Switch(
-            value: _isOnline,
-            onChanged: (value) async {
-              setState(() {
-                _isOnline = value;
-                changeDriverStatus();
-              });
+//   @override
+//   Widget build(BuildContext context) {
+//     final use = Provider.of<DriverauthProvider>(context);
+//     return Scaffold(
+//       appBar: AppBar(
+//   automaticallyImplyLeading: false,
+//   backgroundColor: Colors.black,
+//   title: Row(
+//     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//     children: [
+//       Text(
+//         'Avatii',
+//         style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w500),
+//       ),
+//       // SizedBox(width: 5),
+//       Row(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         children: [
+//           Switch(
+//             value: _isOnline,
+//             onChanged: (value) async {
+//               setState(() {
+//                 _isOnline = value;
+//                 changeDriverStatus();
+//               });
+//             },
+//             activeTrackColor: Colors.blue,
+//             activeColor: Colors.white,
+//           ),
+//           Text(
+//             _isOnline ? 'Online' : 'Offline',
+//             style: TextStyle(color: Colors.white,fontSize: 16),
+//           ),
+//         ],
+//       ),
+//       // Add spacing at the end if needed
+//       Row(
+//         mainAxisAlignment: MainAxisAlignment.end,
+//         children: [
+//           GestureDetector(
+//                         onTap: () {
+//                           showDialog<String>(
+//                             context: context,
+//                             builder: (BuildContext context) => AlertDialog(
+//                               title: const Text('Log out'),
+//                               content: const Text('Do you want to logout?'),
+//                               actions: <Widget>[
+//                                 TextButton(
+//                                   onPressed: () => Navigator.pop(context, 'Cancel'),
+//                                   child: const Text('Cancel'),
+//                                 ),
+//                                 TextButton(
+//                                   onPressed: () async {
+//                                     use.logout();
+//                                     Get.offAll(() => OnboardingView());
+//                                   },
+//                                   child: const Text('OK'),
+//                                 ),
+//                               ],
+//                             ),
+//                           );
+//                         },
+//                         child: const CircleAvatar(
+//                           radius: 22,
+//                           backgroundColor: Colors.white,
+//                           child: Icon(Iconsax.logout, color: Colors.black, size: 30),
+//                         ),
+//                       ),
+//         ],
+//       )
+//     ],
+//   ),
+// ),
 
-              // if (_isOnline) {
-              //   // Call the provider's method to change the driver's status
+//       body: Stack(
+//         children: [
+//           if (_currentLocation != null)
+//             GoogleMap(
+//               polylines: _polylines,
+//               initialCameraPosition: CameraPosition(
+//                 target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+//                 zoom: 14.0,
+//               ),
+//               markers: _marker != null
+//                   ? {
+//                       _marker!
+//                     }
+//                   : {},
+//               myLocationEnabled: true,
+//               onMapCreated: (GoogleMapController controller) {
+//                 _mapController.complete(controller);
+//               },
+//             )
+//           else
+//             Center(child: CircularProgressIndicator()),
 
-              //   // _startAnimation();
-              // }
-            },
-            activeTrackColor: Colors.blue,
-            activeColor: Colors.white,
-          ),
-          Text(
-            _isOnline ? 'Online' : 'Offline',
-            style: TextStyle(color: Colors.white),
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
-      body: Stack(
+//         ],
+//       ),
+//     );
+//   }
+
+
+
+@override
+Widget build(BuildContext context) {
+  final use = Provider.of<DriverauthProvider>(context);
+  return Scaffold(
+    appBar: AppBar(
+      automaticallyImplyLeading: false,
+      backgroundColor: Colors.black,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          if (_currentLocation != null)
-            GoogleMap(
-              polylines: _polylines,
-              initialCameraPosition: CameraPosition(
-                target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-                zoom: 14.0,
-              ),
-              markers: _marker != null
-                  ? {
-                      _marker!
-                    }
-                  : {},
-              myLocationEnabled: true,
-              onMapCreated: (GoogleMapController controller) {
-                _mapController.complete(controller);
+          Builder(
+            builder: (context) => GestureDetector(
+              onTap: () {
+                Scaffold.of(context).openDrawer(); // Opens the drawer
               },
-            )
-          else
-            Center(child: CircularProgressIndicator()),
-
-          // Positioned widget for bottom navigation bar
-          // Positioned(
-          //   bottom: 0,
-          //   left: 0,
-          //   right: 0,
-          //   child: CustomNavigationBar(),
-          // ),
-          // Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: Column(
-          //     crossAxisAlignment: CrossAxisAlignment.start,
-          //     children: [
-          //       Padding(
-          //         padding: const EdgeInsets.only(left: 8, right: 4),
-          //         child: Row(
-          //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //           children: [
-          //             Icon(
-          //               Icons.location_on,
-          //               color: Colors.black,
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
+              child: Text(
+                'Avatii',
+                style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ),
+          SizedBox(width: 5),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Switch(
+                value: _isOnline,
+                onChanged: (value) async {
+                  setState(() {
+                    _isOnline = value;
+                    changeDriverStatus();
+                  });
+                },
+                activeTrackColor: Colors.blue,
+                activeColor: Colors.white,
+              ),
+              Text(
+                _isOnline ? 'Online' : 'Offline',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text('Log out'),
+                      content: const Text('Do you want to logout?'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, 'Cancel'),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            use.logout();
+                            Get.offAll(() => OnboardingView());
+                          },
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: const CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Colors.black,
+                  child: Icon(Iconsax.logout, color: Colors.white, size: 30),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
-    );
-  }
+    ),
+    drawer: Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.black,
+            ),
+            child: Center(
+              child: Text(
+                'Avatii Driver',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ),
+          ),
+          ListTile(
+            
+            title: Text('Qr code'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => QrCodePage()),
+              );
+            },
+          ),
+          ListTile(
+            title: Text('About Us'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AboutUsPage()),
+              );
+            },
+          ),
+        ],
+      ),
+    ),
+    body: Stack(
+      children: [
+        if (_currentLocation != null)
+          GoogleMap(
+            polylines: _polylines,
+            initialCameraPosition: CameraPosition(
+              target: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+              zoom: 16.0,
+            ),
+            markers: _marker != null
+                ? {
+                    _marker!
+                  }
+                : {},
+            myLocationEnabled: true,
+            onMapCreated: (GoogleMapController controller) {
+              _mapController.complete(controller);
+            },
+          )
+        else
+          Center(child: CircularProgressIndicator()),
+      ],
+    ),
+  );
+}
+
+
 }

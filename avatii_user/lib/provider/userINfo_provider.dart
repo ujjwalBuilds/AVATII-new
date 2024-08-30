@@ -9,15 +9,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider with ChangeNotifier {
   UserModel? _user;
-
+  bool get isAuth => _token != null;
   UserModel? get user => _user;
   bool _isLoading = false;
   bool get isLoading => _isLoading;
   static const String _userKey = 'user_data';
-
+  String? _token;
   UserProvider() {
     _loadUserFromPrefs();
   }
+
+  String? get token => _token;
 
   // Register User
   Future<void> registerUser(String name, String phoneNumber) async {
@@ -199,19 +201,11 @@ Journey _journey = Journey.fromJson(jsonData);
   }
 
 
-
-
-
-
-
-
-
-
 Future<void> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey('token')) return;
 
-    // _token = prefs.getString('token');
+    _token = prefs.getString('token');
     // _userId = prefs.getString('userId');
     // _userType = prefs.getString('userType');
 
@@ -229,7 +223,5 @@ Future<void> tryAutoLogin() async {
     notifyListeners();
     //return true;
   }
-  
-
 
 }

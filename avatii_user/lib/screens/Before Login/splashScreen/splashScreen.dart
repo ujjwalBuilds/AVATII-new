@@ -19,8 +19,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   _navigateToHome() async {
     await Future.delayed(Duration(seconds: 3), () {});
-    // Use GoRouter for navigation
-    //context.go('/onboard');
   Get.to(()=>OnboardingView());
   
   }

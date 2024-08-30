@@ -138,22 +138,6 @@ class DriverauthProvider with ChangeNotifier {
   String? get driverName => _driverName;
   String? get phoneNumber => _phoneNumber;
 
-  // Logout driver and clear local storage
-  Future<void> logout() async {
-    _token = null;
-    _driverId = null;
-    _driverName = null;
-    _phoneNumber = null;
-
-    // Clear data from local storage
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token');
-    await prefs.remove('driverId');
-    await prefs.remove('driverName');
-    await prefs.remove('phoneNumber');
-
-    notifyListeners();
-  }
 
   Map<String, dynamic> decodeJWT(String token) {
     final parts = token.split('.');
@@ -190,4 +174,13 @@ class DriverauthProvider with ChangeNotifier {
     _token = prefs.getString('token');
     notifyListeners();
   }
+   Future<void> logout() async {
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    //_clearCacheOnLogout();
+    notifyListeners();
+    //return true;
+  }
+  
 }
