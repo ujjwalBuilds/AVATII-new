@@ -1353,7 +1353,7 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
   String? driverid;
   String pickupAddress = '';
   String dropoffAddress = '';
-
+    bool isnativetodropoff=false;
   bool _showArrivalButton = true;
   bool _showOtpField = false;
   bool _showButtonsAfterOtp = false;
@@ -1364,25 +1364,19 @@ class _JourneyDetailsScreenState extends State<JourneyDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.currentLocation != null) {
-      setRouteToPickupLocation(widget.pickofflocation,null);
-    }
+
     _load();
     _connectToSocket();
 
 //this is for updating marker of the car driver........................
 _locationService = Location();
-  // _locationService.onLocationChanged.listen((LocationData newLocation) {
-  //     if (mounted) {
-  //       setState(() {
-  //         _currentLocation = newLocation;
-  //         _updateMarker(newLocation);
-  //       });
-  //     }
-  //   });
 
-  // for getting the jorney info and fair info.......  
-    
+       if (widget.currentLocation != null) {
+      print("#########################....................initate set to pickoff location walla fucntion working hai");
+      print(widget.currentLocation);
+      setRouteToPickupLocation(widget.pickofflocation,LatLng(widget.currentLocation!.latitude!, widget.currentLocation!.longitude!));
+      _startListeningToLocationChanges();
+    }
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final postProvider = Provider.of<JourneyProvider>(context, listen: false);
@@ -1390,8 +1384,9 @@ _locationService = Location();
       //   postProvider.fetchPostcards();
       // }
     });
+     
     _getAddresses();
-    _startListeningToLocationChanges();
+    
   }
 
   void _load() async {
@@ -1518,16 +1513,24 @@ _locationService = Location();
     final GoogleMapController controller = await _mapController.future;
 
     // Update the route to the pickup location
-    if (_showArrivalButton) {
-      setRouteToPickupLocation(widget.pickofflocation, newDriverLocation);
-    } else {
+    if (isnativetodropoff)
+    {
+
+      print("navgiate to dropppp working ######################################################");
       // Update the route to the dropoff location
       setRouteToDropoffLocation(widget.dropofflocation, newDriverLocation);
+     
+    } else  {
+       print("navigte to  pick of fucntion working####################################################################");
+      setRouteToPickupLocation(widget.pickofflocation, newDriverLocation);
     }
   }
 
 
-  Future<void> setRouteToPickupLocation(LatLng pickOffLocation,LatLng? driverCurrentLocation) async {
+  Future<void> setRouteToPickupLocation(LatLng pickOffLocation,[LatLng? driverCurrentLocation]) async {
+    print("########################..........................setroute to pick off location.......");
+    print("${pickOffLocation}..................................");
+    print("${driverCurrentLocation}...............");
     final GoogleMapController controller = await _mapController.future;
     final PolylinePoints polylinePoints = PolylinePoints();
 
@@ -1540,6 +1543,8 @@ _locationService = Location();
       widget.currentLocation!.latitude!,
       widget.currentLocation!.longitude!,
     );
+    print("${driverCurrentLocation}.............................after drivercurrentlocation...");
+    print("${widget.currentLocation}...................................is the current locaiton..");
 
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ', // Use your actual API key
@@ -1594,68 +1599,6 @@ _locationService = Location();
     return LatLngBounds(southwest: southwest, northeast: northeast);
   }
 
-  // Future<void> setRouteToDropoffLocation(LatLng dropOffLocation) async {
-  //   final GoogleMapController controller = await _mapController.future;
-  //   final PolylinePoints polylinePoints = PolylinePoints();
-
-  //   LatLng driverCurrentLocation = LatLng(
-  //     widget.currentLocation!.latitude!,
-  //     widget.currentLocation!.longitude!,
-  //   );
-
-  //   print('Driver Current Location: $driverCurrentLocation........................................................');
-  //   print('Dropoff Location: $dropOffLocation................................................................');
-
-  //   PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-  //     googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ',
-  //     request: PolylineRequest(
-  //       origin: PointLatLng(driverCurrentLocation.latitude, driverCurrentLocation.longitude),
-  //       destination: PointLatLng(dropOffLocation.latitude, dropOffLocation.longitude),
-  //       mode: TravelMode.driving,
-  //     ),
-  //   );
-
-  //   if (result.points.isNotEmpty) {
-  //     List<LatLng> polylineCoordinates = result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
-
-  //     setState(() {
-  //       _polylines.clear();
-  //       _markers.clear();
-
-  //       _polylines.add(Polyline(
-  //         polylineId: PolylineId('route_to_dropoff'),
-  //         color: Colors.blue,
-  //         points: polylineCoordinates,
-  //         width: 5,
-  //       ));
-
-  //       _markers.add(Marker(
-  //         markerId: MarkerId('start'),
-  //         position: driverCurrentLocation,
-  //         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-  //       ));
-  //       _markers.add(Marker(
-  //         markerId: MarkerId('end'),
-  //         position: dropOffLocation,
-  //         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-  //       ));
-  //     });
-
-  //     LatLngBounds bounds = LatLngBounds(
-  //       southwest: LatLng(
-  //         min(driverCurrentLocation.latitude, dropOffLocation.latitude),
-  //         min(driverCurrentLocation.longitude, dropOffLocation.longitude),
-  //       ),
-  //       northeast: LatLng(
-  //         max(driverCurrentLocation.latitude, dropOffLocation.latitude),
-  //         max(driverCurrentLocation.longitude, dropOffLocation.longitude),
-  //       ),
-  //     );
-  //     controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
-  //   } else {
-  //     print('Failed to get directions: ${result.errorMessage}');
-  //   }
-  // }
   Future<void> setRouteToDropoffLocation(LatLng dropOffLocation, [LatLng? driverCurrentLocation]) async {
     final GoogleMapController controller = await _mapController.future;
     final PolylinePoints polylinePoints = PolylinePoints();
@@ -1861,24 +1804,7 @@ _locationService = Location();
                                           style: TextStyle(color: Colors.red),
                                         ),
                                       ),
-                                    // OtpTextField(
-                                    //   numberOfFields: 6,
-                                    //   borderColor: Theme.of(context).primaryColor,
-                                    //   focusedBorderColor: Theme.of(context).primaryColor,
-                                    //   showFieldAsBox: false,
-                                    //   borderWidth: 4.0,
-                                    //   onSubmit: (String verificationCode) {
-                                    //     journeyProvider.validateOTP(widget.data['journeyId'], verificationCode).then((isSuccess) {
-                                    //       if (isSuccess) {
-                                    //         setState(() {
-                                    //           _showOtpField = false;
-                                    //           _showButtonsAfterOtp = true;
-                                    //         });
-                                    //       }
-                                    //     });
-                                    //   },
-                                    //   keyboardType: TextInputType.number,
-                                    // ),
+                                
                                     OtpTextField(
   numberOfFields: 6,
   borderColor: Theme.of(context).primaryColor,
@@ -1965,6 +1891,9 @@ _locationService = Location();
                                           ElevatedButton(
                                             onPressed: () {
                                               setRouteToDropoffLocation(widget.dropofflocation);
+                                              setState(() {
+                                                isnativetodropoff=true;
+                                              });
                                             },
                                             style: ElevatedButton.styleFrom(
                                               minimumSize: const Size(350, 50),

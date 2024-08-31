@@ -49,7 +49,7 @@ class MainApp extends StatelessWidget {
               return HomeScreen();
             } else {
               // If the user is not authenticated, show the onboarding screen
-              return SplashScreen();
+              return OnboardingView();
             }
           },
         ),
