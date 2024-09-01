@@ -50,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   LocationData? _currentLocation;
   late Location _locationService;
   Marker? _marker;
+  bool _isSplashVisible = true;
 
   IO.Socket? socket; // Socket instance
   bool _hasRideRequest = false; // State to track if there's a ride request
@@ -74,6 +75,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       }
     });
     load();
+    Timer(Duration(seconds: 3), () {
+      setState(() {
+        _isSplashVisible = false;
+      });
+    });
   }
 
   Future<void> _initializeLocation() async {
@@ -805,6 +811,22 @@ print("this is my distance of the to the backend i am givind .................##
             )
           else
             Center(child: CircularProgressIndicator()),
+
+          if (_isSplashVisible)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  // width: double.infinity,
+                  // height: double.infinity,
+                  color: Colors.white, // Optional: add a background color
+                  child: Image.asset(
+                    'assets/images/qr code of avati app.jpg', // Replace with your splash image path
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
 
         ],
       ),
