@@ -8,6 +8,7 @@ import 'package:avatii/models/journeyModel.dart';
 import 'package:avatii/screens/After%20Login/Home%20Screen/homeScreen.dart';
 import 'package:avatii/url.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -40,7 +41,6 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _createPolylines();
     _getAddresses();
     _initializeSocket();
     _createPolylines();
@@ -106,11 +106,12 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
             TextButton(
               child: Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
-                Navigator.of(context).pop(); // Dismiss the dialog
-                Navigator.of(context).pop(); // Dismiss the dialog
-                Navigator.of(context).pop(); // Dismiss the dialog
-                Navigator.of(context).pop(); // Dismiss the dialog
+                // Navigator.of(context).pop(); // Dismiss the dialog
+                // Navigator.of(context).pop(); // Dismiss the dialog
+                // Navigator.of(context).pop(); // Dismiss the dialog
+                // Navigator.of(context).pop(); // Dismiss the dialog
+                // Navigator.of(context).pop(); // Dismiss the dialog
+                SystemNavigator.pop();
               },
             ),
           ],
@@ -136,7 +137,8 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                 // Navigator.of(context).pop(); // Dismiss the dialog
                 // Navigator.of(context).pop(); // Dismiss the dialog
                 // Navigator.of(context).pop(); // Dismiss the dialog
-                Get.offAll(() => HomeScreen());
+                // Get.offAll(() => HomeScreen());
+                SystemNavigator.pop();
               },
             ),
           ],
@@ -175,85 +177,86 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
       // Handle permission denied
     }
   }
-Future<void> _createPolylines() async {
-  journey.Location? pickOffCoordinates = widget.journey?.pickOff;
 
-  // Set the pickup and drop-off coordinates, falling back to current location if necessary
-  LatLng pickOffLatLng = LatLng(
-    pickOffCoordinates?.latitude ?? widget.currentLocation['latitude'] ?? 0.0,
-    pickOffCoordinates?.longitude ?? widget.currentLocation['longitude'] ?? 0.0,
-  );
+  Future<void> _createPolylines() async {
+    journey.Location? pickOffCoordinates = widget.journey?.pickOff;
 
-  LatLng dropOffLatLng = widget.destinationCoordinates ??
-      LatLng(
-        widget.journey?.dropOff?.latitude ?? widget.currentLocation['latitude'] ?? 0.0,
-        widget.journey?.dropOff?.longitude ?? widget.currentLocation['longitude'] ?? 0.0,
-      );
+    // Set the pickup and drop-off coordinates, falling back to current location if necessary
+    LatLng pickOffLatLng = LatLng(
+      pickOffCoordinates?.latitude ?? widget.currentLocation['latitude'] ?? 0.0,
+      pickOffCoordinates?.longitude ?? widget.currentLocation['longitude'] ?? 0.0,
+    );
 
-  // Debugging: Print coordinates to ensure they're correct
-  print("Pickup Coordinates: $pickOffLatLng");
-  print("Dropoff Coordinates: $dropOffLatLng");
+    LatLng dropOffLatLng = widget.destinationCoordinates ??
+        LatLng(
+          widget.journey?.dropOff?.latitude ?? widget.currentLocation['latitude'] ?? 0.0,
+          widget.journey?.dropOff?.longitude ?? widget.currentLocation['longitude'] ?? 0.0,
+        );
 
-  // Ensure that the coordinates are valid
-  if (pickOffLatLng.latitude == 0.0 && pickOffLatLng.longitude == 0.0) {
-    print("Invalid pickup coordinates, cannot create polyline.");
-    return;
-  }
+    // Debugging: Print coordinates to ensure they're correct
+    print("Pickup Coordinates: $pickOffLatLng");
+    print("Dropoff Coordinates: $dropOffLatLng");
 
-  if (dropOffLatLng.latitude == 0.0 && dropOffLatLng.longitude == 0.0) {
-    print("Invalid drop-off coordinates, cannot create polyline.");
-    return;
-  }
-
-  PolylinePoints polylinePoints = PolylinePoints();
-  PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-    googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ',
-    request: PolylineRequest(
-      origin: PointLatLng(pickOffLatLng.latitude, pickOffLatLng.longitude),
-      destination: PointLatLng(dropOffLatLng.latitude, dropOffLatLng.longitude),
-      mode: TravelMode.driving,
-    ),
-  );
-
-  List<LatLng> polylineCoordinates = [];
-
-  if (result.points.isNotEmpty) {
-    for (var point in result.points) {
-      polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+    // Ensure that the coordinates are valid
+    if (pickOffLatLng.latitude == 0.0 && pickOffLatLng.longitude == 0.0) {
+      print("Invalid pickup coordinates, cannot create polyline.");
+      return;
     }
-    print("Polyline Points: $polylineCoordinates");
-  } else {
-    print("No polyline points found!");
-  }
 
-  setState(() {
-    _polylines.add(
-      Polyline(
-        polylineId: PolylineId('route'),
-        points: polylineCoordinates,
-        color: Colors.black,
-        width: 5,
+    if (dropOffLatLng.latitude == 0.0 && dropOffLatLng.longitude == 0.0) {
+      print("Invalid drop-off coordinates, cannot create polyline.");
+      return;
+    }
+
+    PolylinePoints polylinePoints = PolylinePoints();
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      googleApiKey: 'AIzaSyBqUXTvmc_JFLTShS3SRURTafDzd-pdgqQ',
+      request: PolylineRequest(
+        origin: PointLatLng(pickOffLatLng.latitude, pickOffLatLng.longitude),
+        destination: PointLatLng(dropOffLatLng.latitude, dropOffLatLng.longitude),
+        mode: TravelMode.driving,
       ),
     );
-  });
 
-  // Calculate bounds for camera update
-  LatLngBounds bounds = LatLngBounds(
-    southwest: LatLng(
-      min(pickOffLatLng.latitude, dropOffLatLng.latitude),
-      min(pickOffLatLng.longitude, dropOffLatLng.longitude),
-    ),
-    northeast: LatLng(
-      max(pickOffLatLng.latitude, dropOffLatLng.latitude),
-      max(pickOffLatLng.longitude, dropOffLatLng.longitude),
-    ),
-  );
+    List<LatLng> polylineCoordinates = [];
 
-  // Update the camera to fit the polyline within the view
-  _mapController?.animateCamera(
-    CameraUpdate.newLatLngBounds(bounds, 100.0),
-  );
-}
+    if (result.points.isNotEmpty) {
+      for (var point in result.points) {
+        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      }
+      print("Polyline Points: $polylineCoordinates");
+    } else {
+      print("No polyline points found!");
+    }
+
+    setState(() {
+      _polylines.add(
+        Polyline(
+          polylineId: PolylineId('route'),
+          points: polylineCoordinates,
+          color: Colors.black,
+          width: 5,
+        ),
+      );
+    });
+
+    // Calculate bounds for camera update
+    LatLngBounds bounds = LatLngBounds(
+      southwest: LatLng(
+        min(pickOffLatLng.latitude, dropOffLatLng.latitude),
+        min(pickOffLatLng.longitude, dropOffLatLng.longitude),
+      ),
+      northeast: LatLng(
+        max(pickOffLatLng.latitude, dropOffLatLng.latitude),
+        max(pickOffLatLng.longitude, dropOffLatLng.longitude),
+      ),
+    );
+
+    // Update the camera to fit the polyline within the view
+    _mapController?.animateCamera(
+      CameraUpdate.newLatLngBounds(bounds, 100.0),
+    );
+  }
 
   Future<void> _getAddresses() async {
     journey.Location? pickOffCoordinates = widget.journey?.pickOff;
@@ -286,8 +289,8 @@ Future<void> _createPolylines() async {
 
   void cancelRide(journeyId, userId) {
     socket?.emit("cancelJourney", {
-      "journeyId" : journeyId,
-      "userId" : userId,
+      "journeyId": journeyId,
+      "userId": userId,
     });
     print("mane cancel krdi apni traf se.............");
     // navigator?.pop(context);
@@ -412,16 +415,6 @@ Future<void> _createPolylines() async {
                                     children: [
                                       TextSpan(text: 'Driver Name: ', style: TextStyle(fontWeight: FontWeight.bold)),
                                       TextSpan(text: widget.driver?.name),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 3),
-                                RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(color: Colors.black, fontSize: 16),
-                                    children: [
-                                      TextSpan(text: 'Ride Fare: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                                      TextSpan(text: "₹${widget.journey?.distance}"),
                                     ],
                                   ),
                                 ),

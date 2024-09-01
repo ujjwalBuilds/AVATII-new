@@ -107,7 +107,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class HelperFunction {
   static Future<String?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userid');
+    String? userId = prefs.getString('userId');
     return userId;
   }
   static Future<double> calculateFare(
