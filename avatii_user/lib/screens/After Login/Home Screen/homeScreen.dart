@@ -417,61 +417,58 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _searchdriver() {
-    //user current loaction coordinate
-    //user destination coordinates
-    setState(() {
-      _isSearching = true;
-    });
-    print(userid);
-    print("${currentCoordinates}...............................");
-    print("${destinationCoordinates}...........................");
+void _searchdriver() {
+  // User current location coordinate
+  // User destination coordinates
+  setState(() {
+    _isSearching = true;
+  });
+  print(userid);
+  print("${currentCoordinates}...............................");
+  print("${destinationCoordinates}...........................");
 
-    final rideRequest = RideRequest(
-      userId: userid,
-      currentLocation: currentCoordinates ?? {},
-      destinationLocation: destinationCoordinates ?? {},
-    );
+  final rideRequest = RideRequest(
+    userId: userid,
+    currentLocation: currentCoordinates ?? {}, // Ensure correct type
+    destinationLocation: destinationCoordinates ?? {}, // Ensure correct type
+  );
 
-    Provider.of<RideProvider>(context, listen: false).requestRide(rideRequest);
-    showMaterialModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-        child: SingleChildScrollView(
-          child: Container(
-            color: const Color(0xFFF2F2F5),
-            child: Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-              ),
+  Provider.of<RideProvider>(context, listen: false).requestRide(rideRequest);
+
+  showMaterialModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (context) => ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+      child: SingleChildScrollView(
+        child: Container(
+          height: 550,
+          color: const Color(0xFFF2F2F5),
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Center(
               child: Container(
-                height: 500, // Increased height to accommodate new widgets
-                child: const Center(
-                  child: Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          CircularProgressIndicator(color: Colors.black),
-                          SizedBox(height: 10),
-                          Text(
-                            'Searching for Drivers...',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                          ),
-                        ],
-                      ),
+                child: Column(
+                  children: [
+                    CircularProgressIndicator(color: Colors.black),
+                    SizedBox(height: 15),
+                    Text(
+                      'Searching for Drivers...',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   void _sheetaglaneeche() {
     Journey journey;

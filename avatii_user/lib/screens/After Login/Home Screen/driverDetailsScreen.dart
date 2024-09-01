@@ -453,6 +453,16 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                           ],
                         ),
                       ),
+                      SizedBox(height: 5),
+                      RichText(
+                        text: TextSpan(
+                          style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500),
+                          children: [
+                            TextSpan(text: 'Driver phone number: '),
+                            TextSpan(text: widget.driver?.phoneNumber ?? "ERROR"),
+                          ],
+                        ),
+                      ),
                       SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () async {
