@@ -186,6 +186,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
       print('${drop}......................................................is my drop location');
       print('${data['pickOff]']}........................................ .........is my pick up location');
+      print('${_currentLocation}.......................................#################### main improtant.........it the main criteria for the ');
       Get.to(() => JourneyDetailsScreen(
             data: data,
             journeyId: data['journeyId'],
