@@ -325,6 +325,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     distance = d['kilometers'];
     // Notify the server that the ride was accepted
     navigator?.pop(context);
+
+
+print("this is my distance of the to the backend i am givind .................#############................................${distance}");
+
     socket?.emit('acceptRide', {
       // 'driverId': 'your_driver_id', // Replace with actual driver ID
       // 'userId': _rideRequestDetails?['userId'],
