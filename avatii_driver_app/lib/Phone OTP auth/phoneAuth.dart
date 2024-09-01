@@ -42,22 +42,22 @@ class _PhoneAuthState extends State<PhoneAuth> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(backgroundColor: Colors.blue, content: Text("Login successfully")),
       );
- Get.to(()=>StatusCheckPage());
+//  Get.to(()=>StatusCheckPage());
 
-      // FirebaseAuth.instance.verifyPhoneNumber(
-      //   verificationCompleted: (PhoneAuthCredential credential) {},
-      //   verificationFailed: (FirebaseAuthException ex) {},
-      //   codeSent: (String verificationid, int? resendtoken) {
-      //     Navigator.push(
-      //         context,
-      //         MaterialPageRoute(
-      //             builder: (context) => OTPScreen(
-      //                   verificationid: verificationid,
-      //                 )));
-      //   },
-      //   codeAutoRetrievalTimeout: (String verificationId) {},
-      //   phoneNumber: "+91${phoneController.text.toString()}",
-      // );
+      FirebaseAuth.instance.verifyPhoneNumber(
+        verificationCompleted: (PhoneAuthCredential credential) {},
+        verificationFailed: (FirebaseAuthException ex) {},
+        codeSent: (String verificationid, int? resendtoken) {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => OTPScreen(
+                        verificationid: verificationid,
+                      )));
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
+        phoneNumber: "+91${phoneController.text.toString()}",
+      );
     }).catchError((onError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(onError.toString())),
