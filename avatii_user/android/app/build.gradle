@@ -14,11 +14,18 @@ if (localPropertiesFile.exists()) {
     }
 }
 
-def flutterVersionCode = localProperties.getProperty("flutter.versionCode", "1")
-def flutterVersionName = localProperties.getProperty("flutter.versionName", "1.0")
+def flutterVersionCode = localProperties.getProperty("flutter.versionCode", "3")
+def flutterVersionName = localProperties.getProperty("flutter.versionName", "1.2")
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 
 android {
-    namespace = "com.example.avatii"
+    namespace 'com.avati.avatii'
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -27,17 +34,36 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    kotlinOptions {
+        jvmTarget = "1.8"  // Ensure Kotlin targets JVM 1.8 like Java
+    }
+
     defaultConfig {
-        applicationId = "com.example.avatii"
+        applicationId = "com.avati.avatii"
         minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+    signingConfigs {
+        release {
+            keyAlias = keystoreProperties['keyAlias']
+            keyPassword = keystoreProperties['keyPassword']
+            storeFile = keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword = keystoreProperties['storePassword']
+        }
+    }
     buildTypes {
         release {
-            signingConfig = signingConfigs.debug
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now,
+            // so `flutter run --release` works.
+            signingConfig = signingConfigs.release
         }
     }
 }

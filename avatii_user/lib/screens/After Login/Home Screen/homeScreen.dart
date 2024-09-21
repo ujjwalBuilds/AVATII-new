@@ -448,9 +448,10 @@ void _searchdriver() {
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            child: Center(
-              child: Container(
+            child: Container(
+              child: Center(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircularProgressIndicator(color: Colors.black),
                     SizedBox(height: 15),

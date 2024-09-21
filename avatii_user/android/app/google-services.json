@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:175683352301:android:48a503eb7c0bff96d2bee4",
+        "mobilesdk_app_id": "1:175683352301:android:97426f1b6f8fc7ffd2bee4",
         "android_client_info": {
-          "package_name": "com.example.avatii"
+          "package_name": "com.avati.avatii"
         }
       },
       "oauth_client": [],

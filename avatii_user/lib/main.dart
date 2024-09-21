@@ -5,7 +5,6 @@ import 'package:avatii/provider/journeyINfoprovider.dart';
 import 'package:avatii/provider/userINfo_provider.dart';
 import 'package:avatii/screens/After%20Login/Home%20Screen/homeScreen.dart';
 import 'package:avatii/screens/Before%20Login/Onboarding1/onboardingView.dart';
-import 'package:avatii/screens/Before%20Login/splashScreen/splashScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_riverpod/flutter_riverpod.dart';
