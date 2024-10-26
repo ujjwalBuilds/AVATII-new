@@ -1,4 +1,4 @@
-package com.avati.avatii
+package com.avatii.avatiiapp
 
 import io.flutter.embedding.android.FlutterActivity
 
