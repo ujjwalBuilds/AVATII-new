@@ -18,6 +18,20 @@ class DriverauthProvider with ChangeNotifier {
 
   Driver? _driver;
 
+  // List of test phone numbers
+  final List<String> testNumbers = [
+    '+16505550000',
+    '+16505551111',
+    '+16505552222',
+  ];
+
+  // Function to check if the number is a test number
+  bool isTestNumber(String number) {
+    // Clean the phone number (remove any spaces, dashes, or special characters)
+    String cleanNumber = number.replaceAll(RegExp(r'[\s-]'), '');
+    return testNumbers.contains(cleanNumber);
+  }
+
   Driver? get driver => _driver;
   Future<void> registerDriver(Driver driver) async {
     final url = Uri.parse(Appurls.registerDriver); // Replace with your actual API URL
@@ -81,7 +95,78 @@ class DriverauthProvider with ChangeNotifier {
     }
   }
 
+  // Future<void> loginDriver(String phoneNumber) async {
+  //   final url = Uri.parse(Appurls.LoginDriver); // Replace with your actual API URL
+  //   _isLoading = true;
+  //   notifyListeners();
+  //   try {
+  //     final response = await http.post(
+  //       url,
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: json.encode({
+  //         'PhoneNumber': phoneNumber,
+  //       }),
+  //     );
+  //     _isLoading = false;
+  //   notifyListeners();
+
+  //     if (response.statusCode == 200) {
+  //       final responseData = json.decode(response.body);
+  //       print('Login successfull.................................');
+  //       print(response.body);
+
+  //       _driverId = responseData['_id'];
+  //       _driverName = responseData['name'];
+  //       _phoneNumber = responseData['PhoneNumber'];
+  //       _token = responseData['token'];
+  //       _approved = responseData['approved'];
+
+  //       // Save data locally
+  //       final prefs = await SharedPreferences.getInstance();
+  //       await prefs.setString('token', _token!);
+  //       await prefs.setString('driverId', _driverId!);
+  //       await prefs.setString('driverName', _driverName!);
+  //       await prefs.setString('phoneNumber', _phoneNumber!);
+  //       await prefs.setInt('approved', _approved!);
+
+  //       notifyListeners();
+  //     } else {
+  //       final errorData = json.decode(response.body);
+  //       throw Exception(errorData['message']);
+  //     }
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+
+
   Future<void> loginDriver(String phoneNumber) async {
+    // Check if the phone number is a test number
+    if (isTestNumber(phoneNumber)) {
+      print("Logging in as test driver: $phoneNumber");
+      // Simulate a successful login for test numbers
+      _driverId = "test_id"; // Dummy driver ID
+      _driverName = "Test Driver";
+      _phoneNumber = phoneNumber;
+      _token = "test_token"; // Dummy token
+      _approved = 1; // Dummy approved value
+
+      // Save data locally
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', _token!);
+      await prefs.setString('driverId', _driverId!);
+      await prefs.setString('driverName', _driverName!);
+      await prefs.setString('phoneNumber', _phoneNumber!);
+      await prefs.setInt('approved', _approved!);
+
+      // Return early since it's a test number
+      notifyListeners();
+      return Future.value(); // Skip actual API call for test numbers
+    }
+
+    // Normal login process for regular users
     final url = Uri.parse(Appurls.LoginDriver); // Replace with your actual API URL
     _isLoading = true;
     notifyListeners();
@@ -95,13 +180,13 @@ class DriverauthProvider with ChangeNotifier {
           'PhoneNumber': phoneNumber,
         }),
       );
+
       _isLoading = false;
-    notifyListeners();
+      notifyListeners();
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        print('Login successfull.................................');
-        print(response.body);
+        print('Login successful: ${response.body}');
 
         _driverId = responseData['_id'];
         _driverName = responseData['name'];
@@ -126,6 +211,7 @@ class DriverauthProvider with ChangeNotifier {
       throw error;
     }
   }
+
 
   String? _token;
   String? _driverId;

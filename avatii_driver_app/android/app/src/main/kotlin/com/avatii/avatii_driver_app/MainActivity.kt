@@ -1,4 +1,4 @@
-package com.example.avatii_driver_app
+package com.avatii.avatii_driver_app
 
 import io.flutter.embedding.android.FlutterActivity
 
